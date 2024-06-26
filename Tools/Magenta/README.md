@@ -9,8 +9,6 @@ Magenta Interpreter is a simple interpreter designed to parse and execute math-l
 
 The code in this repository is released under the [Mozilla Public License Version 2.0](https://www.mozilla.org/en-US/MPL/2.0/), an open-source license that governs the usage, modification, and distribution of the code. The license provides rights and responsibilities for users and contributors, ensuring the project remains accessible and transparent.
 
-For a detailed understanding of the terms and conditions of the Mozilla Public License Version 2.0, please refer to the [LICENSE](LICENSE) file in this repository.
-
 ## Usage
 
 Instantiate the `Magenta` class by providing the `codes` parameter, which represents the code to be interpreted. The interpreter supports variable storage using the `symbolTable` property.

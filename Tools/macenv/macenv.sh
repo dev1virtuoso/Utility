@@ -3,16 +3,23 @@
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 brew install git
 brew install readline
-
-git config --global user.name "USER_NAME"
-git config --global user.email "EMAIL"
-
-brew install zsh zsh-completions
-sh -c "$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
-
+brew install node
+brew install --cask visual-studio-code
+brew install python
+brew install ruby
+brew install --cask adoptopenjdk
+brew install --cask android-studio
+xcode-select --install
+brew install --cask docker
+brew install postgresql
+brew install redis
+brew install mongodb-community
 brew install mongodb
-
+brew install elasticsearch
+brew install awscli
+brew install zsh zsh-completions
+git clone git://github.com/zsh-users/zsh-autosuggestions $ZSH_CUSTOM/plugins/zsh-autosuggestions
 curl -L https://get.rvm.io | bash -s stable --ruby
-source ~/.rvm/scripts/rvm
-
-gem install compass
+git config --global user.name “USER_NAME”
+git config --global user.email “EMAIL”
+echo "Development environment setup complete."

@@ -14,7 +14,7 @@ This repository utilizes the MonoRepo approach, which involves integrating multi
 
 ## Getting Started
 
-To begin working with the MakeCode project, follow these steps:
+To begin working with the Utility project, follow these steps:
 
 1. Clone the repository to your local machine:
 

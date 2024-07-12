@@ -184,3 +184,12 @@ xxhash==3.4.1
 yarg==0.1.9
 yarl==1.9.4
 zipp==3.19.2
+huggingface
+openai
+pybrain
+Theano
+mxnet
+caffe2onnx
+onnx
+gdbm
+tcl-tk

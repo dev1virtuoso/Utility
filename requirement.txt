@@ -1,0 +1,16 @@
+random
+decimal
+math
+multiprocessing
+time
+pygame
+openai
+speech_recognition
+gtts
+os
+bs4
+requests
+numpy
+matplotlib
+phonenumbers
+pyaudio

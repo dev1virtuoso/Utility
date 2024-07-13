@@ -5,9 +5,9 @@ macenv can help automate the setup of your Mac development environment.
 
 To begin working with the MakeCode project, follow these steps:
 
-1. Save the file, and then open your terminal. Navigate to the directory where you saved the `install_packages.sh` file. Run the following command to make the script executable:`chmod +x install_packages.sh`
+1. Save the file, and then open your terminal. Navigate to the directory where you saved the `macenv.sh` file. Run the following command to make the script executable:`chmod +x macenv.sh`
 
-2. To execute the script, run the following command:`./install_packages.sh`
+2. To execute the script, run the following command:`./macenv.sh`
 
 ## Contact Information
 

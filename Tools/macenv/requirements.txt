@@ -391,6 +391,8 @@ yaml-1.3==0.1.0
 yarg==0.1.9
 yarl==1.9.4
 zope.interface==6.4.post2
+Bython==0.8
+langchain==3.0.0
 # problems
 gdbm
 PyGTK

@@ -31,6 +31,7 @@ bleach==6.1.0
 blinker==1.8.2
 blis==0.7.11
 bokeh==3.5.0
+bython==0.8
 cachetools==5.3.3
 call-openai-gpt==1.0.0
 catalogue==2.0.10
@@ -62,6 +63,11 @@ defusedxml==0.7.1
 distlib==0.3.8
 distro==1.9.0
 Django==5.0.7
+django-classy-tags==4.1.0
+django-js-asset==2.2.0
+django-mptt==0.16.0
+django-nyt==1.4
+django-sekizai==4.1.0
 django4django==0.0.2
 djangorestframework==3.15.2
 djangorestframework-xml==2.0.0
@@ -258,6 +264,7 @@ pygame==2.6.0
 pyglet==2.0.dev23
 Pygments==2.18.0
 PyHive==0.7.0
+pymdown-extensions==10.5
 pymunk==6.4.0
 pyOpenSSL==24.1.0
 pyparsing==3.1.2
@@ -305,6 +312,7 @@ six==1.16.0
 smart-open==7.0.4
 smmap==5.0.1
 sniffio==1.3.1
+sorl-thumbnail==12.10.0
 sortedcontainers==2.4.0
 soundfile==0.12.1
 soupsieve==2.5
@@ -338,7 +346,7 @@ thrift==0.20.0
 thrift-sasl==0.4.3
 tiktoken==0.5.2
 time-machine==2.14.2
-tinycss2==1.3.0
+tinycss2==1.2.1
 tkinterhtml==0.7
 tkthread==0.5.2
 tldextract==5.1.2
@@ -380,6 +388,8 @@ websocket-client==1.8.0
 websockets==12.0
 Werkzeug==3.0.3
 widgetsnbextension==4.0.11
+wiki==0.11.1
+wikipedia==1.4.0
 word2vec==0.11.1
 word2vec-torch==1.0.2
 wrapt==1.16.0
@@ -391,13 +401,5 @@ yaml-1.3==0.1.0
 yarg==0.1.9
 yarl==1.9.4
 zope.interface==6.4.post2
-Bython==0.8
-langchain==3.0.0
-# problems
-gdbm
-PyGTK
-word2vec-keras
-multiprocessing
-threading2
-Pattern
-pywin10
+
+#problems

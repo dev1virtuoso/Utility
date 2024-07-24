@@ -402,4 +402,11 @@ yarg==0.1.9
 yarl==1.9.4
 zope.interface==6.4.post2
 
-#problems
+# problems
+gdbm
+PyGTK
+word2vec-keras
+multiprocessing
+threading2
+Pattern
+pywin10

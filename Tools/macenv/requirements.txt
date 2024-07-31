@@ -74,6 +74,7 @@ djangorestframework-xml==2.0.0
 dnspython==2.6.1
 docal-tkinter==3.0.5
 docopt==0.6.2
+edge-tts==6.1.12
 eli==0.3.1
 email_validator==2.2.0
 enhanced_multiprocessing==1.0
@@ -306,6 +307,7 @@ scipy==1.14.0
 Scrapy==2.11.2
 selenium==4.22.0
 Send2Trash==1.8.3
+sentencepiece==0.2.0
 service-identity==24.1.0
 shellingham==1.5.4
 six==1.16.0

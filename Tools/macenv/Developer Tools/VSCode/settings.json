@@ -1,0 +1,19 @@
+{
+    "vim.mouseSelectionGoesIntoVisualMode": false,
+    "editor.formatOnPaste": true,
+    "editor.suggest.matchOnWordStartOnly": false,
+    "editor.cursorSmoothCaretAnimation": "on",
+    "terminal.integrated.copyOnSelection": true,
+    "vim.cursorStylePerMode.insert": "line",
+    "vim.cursorStylePerMode.visual": "line",
+    "vim.disableExtension": true,
+    "files.autoSave": "afterDelay",
+    "editor.smoothScrolling": true,
+    "terminal.integrated.smoothScrolling": true,
+    "workbench.reduceMotion": "off",
+    "vscode_custom_css.imports": [
+        "file:///Users/carsonwu/.vscode/extensions/brandonkirbyson.vscode-animations-2.0.3/dist/updateHandler.js"
+    ],
+    "animations.Enabled": true,
+    "animations.Focus-Dimming-Mode": "Full Window"
+}

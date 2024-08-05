@@ -5,32 +5,13 @@ xcode-select --install
 sudo sh -c 'xcode-select -s /Applications/Xcode.app/Contents/Developer && xcodebuild -runFirstLaunch'
 sudo xcodebuild -license
 xcodebuild -downloadAllPlatforms
-brew install git
-brew install readline
-brew install node
+<brew-requirements.txt xargs brew install
 brew install --cask visual-studio-code
-brew install ruby
 brew install --cask adoptopenjdk
 brew install --cask android-studio
 brew install --cask docker
-brew install postgresql
-brew install redis
-brew install mongodb-community
-brew install mongodb
-brew install elasticsearch
-brew install awscli
-brew install zsh zsh-completions
-brew install git
-brew install gitkraken-cli
-brew install gmp
-brew install gnupg
-brew install sqlite
-brew install postgresql
 brew services start postgresql
-brew install zsh
 brew tap heroku/brew
-brew install heroku
-brew install wget
 read -p "Enter your Git username: " username
 read -p "Enter your Git email address: " email
 git config --global user.name "$username"

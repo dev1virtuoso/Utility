@@ -46,4 +46,3 @@ gem install pg
 echo '[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"' >> ~/.zshrc
 echo 'export NVM_DIR="$HOME/.nvm"' >> ~/.zshrc
 source ~/.zshrc
-echo "Development environment setup complete."

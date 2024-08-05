@@ -14,4 +14,4 @@ else
     echo "requirements.txt not found. No dependencies to install."
 fi
 
-echo "Development environment setup complete."
+echo "Mac development environment setup complete."

@@ -6,7 +6,6 @@ brew install git
 brew install readline
 brew install node
 brew install --cask visual-studio-code
-brew install python
 brew install ruby
 brew install --cask adoptopenjdk
 brew install --cask android-studio

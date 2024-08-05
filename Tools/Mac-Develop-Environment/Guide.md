@@ -8,7 +8,7 @@ To begin working with the mac develop environment project, follow these steps:
 
 2. Download Python from [Python's website](https://www.python.org/downloads/)
 
-3. Save the file, and then open your terminal. Navigate to the directory where you saved the `main.sh` file. Run the following command to make the script executable:`chmod +x macenv.sh`
+3. Save the file, and then open your terminal. Navigate to the directory where you saved the `main.sh` file. Run the following command to make the script executable:`chmod +x main.sh`
 
 4. To execute the script, run the following command:`./main.sh`
 

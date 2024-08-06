@@ -34,7 +34,7 @@ def calculate_pi(prec, num_processes):
 if __name__ == '__main__':
     start_time = time.time()
 
-    prec = 100000
+    prec = 10000
     num_processes = 8
     pi = calculate_pi(prec, num_processes)
 

@@ -1,4 +1,4 @@
-// Copyright © 2024 Carson. All rights reserved.
+
 using System;
 
 class Calculator

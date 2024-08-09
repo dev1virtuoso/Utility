@@ -1,5 +1,3 @@
-# Copyright © 2024 Carson. All rights reserved.
-
 import openai
 import time
 import speech_recognition as sr

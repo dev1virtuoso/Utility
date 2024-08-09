@@ -1,5 +1,3 @@
-// Copyright © 2024 Carson. All rights reserved.
-
 class Magenta {
   constructor(codes) {
     this.codes = codes;

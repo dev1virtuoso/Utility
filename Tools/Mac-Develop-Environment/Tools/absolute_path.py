@@ -1,5 +1,3 @@
-# Copyright © 2024 Carson. All rights reserved.
-
 import os
 
 def convert_absolute_to_relative(folder_path):

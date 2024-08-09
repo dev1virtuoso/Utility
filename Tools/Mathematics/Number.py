@@ -1,5 +1,3 @@
-# Copyright © 2024 Carson. All rights reserved.
-
 from time import sleep
 n = 1
 while True:

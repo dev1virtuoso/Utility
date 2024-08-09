@@ -7,7 +7,7 @@
 if [ -f "requirements.txt" ]; then
     echo "Installing dependencies listed in requirements.txt..."
     while read requirement; do
-        pip install $requirement
+        pip3 install $requirement
     done < requirements.txt
     echo "Dependencies installed successfully."
 else

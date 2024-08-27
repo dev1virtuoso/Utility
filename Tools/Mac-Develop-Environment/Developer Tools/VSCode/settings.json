@@ -15,5 +15,60 @@
         "file:///Users/carsonwu/.vscode/extensions/brandonkirbyson.vscode-animations-2.0.3/dist/updateHandler.js"
     ],
     "animations.Enabled": true,
-    "animations.Focus-Dimming-Mode": "Full Window"
+    "animations.Focus-Dimming-Mode": "Full Window",
+    "vs-kubernetes": {
+        "vscode-kubernetes.helm-path-mac": "/Userscarsonwu/Developer/develoment/.vs-kubernetes/tools/helm/darwin-arm64/helm",
+        "vscode-kubernetes.minikube-path-mac": "/Users/carsonwu//Developer/develoment/.vs-kubernetes/tools/minikube/darwin-arm64/minikube"
+    },
+    "dart.flutterSdkPath": "/Users/carsonwu/Developer/develoment/flutter",
+    "sync.gist": "45fd5c639602e28e101fea173fcc06a5",
+    "dart.addSdkToTerminalPath": false,
+    "typescript.tsserver.enableTracing": true,
+    "typescript.tsserver.log": "normal",
+    "typescript.tsserver.nodePath": "node",
+    "terminal.integrated.cwd": "/Users/carsonwu/.vscode",
+    "workbench.iconTheme": "vscode-icons",
+    "editor.multiCursorModifier": "ctrlCmd",
+    "C_Cpp.default.compilerPath": "/usr/bin/gcc",
+    "settingsSync.ignoredSettings": [
+        "-files.dialog.defaultPath"
+    ],
+    "terminal.integrated.profiles.linux": {
+        "bash": {
+            "path": "bash",
+            "icon": "terminal-bash"
+        },
+        "zsh": {
+            "path": "zsh"
+        },
+        "fish": {
+            "path": "fish"
+        },
+        "tmux": {
+            "path": "tmux",
+            "icon": "terminal-tmux"
+        },
+        "pwsh": {
+            "path": "pwsh",
+            "icon": "terminal-powershell"
+        }
+    },
+    "php.validate.executablePath": "",
+    "php.executablePath": "/opt/homebrew/etc/php/8.3",
+    "editor.wordWrap": "on",
+    "workbench.editor.wrapTabs": true,
+    "diffEditor.wordWrap": "on",
+    "terminal.integrated.env.osx": {},
+    "tabnine.experimentalAutoImports": true,
+    "vscode-edge-devtools.webhint": false,
+    "workbench.colorTheme": "Visual Studio Dark",
+    "[javascript]": {
+        "editor.defaultFormatter": "vscode.typescript-language-features"
+    },
+    "[html]": {
+        "editor.defaultFormatter": "vscode.html-language-features"
+    },
+    "[markdown]": {
+        "editor.defaultFormatter": "DavidAnson.vscode-markdownlint"
+    },
 }

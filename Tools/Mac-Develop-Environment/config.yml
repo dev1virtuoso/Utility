@@ -1,0 +1,217 @@
+apps:
+  pages:
+    - number: 1
+      items:
+        - App Store
+        - folder: Brower
+          pages:
+            - number: 1
+              items:
+                - Google Chrome
+                - Safari
+                - Safari Technology Preview
+        - folder: Developer Tools
+          pages:
+            - number: 1
+              items:
+                - Android Studio
+                - Bakery
+                - Developer
+                - Docker
+                - File Icons for GitHub and GitLab
+                - GitHub Desktop
+                - Git Streaks
+                - manager-osx
+                - MySQLWorkbench
+                - Playgrounds
+                - SF Symbols beta
+                - Sourcetree
+                - Status of Github Menu App
+                - Visual Studio Code
+                - WakaTime
+                - Xcode-beta
+                - TestFlight
+        - folder: Enterainment
+          pages:
+            - number: 1
+              items:
+                - Podcasts
+                - TV
+                - 嗶哩嗶哩
+        - folder: Games
+          pages:
+            - number: 1
+              items:
+                - Chess
+                - Steam
+                - The Most Boring Game Ever
+                - Cell to Singularity - Evolution Never Ends
+                - FPV.SkyDive
+                - RetroArch
+        - folder: Microsoft
+          pages:
+            - number: 1
+              items:
+                - OneDrive
+                - Microsoft Accessory Updater
+                - Microsoft Excel
+                - Microsoft OneNote
+                - Microsoft Outlook
+                - Microsoft PowerPoint
+                - Microsoft Word
+        - folder: Other
+          pages:
+            - number: 1
+              items:
+                - Shortcuts
+                - QuickTime Player
+                - Dictionary
+                - TextEdit
+                - Font Book
+                - Screen Sharing
+                - Mission Control
+                - Time Machine
+                - Preview
+                - Screenshot
+                - Image Capture
+                - Digital Color Meter
+                - ColorSync Utility
+                - Stickies
+                - Grapher
+                - VoiceOver Utility
+                - Print Center
+                - Automator
+                - Script Editor
+                - Audio MIDI Setup
+                - Bluetooth File Exchange
+                - Disk Utility
+                - System Information
+                - Activity Monitor
+                - Console
+                - Terminal
+                - AirPort Utility
+                - Migration Assistant
+                - Feedback Assistant
+        - folder: Photographic
+          pages:
+            - number: 1
+              items:
+                - Final Cut Pro
+                - iMovie
+                - Photos
+                - Photo Booth
+                - VLC
+                - Canva
+        - folder: iWork
+          pages:
+            - number: 1
+              items:
+                - Keynote
+                - Numbers
+                - Pages
+        - folder: Python
+          pages:
+            - number: 1
+              items:
+                - IDLE
+                - Python Launcher
+        - folder: Reference
+          pages:
+            - number: 1
+              items:
+                - Books
+                - News
+                - Stocks
+        - folder: Reminder
+          pages:
+            - number: 1
+              items:
+                - Calendar
+                - Clock
+                - Freeform
+                - Notes
+                - Reminders
+                - Voice Memos
+        - Siri
+        - folder: Social
+          pages:
+            - number: 1
+              items:
+                - Contacts
+                - Discord
+                - FaceTime
+                - Mail
+                - Messages
+                - Telegram
+                - Telegram Lite
+                - WhatsApp
+                - X
+                - Backgrounds for Zoom
+        - System Settings
+        - folder: Travel
+          pages:
+            - number: 1
+              items:
+                - Find My
+                - Maps
+        - folder: Utility
+          pages:
+            - number: 1
+              items:
+                - Blackmagic Disk Speed Test
+                - BuhoCleaner
+                - Calculator
+                - Cinebench
+                - CleanMyMac X
+                - Geekbench 6
+                - Geekbench AI
+                - Home
+                - iPhone Mirroring
+                - OnyX
+                - Passwords
+                - Poe
+                - Macs Fan Control
+                - RunCat
+                - Tips
+                - Usage
+                - Weather
+        - folder: Music
+          pages:
+            - number: 1
+              items:
+                - GarageBand
+                - Music
+                - Shazam
+widgets:
+  pages: []
+dock_items:
+  apps:
+    - /System/Applications/Launchpad.app
+    - /System/Volumes/Preboot/Cryptexes/App/System/Applications/Safari.app
+    - /System/Applications/Messages.app
+    - /System/Applications/Mail.app
+    - /System/Applications/Maps.app
+    - /System/Applications/Photos.app
+    - /System/Applications/FaceTime.app
+    - /System/Applications/Calendar.app
+    - /System/Applications/Contacts.app
+    - /System/Applications/Reminders.app
+    - /System/Applications/Notes.app
+    - /System/Applications/Freeform.app
+    - /System/Applications/TV.app
+    - /System/Applications/Music.app
+    - /System/Applications/News.app
+    - /System/Applications/App Store.app
+    - /System/Applications/System Settings.app
+    - /System/Applications/iPhone Mirroring.app
+    - /System/Library/CoreServices/Applications/Feedback Assistant.app
+    - /Applications/Poe.app
+  settings:
+    autohide: false
+    largesize: 16
+    magnification: false
+    minimize-to-application: false
+    mru-spaces: false
+    show-recents: false
+    tilesize: null
+desktop: {}

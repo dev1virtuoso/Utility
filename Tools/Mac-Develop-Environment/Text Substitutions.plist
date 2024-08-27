@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<array>
+	<dict>
+		<key>phrase</key>
+		<string>Atlas V</string>
+		<key>shortcut</key>
+		<string>A5</string>
+	</dict>
+	<dict>
+		<key>phrase</key>
+		<string>Artemis Program</string>
+		<key>shortcut</key>
+		<string>AP</string>
+	</dict>
+	<dict>
+		<key>phrase</key>
+		<string>Alex Silcox</string>
+		<key>shortcut</key>
+		<string>AS</string>
+	</dict>
+	<dict>
+		<key>phrase</key>
+		<string>Autonomous Spaceport Drone Ship</string>
+		<key>shortcut</key>
+		<string>ASDS</string>
+	</dict>
+	<dict>
+		<key>phrase</key>
+		<string>Apple Watch Series</string>
+		<key>shortcut</key>
+		<string>AWS</string>
+	</dict>
+	<dict>
+		<key>phrase</key>
+		<string>Crew Dragon</string>
+		<key>shortcut</key>
+		<string>CD</string>
+	</dict>
+	<dict>
+		<key>phrase</key>
+		<string>Cruella De Vill</string>
+		<key>shortcut</key>
+		<string>CDV</string>
+	</dict>
+	<dict>
+		<key>phrase</key>
+		<string>Craig Federighi</string>
+		<key>shortcut</key>
+		<string>CF</string>
+	</dict>
+	<dict>
+		<key>phrase</key>
+		<string>Crawler-Transporters</string>
+		<key>shortcut</key>
+		<string>CT</string>
+	</dict>
+	<dict>
+		<key>phrase</key>
+		<string>Double Asteroid Redirection Test</string>
+		<key>shortcut</key>
+		<string>DART</string>
+	</dict>
+	<dict>
+		<key>phrase</key>
+		<string>Escape Tower</string>
+		<key>shortcut</key>
+		<string>ET</string>
+	</dict>
+	<dict>
+		<key>phrase</key>
+		<string>Hong Kong Disneyland </string>
+		<key>shortcut</key>
+		<string>HKDL</string>
+	</dict>
+	<dict>
+		<key>phrase</key>
+		<string>International Space Station</string>
+		<key>shortcut</key>
+		<string>ISS</string>
+	</dict>
+	<dict>
+		<key>phrase</key>
+		<string>James Webb Space Telescope</string>
+		<key>shortcut</key>
+		<string>JWST</string>
+	</dict>
+	<dict>
+		<key>phrase</key>
+		<string>Kármán line</string>
+		<key>shortcut</key>
+		<string>KL</string>
+	</dict>
+	<dict>
+		<key>phrase</key>
+		<string>Launch Abort System</string>
+		<key>shortcut</key>
+		<string>LAS</string>
+	</dict>
+	<dict>
+		<key>phrase</key>
+		<string>發射逃逸系統</string>
+		<key>shortcut</key>
+		<string>LASC</string>
+	</dict>
+	<dict>
+		<key>phrase</key>
+		<string>Launch Escape System</string>
+		<key>shortcut</key>
+		<string>LES</string>
+	</dict>
+	<dict>
+		<key>phrase</key>
+		<string>惡人舞動迪士尼</string>
+		<key>shortcut</key>
+		<string>LGWC</string>
+	</dict>
+	<dict>
+		<key>phrase</key>
+		<string>Max Marshall</string>
+		<key>shortcut</key>
+		<string>MM</string>
+	</dict>
+	<dict>
+		<key>phrase</key>
+		<string>Mystic Manor</string>
+		<key>shortcut</key>
+		<string>MMH</string>
+	</dict>
+	<dict>
+		<key>phrase</key>
+		<string>Mystic Point</string>
+		<key>shortcut</key>
+		<string>MP</string>
+	</dict>
+	<dict>
+		<key>phrase</key>
+		<string>National Aeronautics and Space Administration</string>
+		<key>shortcut</key>
+		<string>NASA</string>
+	</dict>
+	<dict>
+		<key>phrase</key>
+		<string>Of Course I Still Love You</string>
+		<key>shortcut</key>
+		<string>OCISLY</string>
+	</dict>
+	<dict>
+		<key>phrase</key>
+		<string>On my way!</string>
+		<key>shortcut</key>
+		<string>omw</string>
+	</dict>
+	<dict>
+		<key>phrase</key>
+		<string>在路上了！</string>
+		<key>shortcut</key>
+		<string>omw</string>
+	</dict>
+	<dict>
+		<key>phrase</key>
+		<string>On my way!</string>
+		<key>shortcut</key>
+		<string>OMW</string>
+	</dict>
+	<dict>
+		<key>phrase</key>
+		<string>在路上了！</string>
+		<key>shortcut</key>
+		<string>OMWC</string>
+	</dict>
+	<dict>
+		<key>phrase</key>
+		<string>Project Apollo</string>
+		<key>shortcut</key>
+		<string>PA</string>
+	</dict>
+	<dict>
+		<key>phrase</key>
+		<string>Parker Solar Probe</string>
+		<key>shortcut</key>
+		<string>PSP</string>
+	</dict>
+	<dict>
+		<key>phrase</key>
+		<string>Poor Unfortunate Souls</string>
+		<key>shortcut</key>
+		<string>PUS</string>
+	</dict>
+	<dict>
+		<key>phrase</key>
+		<string>Reusable Launch System</string>
+		<key>shortcut</key>
+		<string>RLS</string>
+	</dict>
+	<dict>
+		<key>phrase</key>
+		<string>Saturn V</string>
+		<key>shortcut</key>
+		<string>S5</string>
+	</dict>
+	<dict>
+		<key>phrase</key>
+		<string>Scott Forstall</string>
+		<key>shortcut</key>
+		<string>SF</string>
+	</dict>
+	<dict>
+		<key>phrase</key>
+		<string>United Launch Alliance</string>
+		<key>shortcut</key>
+		<string>ULA</string>
+	</dict>
+	<dict>
+		<key>phrase</key>
+		<string>Apple Worldwide Developers Conference</string>
+		<key>shortcut</key>
+		<string>WWDC</string>
+	</dict>
+</array>
+</plist>

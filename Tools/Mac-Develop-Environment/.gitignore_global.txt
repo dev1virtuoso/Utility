@@ -90,8 +90,6 @@ doc/api/
 # Avoid committing generated Javascript files:
 *.dart.js
 *.info.json
-*.js
-*.js_
 *.js.deps
 *.js.map
 

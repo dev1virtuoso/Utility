@@ -7,7 +7,7 @@ Magenta Interpreter is a simple interpreter designed to parse and execute math-l
 
 ## License
 
-This repository is licensed under the Carson Open Source License, which provides users and contributors with the freedom to copy, modify, distribute, and sublicense the software under certain conditions. The project is governed by the Mozilla Public License Version 2.0 in addition to the terms outlined in this license.
+This repository is licensed under the Carson Open Source License, which provides users and contributors with the freedom to copy, modify, distribute, and sublicense the software under certain conditions. The project is governed by the The Carson Open Source License (CEOSL) Version 2.0 in addition to the terms outlined in this license.
 
 ## Usage
 

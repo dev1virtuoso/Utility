@@ -14,4 +14,4 @@ To begin working with the mac develop environment project, follow these steps:
 
 5. Mac development environment setup complete.
 
-You can find more developer tools on [tools.md](tools.md)
+You can find more developer tools on [tools.md](tools.md) & [suggestion.md](suggestion.md)

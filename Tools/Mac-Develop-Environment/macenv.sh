@@ -2,16 +2,18 @@
 
 xcode-select --install
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+softwareupdate --install-rosetta
 sudo sh -c 'xcode-select -s /Applications/Xcode.app/Contents/Developer && xcodebuild -runFirstLaunch'
 sudo xcodebuild -license
 xcodebuild -downloadAllPlatforms
-<brew-requirements.txt xargs brew install
+xargs brew install < brew-requirements.txt
 brew install --cask visual-studio-code
 brew install --cask adoptopenjdk
 brew install --cask android-studio
 brew install --cask docker
 brew services start postgresql
 brew tap heroku/brew
+brew install lporg
 read -p "Enter your Git username: " username
 read -p "Enter your Git email address: " email
 git config --global user.name "$username"

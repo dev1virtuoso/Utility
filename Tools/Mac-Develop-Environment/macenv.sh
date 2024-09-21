@@ -15,9 +15,10 @@ sudo xcodebuild -license
 xcodebuild -downloadAllPlatforms
 
 # Update Homebrew and install dependencies
-brew update
 xargs brew install < brew-requirements.txt
 brew install --cask visual-studio-code
+brew update
+brew cask upgrade
 # Add more brew installations as needed
 
 # Configure Git

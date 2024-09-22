@@ -5,6 +5,7 @@
 To begin working with the mac develop environment project, follow these steps:
 
 1. Download Docker from [Docker's website](https://www.docker.com/products/docker-desktop/), download Flutter from [Flutter's website](https://docs.flutter.dev/get-started/install), download Python from [Python's website](https://www.python.org/downloads/), download Stable Diffusion WebUI from [Stable Diffusion WebUI's GitHub Repo](https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki#setup),download SQL from [SQL's website](https://dev.mysql.com/downloads/), download .NET from [.NET's website](https://dotnet.microsoft.com/en-us/download/), and download .NET Framework from [.NET Framework's website](https://dotnet.microsoft.com/en-us/download/dotnet-framework).
+
 2. Download following Apps(Optional, except VSCode and Xcode)
 - [Android Studio](https://developer.android.com/studio)
 - [Bakery](https://apps.apple.com/app/bakery-simple-icon-creator/)
@@ -61,12 +62,12 @@ To begin working with the mac develop environment project, follow these steps:
 - [WakaTime](https://github.com/wakatime/macos-wakatime)
 - [WhatsApp](https://apps.apple.com/app/whatsapp-messenger/)
 - [X](https://apps.apple.com/app/x/)
+
 - [Xcode(App Store)](https://apps.apple.com/app/xcode/) or [Xcode(Apple Devloper's website)](https://developer.apple.com/xcode/resources/)
+3. Save the file, and then open your terminal. Navigate to the directory where you saved the `main.sh` file. Run the following command to make the script executable:`chmod +x main.sh`
 
-1. Save the file, and then open your terminal. Navigate to the directory where you saved the `main.sh` file. Run the following command to make the script executable:`chmod +x main.sh`
+4. To execute the script, run the following command:`./main.sh`
 
-2. To execute the script, run the following command:`./main.sh`
-
-3. Mac development environment setup complete.
+5. Mac development environment setup complete.
 
 You can find more developer tools on [tools.md](tools.md) & [suggestion.md](suggestion.md)

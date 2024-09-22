@@ -43,8 +43,8 @@ git config --global user.email "$email"
 echo "Git username set to: $username"
 echo "Git email address set to: $email"
 
-# Clone necessary Git repositories
-git clone git://github.com/zsh-users/zsh-autosuggestions $ZSH_CUSTOM/plugins/zsh-autosuggestions
+# Install necessary Git repositories
+curl -s "https://raw.githubusercontent.com/superhj1987/awesome-mac-things/master/get.sh" | bash -s
 
 # Install RVM and NVM
 curl -L https://get.rvm.io | bash -s stable --ruby

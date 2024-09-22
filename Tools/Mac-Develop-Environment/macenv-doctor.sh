@@ -6,8 +6,15 @@ xcode-select --print-path
 echo
 
 # List Homebrew packages
+brew -v
 echo "Homebrew Packages:"
 brew list
+echo
+
+# List MacPorts packages
+port version
+echo "MacPorts Packages:"
+port installed
 echo
 
 # Git user configuration

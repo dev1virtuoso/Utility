@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# Prompt user to agree to the license agreement
+read -p "Do you agree to the terms of the license agreement? (Y/N): " agreed
+if [ "$agreed" != "Y" ]; then
+    echo "You did not agree to the license. Exiting."
+    exit 1
+fi
+
 # Install Xcode Command Line Tools
 xcode-select --install
 
@@ -16,10 +23,18 @@ xcodebuild -downloadAllPlatforms
 
 # Update Homebrew and install dependencies
 xargs brew install < brew-requirements.txt
-brew install --cask visual-studio-code
+brew install --cask visual-studio-code cmake zulu8 processing dotnet-sdk sf-symbols gcenx/wine/wine-crossover little-snitch utm docker appcleaner the-unarchiver coconutbattery barrier raspberry-pi-imager burn nextcloud firefox discord mattermost signal zulip slack zoom mactex libreoffice zotero font-jetbrains-mono vlc spotify mixxx fwcd/mixxx/m1xxx blender obs blackhole-2ch gimp inkscape prusaslicer openscad epic-games steam prismlauncher
 brew update
 brew cask upgrade
-# Add more brew installations as needed
+
+# Update MacPorts and install dependencies
+curl -O https://distfiles.macports.org/MacPorts/MacPorts-2.10.1.tar.bz2
+tar xf MacPorts-2.10.1.tar.bz2
+cd MacPorts-2.10.1/
+./configure
+make
+sudo make install
+sudo port -v selfupdate
 
 # Configure Git
 read -p "Enter your Git username: " username
@@ -72,3 +87,16 @@ echo 'export PATH="/usr/local/opt/ruby/bin:$PATH"' >> ~/.bash_profile
 
 # Source the updated shell configuration
 source ~/.zshrc
+
+cd ~/.
+python3 -m venv pip_venv
+source env/bin/activate
+
+# Prompt user to run the doctor script
+read -p "Do you want to run the doctor? (Y/N): " agreed
+if [ "$agreed" = "Y" ]; then
+    bash macenv-doctor.sh
+else
+    echo "You did not agree to run the doctor. Exiting."
+    exit 1
+fi

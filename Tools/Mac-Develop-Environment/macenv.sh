@@ -23,7 +23,6 @@ xcodebuild -downloadAllPlatforms
 
 # Update Homebrew and install dependencies
 xargs brew install < brew-requirements.txt
-brew install --cask visual-studio-code cmake zulu8 processing dotnet-sdk sf-symbols gcenx/wine/wine-crossover little-snitch utm docker appcleaner the-unarchiver coconutbattery barrier raspberry-pi-imager burn nextcloud firefox discord mattermost signal zulip slack zoom mactex libreoffice zotero font-jetbrains-mono vlc spotify mixxx fwcd/mixxx/m1xxx blender obs blackhole-2ch gimp inkscape prusaslicer openscad epic-games steam prismlauncher
 brew update
 brew cask upgrade
 
@@ -74,7 +73,10 @@ gem install cocoapods
 gem update --system
 
 # Setup Composer for PHP
-php composer-setup.php --install-dir=bin --filename=composer
+php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+php -r "if (hash_file('sha384', 'composer-setup.php') === 'dac665fdc30fdd8ec78b38b9800061b4150413ff2e3b6f88543c636f7cd84f6db9189d43a81e5503cda447da73c7e5b6') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
+php composer-setup.php
+php -r "unlink('composer-setup.php');"
 
 # Update shell configuration
 echo '[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"' >> ~/.zshrc

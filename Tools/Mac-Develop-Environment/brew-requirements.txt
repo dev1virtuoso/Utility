@@ -192,6 +192,7 @@ rlwrap
 rtmpdump
 rubberband
 ruby
+ruby-build
 rust
 rustup
 sdl2

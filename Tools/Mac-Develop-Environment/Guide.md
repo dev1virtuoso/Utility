@@ -4,7 +4,7 @@
 
 To begin working with the mac develop environment project, follow these steps:
 
-1. Download Docker from [Docker's website](https://www.docker.com/products/docker-desktop/), download Flutter from [Flutter's website](https://docs.flutter.dev/get-started/install), download Python from [Python's website](https://www.python.org/downloads/), download Stable Diffusion WebUI from [Stable Diffusion WebUI's GitHub Repo](https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki#setup),download SQL from [SQL's website](https://dev.mysql.com/downloads/), download .NET from [.NET's website](https://dotnet.microsoft.com/en-us/download/), and download .NET Framework from [.NET Framework's website](https://dotnet.microsoft.com/en-us/download/dotnet-framework).
+1. Download Flutter from [Flutter's website](https://docs.flutter.dev/get-started/install), download Python from [Python's website](https://www.python.org/downloads/), download Stable Diffusion WebUI from [Stable Diffusion WebUI's GitHub Repo](https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki#setup),download SQL from [SQL's website](https://dev.mysql.com/downloads/), download .NET from [.NET's website](https://dotnet.microsoft.com/en-us/download/), and download .NET Framework from [.NET Framework's website](https://dotnet.microsoft.com/en-us/download/dotnet-framework).
 
 2. Download following Apps(Optional, except VSCode and Xcode)
 - [Android Studio](https://developer.android.com/studio)
@@ -15,7 +15,7 @@ To begin working with the mac develop environment project, follow these steps:
 - [Cinebench](https://apps.apple.com/app/cinebench/)
 - [CleanMyMac X](https://apps.apple.com/app/cleanmymac-x/)
 - [Complete Anatomy](https://apps.apple.com/app/complete-anatomy/)
-- [Developer](https://apps.apple.com/app/apple-developer/
+- [Developer](https://apps.apple.com/app/apple-developer/)
 - [Discord](https://discord.com/download)
 - [Docker](https://www.docker.com/products/docker-desktop/)
 - [Endurance](https://apps.apple.com/app/endurance-cpu-stress-test/)

@@ -13,7 +13,7 @@ def generate_sitemap(directory):
 
     # 生成Sitemap文件
     with open('sitemap.html', 'w', encoding='utf-8') as f:
-        f.write('<!DOCTYPE html>\n<html>\n<head>\n<title>Sitemap</title>\n</head>\n<body>\n')
+        f.write('<!DOCTYPE html>\n<html lang="en-US">\n<head>\n<title>Sitemap</title>\n</head>\n<body>\n')
         for filename, url in urls:
             f.write(f'<a href="{url}">{filename}</a><br>\n')
         f.write('</body>\n</html>')

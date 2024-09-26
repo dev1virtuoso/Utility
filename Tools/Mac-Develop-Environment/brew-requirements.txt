@@ -7,6 +7,7 @@ aribb24
 aspell
 at-spi2-core
 autoconf
+bash-completion
 berkeley-db@5
 brew-cask-completion
 brotli
@@ -145,7 +146,9 @@ luajit
 luv
 lz4
 lzo
+m-cli
 m4
+mas
 mbedtls
 mpdecimal
 mpg123
@@ -183,6 +186,7 @@ pkg-config
 poppler
 postgresql@14
 protobuf
+pv
 py3cairo
 pygobject3
 python@3.10
@@ -233,6 +237,7 @@ z3
 zeromq
 zimg
 zlib
+zsh-autosuggestions
 zstd
 appcleaner
 barrier

@@ -5,6 +5,13 @@ echo "Xcode Path:"
 xcode-select --print-path
 echo
 
+# List Python packages
+which python
+which pip3
+echo "Python Packages:"
+python list
+echo
+
 # List Homebrew packages
 brew -v
 echo "Homebrew Packages:"

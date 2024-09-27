@@ -21,6 +21,17 @@ sudo sh -c 'xcode-select -s /Applications/Xcode.app/Contents/Developer && xcodeb
 sudo xcodebuild -license
 xcodebuild -downloadAllPlatforms
 
+# Install packages listed in requirements.txt
+if [ -f "requirements.txt" ]; then
+    echo "Installing dependencies listed in requirements.txt..."
+    while read requirement; do
+        pip3 install -r requirements.txt
+    done < requirements.txt
+    echo "Dependencies installed successfully."
+else
+    echo "requirements.txt not found. No dependencies to install."
+fi
+
 # Update Homebrew and install dependencies
 xargs brew install < brew-requirements.txt
 brew update
@@ -49,6 +60,15 @@ curl -s "https://raw.githubusercontent.com/superhj1987/awesome-mac-things/master
 # Install RVM and NVM
 curl -L https://get.rvm.io | bash -s stable --ruby
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+nvm install node
+nvm use node
+
+npm install -g coffee-script
+npm install -g grunt-cli
+npm install -g gulp
+npm install -g bower
+npm install -g jshint
+npm install -g less
 
 # Download specific Gitignore and Gitconfig files
 curl "https://raw.githubusercontent.com/flatiron-school/dotfiles/master/ubuntu-gitignore" -o "$HOME/.gitignore"
@@ -67,10 +87,30 @@ nvm install node
 npm install --global yarn
 npm install --global pm2
 
+if [ -f "npm-requirements.txt" ]; then
+    echo "Installing dependencies listed in npm-requirements.txt..."
+    while read requirement; do
+        npm install $requirement
+    done < npm-requirements.txt
+    echo "Dependencies installed successfully."
+else
+    echo "npm-requirements.txt not found. No dependencies to install."
+fi
+
 # Install necessary Ruby gems
 gem install pg
 gem install cocoapods
 gem update --system
+
+if [ -f "gem-requirements.txt" ]; then
+    echo "Installing dependencies listed in gem-requirements.txt..."
+    while read requirement; do
+        gem install $requirement
+    done < gem-requirements.txt
+    echo "Dependencies installed successfully."
+else
+    echo "gem-requirements.txt not found. No dependencies to install."
+fi
 
 # Setup Composer for PHP
 php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
@@ -86,6 +126,8 @@ echo 'export PATH="/opt/homebrew/opt/php@8.0/sbin:$PATH"' >> ~/.zshrc
 export LDFLAGS="-L/opt/homebrew/opt/php@8.0/lib"
 export CPPFLAGS="-I/opt/homebrew/opt/php@8.0/include"
 echo 'export PATH="/usr/local/opt/ruby/bin:$PATH"' >> ~/.bash_profile
+export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
 
 # Source the updated shell configuration
 source ~/.zshrc

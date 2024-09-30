@@ -39,6 +39,16 @@ xargs brew install < brew-requirements.txt
 brew update
 brew cask upgrade
 
+if [ -f "brew-cask-requirements.txt" ]; then
+    echo "Installing dependencies listed in npm-requirements.txt..."
+    while read requirement; do
+        brew install--cask $requirement
+    done < npm-requirements.txt
+    echo "Dependencies installed successfully."
+else
+    echo "npm-requirements.txt not found. No dependencies to install."
+fi
+
 # Update MacPorts and install dependencies
 curl -O https://distfiles.macports.org/MacPorts/MacPorts-2.10.1.tar.bz2
 tar xf MacPorts-2.10.1.tar.bz2
@@ -66,6 +76,7 @@ git clone https://github.com/oobabooga/text-generation-webui.git
 git clone https://github.com/chidiwilliams/GPT-Automator.git
 git clone https://github.com/AUTOMATIC1111/stable-diffusion-webui.git
 cd ..
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
 
 # Install RVM and NVM
 curl -L https://get.rvm.io | bash -s stable --ruby
@@ -94,13 +105,21 @@ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 # Setup Node.js and related tools
 nvm install v16.13.2
 nvm install node
-npm install --global yarn
-npm install --global pm2
 
 if [ -f "npm-requirements.txt" ]; then
     echo "Installing dependencies listed in npm-requirements.txt..."
     while read requirement; do
         npm install $requirement
+    done < npm-requirements.txt
+    echo "Dependencies installed successfully."
+else
+    echo "npm-requirements.txt not found. No dependencies to install."
+fi
+
+if [ -f "npm-g-requirements.txt" ]; then
+    echo "Installing dependencies listed in npm-requirements.txt..."
+    while read requirement; do
+        npm install -g $requirement
     done < npm-requirements.txt
     echo "Dependencies installed successfully."
 else

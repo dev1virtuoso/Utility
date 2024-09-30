@@ -35,6 +35,6 @@ const result = interpreter.parse(tokens);
 
 ## Contact Information
 
-If you have any questions or suggestions regarding this machine learning project, please feel free to contact me at [carson.developer1125@gmail.com](mailto:carson.developer1125@gmail.com).
+If you have any questions or suggestions regarding this machine learning project, please feel free to contact me at [following methods](https://carson-we.github.io/contact.html).
 
 Thank you for your interest to the project!

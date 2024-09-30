@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 # Prompt user to agree to the license agreement
 read -p "Do you agree to the terms of the license agreement? (Y/N): " agreed
 if [ "$agreed" != "Y" ]; then
@@ -56,6 +58,14 @@ echo "Git email address set to: $email"
 
 # Install necessary Git repositories
 curl -s "https://raw.githubusercontent.com/superhj1987/awesome-mac-things/master/get.sh" | bash -s
+cd ..
+mkdir Devloper
+cd Devloper
+mkdir environment
+git clone https://github.com/oobabooga/text-generation-webui.git
+git clone https://github.com/chidiwilliams/GPT-Automator.git
+git clone https://github.com/AUTOMATIC1111/stable-diffusion-webui.git
+cd ..
 
 # Install RVM and NVM
 curl -L https://get.rvm.io | bash -s stable --ruby

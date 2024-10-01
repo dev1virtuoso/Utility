@@ -42,7 +42,7 @@ brew cask upgrade
 if [ -f "brew-cask-requirements.txt" ]; then
     echo "Installing dependencies listed in npm-requirements.txt..."
     while read requirement; do
-        brew install--cask $requirement
+        brew install --cask $requirement
     done < npm-requirements.txt
     echo "Dependencies installed successfully."
 else
@@ -77,6 +77,7 @@ git clone https://github.com/chidiwilliams/GPT-Automator.git
 git clone https://github.com/AUTOMATIC1111/stable-diffusion-webui.git
 cd ..
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+ollama pull llama3.2
 
 # Install RVM and NVM
 curl -L https://get.rvm.io | bash -s stable --ruby

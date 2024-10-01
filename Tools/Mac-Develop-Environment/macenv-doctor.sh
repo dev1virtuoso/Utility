@@ -78,3 +78,6 @@ echo
 # Rust compiler version
 echo "Rust Compiler Version:"
 rustc --version
+
+# necessary Git repositories
+ollama list

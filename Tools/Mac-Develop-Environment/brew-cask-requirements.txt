@@ -1,5 +1,6 @@
 alfred
 android-sdk
+android-studio
 appcleaner
 atom
 ava
@@ -8,7 +9,6 @@ blackhole-2ch
 burn
 coconutbattery
 coderunner
-github-desktop
 eclipse-ide
 eclipse-java
 firefox
@@ -16,14 +16,15 @@ font-caskaydia-cove-nerd-font
 font-jetbrains-mono
 freeze
 ghidra
+github@beta
 gitkraken
 google-chrome
 google-drive
 inkscape
 intellij-idea-ce
+iterm2
 libreoffice
 little-snitch
-iterm2
 macdown
 mactex
 mamp
@@ -41,7 +42,9 @@ scratch
 sf-symbols
 slack
 sublime-text
+utm
 virtualbox
+vscodium
 wine-crossover
 zotero
 zulip

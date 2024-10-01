@@ -207,6 +207,7 @@ python@3.12
 qemu
 qt
 rav1e
+rbenv
 readline
 redis
 rename

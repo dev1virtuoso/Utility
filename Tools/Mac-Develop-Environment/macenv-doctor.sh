@@ -6,21 +6,22 @@ xcode-select --print-path
 echo
 
 # List Python packages
+echo "Python Packages:"
 which python
 which pip3
-echo "Python Packages:"
-python list
+pip3 list
 echo
 
 # List Homebrew packages
-brew -v
 echo "Homebrew Packages:"
+brew -v
+brew doctor
 brew list
 echo
 
 # List MacPorts packages
-port version
 echo "MacPorts Packages:"
+port version
 port installed
 echo
 
@@ -30,11 +31,6 @@ echo "Username:"
 git config --global user.name
 echo "Email:"
 git config --global user.email
-echo
-
-# List contents of a directory
-echo "Contents of Cloned Repository:"
-ls /path/to/cloned/repository
 echo
 
 # List RVM managed Ruby versions
@@ -79,5 +75,5 @@ echo
 echo "Rust Compiler Version:"
 rustc --version
 
-# necessary Git repositories
-ollama list
+# Necessary dependencies
+echo "Necessary Dependencies:"

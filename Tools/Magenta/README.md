@@ -7,7 +7,7 @@ Magenta Interpreter is a simple interpreter designed to parse and execute math-l
 
 ## License
 
-This repository is licensed under the Carson Open Source License, which provides users and contributors with the freedom to copy, modify, distribute, and sublicense the software under certain conditions. The project is governed by the Carson Open Source License (CEOSL)  in addition to the terms outlined in this license.
+This repository is licensed under the Carson Open Source License, which provides users and contributors with the freedom to copy, modify, distribute, and sublicense the software under certain conditions. The project is governed by MIT License in addition to the terms outlined in this license.
 
 ## Usage
 
@@ -35,6 +35,6 @@ const result = interpreter.parse(tokens);
 
 ## Contact Information
 
-If you have any questions or suggestions regarding this machine learning project, please feel free to contact me at [following methods](https://carson-we.github.io/contact.html).
+If you have any questions or suggestions regarding this machine learning project, please feel free to contact me at [following methods](https://carson-we.github.io/Carson-We.github.io/contact.html).
 
 Thank you for your interest to the project!

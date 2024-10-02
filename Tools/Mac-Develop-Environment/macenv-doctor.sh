@@ -10,6 +10,7 @@ echo "Python Packages:"
 which python
 which pip3
 pip3 list
+pip3 freeze > requirements.txt
 echo
 
 # List Homebrew packages
@@ -17,6 +18,7 @@ echo "Homebrew Packages:"
 brew -v
 brew doctor
 brew list
+brew list > brew-requirements.txt
 echo
 
 # List MacPorts packages

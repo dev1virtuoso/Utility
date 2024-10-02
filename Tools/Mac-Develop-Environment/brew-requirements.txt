@@ -258,6 +258,7 @@ xz
 yaml-language-server
 yarn-completion
 you-get
+youtube-dl
 youtubedr
 youtubeuploader
 yuicompressor

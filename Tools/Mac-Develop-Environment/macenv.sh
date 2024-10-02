@@ -21,16 +21,19 @@ sudo sh -c 'xcode-select -s /Applications/Xcode.app/Contents/Developer && xcodeb
 sudo xcodebuild -license
 xcodebuild -downloadAllPlatforms
 
-# Install Python dependencies listed in requirements.txt
-if [ -f "requirements.txt" ]; then
-    echo "Installing Python dependencies listed in requirements.txt..."
+# Install Python dependencies listed in python-requirements.txt
+if [ -f "python-requirements.txt" ]; then
+    echo "Installing Python dependencies listed in python-requirements.txt..."
     while read requirement; do
         pip3 install $requirement
-    done < requirements.txt
+    done < python-requirements.txt
     echo "Python dependencies installed successfully."
 else
-    echo "requirements.txt not found. No Python dependencies to install."
+    echo "python-requirements.txt not found. No Python dependencies to install."
 fi
+
+pip3 list --outdated
+pip-review --local --auto
 
 # Install Homebrew packages from brew-requirements.txt
 xargs brew install < brew-requirements.txt
@@ -77,6 +80,10 @@ git clone https://github.com/AUTOMATIC1111/stable-diffusion-webui.git
 
 # Install Oh My Zsh
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+
+# Install youtube-dl
+sudo curl -L https://yt-dl.org/downloads/latest/youtube-dl -o /usr/local/bin/youtube-dl
+sudo chmod a+rx /usr/local/bin/youtube-dl
 
 # Download color schemes for iTerm
 curl -o "Atom One Dark.itermcolors" https://raw.githubusercontent.com/nathanbuchar/atom-one-dark-terminal/master/scheme/iterm/One%20Dark.itermcolors

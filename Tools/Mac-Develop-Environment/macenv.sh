@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # Prompt user to agree to the license agreement
-read -p "Do you agree to the terms of the license agreement? (Y/N): " agreed
+read -p "$(echo -e '\033[1;33mDo you agree to the terms of the license agreement? (Y/N): \033[0m')" agreed
 if [ "$agreed" != "Y" ]; then
-    echo "You did not agree to the license. Exiting."
+    echo "$(echo -e '\033[1;31mYou did not agree to the license. Exiting.\033[0m')"
     exit 1
 fi
 
@@ -23,16 +23,17 @@ xcodebuild -downloadAllPlatforms
 
 # Install Python dependencies listed in python-requirements.txt
 if [ -f "python-requirements.txt" ]; then
-    echo "Installing Python dependencies listed in python-requirements.txt..."
+    echo "$(echo -e '\033[1;32mInstalling Python dependencies listed in python-requirements.txt...\033[0m')"
     while read requirement; do
         pip3 install $requirement
     done < python-requirements.txt
-    echo "Python dependencies installed successfully."
+    echo "$(echo -e '\033[1;32mPython dependencies installed successfully.\033[0m')"
 else
-    echo "python-requirements.txt not found. No Python dependencies to install."
+    echo "$(echo -e '\033[1;31mpython-requirements.txt not found. No Python dependencies to install.\033[0m')"
 fi
 
 pip3 list --outdated
+pip --disable-pip-version-check list --outdated --format=json | python -c "import json, sys; print('\n'.join([x['name'] for x in json.load(sys.stdin)]))" | xargs -n1 pip install -U
 pip-review --local --auto
 
 # Install Homebrew packages from brew-requirements.txt
@@ -42,13 +43,13 @@ brew cask upgrade
 
 # Install Homebrew Cask packages
 if [ -f "brew-cask-requirements.txt" ]; then
-    echo "Installing Homebrew Cask dependencies listed in brew-cask-requirements.txt..."
+    echo "$(echo -e '\033[1;32mInstalling Homebrew Cask dependencies listed in brew-cask-requirements.txt...\033[0m')"
     while read requirement; do
         brew install --cask $requirement
     done < brew-cask-requirements.txt
-    echo "Homebrew Cask dependencies installed successfully."
+    echo "$(echo -e '\033[1;32mHomebrew Cask dependencies installed successfully.\033[0m')"
 else
-    echo "brew-cask-requirements.txt not found. No Homebrew Cask dependencies to install."
+    echo "$(echo -e '\033[1;31mbrew-cask-requirements.txt not found. No Homebrew Cask dependencies to install.\033[0m')"
 fi
 
 # Install MacPorts
@@ -63,10 +64,10 @@ sudo port -v selfupdate
 # Configure Git
 read -p "Enter your Git username: " username
 read -p "Enter your Git email address: " email
-git config --global user.name "$username"
-git config --global user.email "$email"
-echo "Git username set to: $username"
-echo "Git email address set to: $email"
+git config --global user.name "\e[0;32m$username\e[0m"
+git config --global user.email "\e[0;32m$email\e[0m"
+echo "Git username set to: \e[0;32m$username\e[0m"
+echo "Git email address set to: \e[0;32m$email\e[0m"
 
 # Install additional tools and configurations
 curl -s "https://raw.githubusercontent.com/superhj1987/awesome-mac-things/master/get.sh" | bash -s
@@ -74,20 +75,24 @@ curl -s "https://raw.githubusercontent.com/superhj1987/awesome-mac-things/master
 # Clone specific repositories
 mkdir -p ~/Developer/environment
 cd ~/Developer/environment
-git clone https://github.com/oobabooga/text-generation-webui.git
-git clone https://github.com/chidiwilliams/GPT-Automator.git
-git clone https://github.com/AUTOMATIC1111/stable-diffusion-webui.git
+git clone \e[0;33mhttps://github.com/oobabooga/text-generation-webui.git\e[0m
+git clone \e[0;33mhttps://github.com/chidiwilliams/GPT-Automator.git\e[0m
+git clone \e[0;33mhttps://github.com/AUTOMATIC1111/stable-diffusion-webui.git\e[0m
+git clone --depth 1 \e[0;33mhttps://github.com/sqlmapproject/sqlmap.git\e[0m sqlmap-dev
+git clone \e[0;33mhttps://github.com/rolczynski/Automatic-Speech-Recognition.git\e[0m
+conda env create -f=environment.yml     # or use: environment-gpu.yml
+conda activate Automatic-Speech-Recognition
 
 # Install Oh My Zsh
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+sh -c "\e[0;32m$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)\e[0m"
 
 # Install youtube-dl
 sudo curl -L https://yt-dl.org/downloads/latest/youtube-dl -o /usr/local/bin/youtube-dl
 sudo chmod a+rx /usr/local/bin/youtube-dl
 
 # Download color schemes for iTerm
-curl -o "Atom One Dark.itermcolors" https://raw.githubusercontent.com/nathanbuchar/atom-one-dark-terminal/master/scheme/iterm/One%20Dark.itermcolors
-curl -o "Atom One Light.itermcolors" https://raw.githubusercontent.com/nathanbuchar/atom-one-dark-terminal/master/scheme/iterm/One%20Light.itermcolors
+curl -o "\e[0;32mAtom One Dark.itermcolors\e[0m" \e[0;33mhttps://raw.githubusercontent.com/nathanbuchar/atom-one-dark-terminal/master/scheme/iterm/One%20Dark.itermcolors\e[0m
+curl -o "\e[0;32mAtom One Light.itermcolors\e[0m" \e[0;33mhttps://raw.githubusercontent.com/nathanbuchar/atom-one-dark-terminal/master/scheme/iterm/One%20Light.itermcolors\e[0m
 
 # Set up Vim with sensible defaults
 mkdir -p ~/.vim/pack/tpope/start
@@ -104,8 +109,8 @@ nvm use node
 npm install -g coffee-script grunt-cli gulp bower jshint less
 
 # Download specific Gitignore and Gitconfig files
-curl "https://raw.githubusercontent.com/flatiron-school/dotfiles/master/ubuntu-gitignore" -o "$HOME/.gitignore"
-curl "https://raw.githubusercontent.com/flatiron-school/dotfiles/master/gitconfig" -o "$HOME/.gitconfig"
+curl \e[0;33m"https://raw.githubusercontent.com/flatiron-school/dotfiles/master/ubuntu-gitignore"\e[0m -o "$HOME/.gitignore"
+curl \e[0;33m"https://raw.githubusercontent.com/flatiron-school/dotfiles/master/gitconfig"\e[0m -o "$HOME/.gitconfig"
 
 # Run setup validation script
 curl -so- https://raw.githubusercontent.com/learn-co-curriculum/flatiron-manual-setup-validator/master/manual-setup-check.sh | bash 2> /dev/null

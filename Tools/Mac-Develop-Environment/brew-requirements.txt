@@ -4,6 +4,7 @@ aom
 apr
 apr-util
 argon2
+aria2
 aribb24
 aspell
 assimp
@@ -11,6 +12,7 @@ at-spi2-core
 autoconf
 bash
 bash-completion
+bat
 berkeley-db@5
 brew-cask-completion
 brotli
@@ -28,9 +30,12 @@ coreutils
 curl
 dav1d
 dbus
+diff-so-fancy
 discount
 double-conversion
 dtc
+duf
+entr
 faac
 faad2
 fdk-aac
@@ -73,6 +78,7 @@ hicolor-icon-theme
 highway
 htop
 hunspell
+hyperfine
 icu4c
 imath
 jasper
@@ -81,6 +87,7 @@ jpeg-turbo
 jpeg-xl
 jq
 json-glib
+just
 k9s
 krb5
 kubernetes-cli
@@ -98,6 +105,7 @@ libevent
 libgcrypt
 libgee
 libgit2
+libgit2@1.7
 libgpg-error
 libidn
 libidn2
@@ -166,6 +174,7 @@ mpg123
 msgpack
 musepack
 mysql
+ncdu
 ncurses
 neovim
 nettle
@@ -206,6 +215,7 @@ python@3.10
 python@3.12
 qemu
 qt
+ranger
 rav1e
 rbenv
 readline
@@ -219,6 +229,7 @@ ruby-build
 ruby-install
 rust
 rustup
+scc
 sdl2
 snappy
 speex
@@ -228,10 +239,14 @@ srtp
 svt-av1
 swi-prolog
 taglib
+task
+taskwarrior-tui
 tcl-tk
 tesseract
+thefuck
 theora
 tidy-html5
+tldr
 tmux
 trash
 tree
@@ -266,6 +281,7 @@ z3
 zeromq
 zimg
 zlib
+zoxide
 zsh-autosuggestions
 zsh-you-should-use
 zstd

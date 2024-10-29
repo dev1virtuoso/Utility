@@ -41,17 +41,6 @@ xargs brew install < brew-requirements.txt
 brew update
 brew cask upgrade
 
-# Install Homebrew Cask packages
-if [ -f "brew-cask-requirements.txt" ]; then
-    echo "$(echo -e '\033[1;32mInstalling Homebrew Cask dependencies listed in brew-cask-requirements.txt...\033[0m')"
-    while read requirement; do
-        brew install --cask $requirement
-    done < brew-cask-requirements.txt
-    echo "$(echo -e '\033[1;32mHomebrew Cask dependencies installed successfully.\033[0m')"
-else
-    echo "$(echo -e '\033[1;31mbrew-cask-requirements.txt not found. No Homebrew Cask dependencies to install.\033[0m')"
-fi
-
 # Install MacPorts
 curl -O https://distfiles.macports.org/MacPorts/MacPorts-2.10.1.tar.bz2
 tar xf MacPorts-2.10.1.tar.bz2

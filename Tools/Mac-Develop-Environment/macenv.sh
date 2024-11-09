@@ -53,8 +53,8 @@ sudo port -v selfupdate
 # Configure Git
 read -p "Enter your Git username: " username
 read -p "Enter your Git email address: " email
-git config --global user.name "\e[0;32m$username\e[0m"
-git config --global user.email "\e[0;32m$email\e[0m"
+git config --global user.name "$username"
+git config --global user.email "$email"
 echo "Git username set to: \e[0;32m$username\e[0m"
 echo "Git email address set to: \e[0;32m$email\e[0m"
 

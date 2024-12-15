@@ -124,14 +124,14 @@ else
 fi
 
 # Install global Node.js dependencies
-if [ -f "npm-g-requirements.txt" ]; then
-    echo "Installing global Node.js dependencies listed in npm-g-requirements.txt..."
+if [ -f "npm-global-requirements.txt" ]; then
+    echo "Installing global Node.js dependencies listed in npm-global-requirements.txt..."
     while read requirement; do
         npm install -g $requirement
-    done < npm-g-requirements.txt
+    done < npm-global-requirements.txt
     echo "Global Node.js dependencies installed successfully."
 else
-    echo "npm-g-requirements.txt not found. No global Node.js dependencies to install."
+    echo "npm-global-requirements.txt not found. No global Node.js dependencies to install."
 fi
 
 # Install necessary Ruby gems
@@ -155,6 +155,12 @@ php -r "if (hash_file('sha384', 'composer-setup.php') === 'dac665fdc30fdd8ec78b3
 php composer-setup.php
 php -r "unlink('composer-setup.php');"
 
+# Install Rust
+curl --proto '=https' --tlsv1.2 https://sh.rustup.rs -sSf | sh
+
+# Install Bun
+curl -fsSL https://bun.sh/install | bash
+
 # Update shell configuration for NVM and PHP
 echo '[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"' >> ~/.zshrc
 echo 'export NVM_DIR="$HOME/.nvm"' >> ~/.zshrc
@@ -162,6 +168,9 @@ echo 'export PATH="/opt/homebrew/opt/php@8.0/bin:$PATH"' >> ~/.zshrc
 echo 'export PATH="/opt/homebrew/opt/php@8.0/sbin:$PATH"' >> ~/.zshrc
 export LDFLAGS="-L/opt/homebrew/opt/php@8.0/lib"
 export CPPFLAGS="-I/opt/homebrew/opt/php@8.0/include"
+export JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home"
+export ANDROID_HOME="$HOME/Android/Sdk"
+export NDK_HOME="$ANDROID_HOME/ndk/$(ls -1 $ANDROID_HOME/ndk)"
 
 # Source the updated shell configuration
 source ~/.zshrc
@@ -170,6 +179,10 @@ source ~/.zshrc
 cd ~
 python3 -m venv pip_venv
 source pip_venv/bin/activate
+
+# Others
+rustup target add aarch64-linux-android armv7-linux-androideabi i686-linux-android x86_64-linux-android
+rustup target add aarch64-apple-ios x86_64-apple-ios aarch64-apple-ios-sim
 
 # Prompt user to run the doctor script
 read -p "Do you want to run the doctor? (Y/N): " agreed

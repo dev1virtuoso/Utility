@@ -43,7 +43,7 @@ def calculate_pi(prec, log_path):
 if __name__ == '__main__':
     start_time = time.time()
 
-    prec = 10001
+    prec = 10000001
     log_dir = os.getcwd()
     log_path = os.path.join(log_dir, "log.txt")
     

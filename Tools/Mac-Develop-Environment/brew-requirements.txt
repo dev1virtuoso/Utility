@@ -42,6 +42,7 @@ duf
 entr
 faac
 faad2
+fastlane
 fdk-aac
 ffmpeg
 flac
@@ -90,6 +91,7 @@ hyperfine
 icu4c@75
 icu4c@76
 imath
+ipsw
 isl
 jasper
 jbig2dec
@@ -262,6 +264,7 @@ taglib
 task
 taskwarrior-tui
 tcl-tk
+terminal-notifier
 tesseract
 thefuck
 theora
@@ -307,3 +310,6 @@ zsh-autosuggestions
 zsh-you-should-use
 zstd
 zurl
+double-commander
+hiddenbar
+lyricsx

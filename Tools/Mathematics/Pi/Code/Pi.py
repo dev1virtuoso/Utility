@@ -1,40 +1,40 @@
 import decimal
 import math
-import multiprocessing
 import time
+import numba
+from numba import cuda
 
+@cuda.jit(device=True)
 def calculate_term(k):
     numerator = decimal.Decimal(math.factorial(4*k)) * (1103 + 26390*k)
     denominator = (decimal.Decimal(math.factorial(k))**4) * decimal.Decimal(396**(4*k))
     return numerator / denominator
 
-def calculate_pi(prec, num_processes):
+@cuda.jit
+def calculate_pi_kernel(prec, s):
+    i = cuda.grid(1)
+    if i < prec:
+        term = calculate_term(i)
+        cuda.atomic.add(s, 0, term)
+
+def calculate_pi(prec):
     decimal.getcontext().prec = prec
-    pool = multiprocessing.Pool(processes=num_processes)
-    s = decimal.Decimal(0)
-    with open("pi.txt", "w") as f:
-        for i, term in enumerate(pool.imap_unordered(calculate_term, range(0, prec)), 1):
-            s += term
-            if i % 100 == 0:
-                inverse_pi = (2 * decimal.Decimal(math.sqrt(2))) / decimal.Decimal(9801) * s
-                pi = 1 / inverse_pi
-                f.write(f"{i}: {pi}\n")
-                progress = decimal.Decimal(i) / decimal.Decimal(prec) * 100
-                print(f"Current progress: {progress}%")
-    pool.close()
-    pool.join()
-    inverse_pi = (2 * decimal.Decimal(math.sqrt(2))) / decimal.Decimal(9801) * s
+    threads_per_block = 128
+    blocks_per_grid = (prec + threads_per_block - 1) // threads_per_block
+    s = cuda.atomic.empty_like(decimal.Decimal(0))
+    s[0] = decimal.Decimal(0)
+    calculate_pi_kernel[blocks_per_grid, threads_per_block](prec, s)
+    cuda.synchronize()
+    
+    inverse_pi = (2 * decimal.Decimal(math.sqrt(2))) / decimal.Decimal(9801) * s[0]
     pi = 1 / inverse_pi
-    with open("pi.txt", "w") as f:
-        f.write(f"{prec}: {pi}\n")
     return pi
 
 if __name__ == '__main__':
     start_time = time.time()
 
-    prec = 1000000
-    num_processes = 8
-    pi = calculate_pi(prec, num_processes)
+    prec = 10000
+    pi = calculate_pi(prec)
 
     end_time = time.time()
     print(f"Time taken: {end_time - start_time} seconds")

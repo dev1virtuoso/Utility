@@ -27,7 +27,8 @@ def calculate_pi(prec, log_path):
                 pi = 1 / inverse_pi
                 f_pi.write(f"{i}: {pi}\n")
                 progress = decimal.Decimal(i) / decimal.Decimal(prec) * 100
-                print(f"Current progress: {progress}% - Calculating up to {i} decimal places")
+                decimals_calculated = i
+                print(f"Current progress: {progress}% - Calculating up to {decimals_calculated} decimal places")
                 f_log.write(f"Iteration {i}: {time.strftime('%Y-%m-%d %H:%M:%S')} - Calculated pi: {pi}\n")
     
     inverse_pi = (2 * decimal.Decimal(math.sqrt(2))) / decimal.Decimal(9801) * s
@@ -39,7 +40,7 @@ def calculate_pi(prec, log_path):
 if __name__ == '__main__':
     start_time = time.time()
 
-    prec = 10001
+    prec = 101
     log_dir = os.getcwd()
     log_path = os.path.join(log_dir, "log.txt")
     

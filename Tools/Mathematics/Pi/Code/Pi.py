@@ -1,40 +1,16 @@
 import decimal
-import math
-import multiprocessing
-import time
 
-def calculate_term(k):
-    numerator = decimal.Decimal(math.factorial(4*k)) * (1103 + 26390*k)
-    denominator = (decimal.Decimal(math.factorial(k))**4) * decimal.Decimal(396**(4*k))
-    return numerator / denominator
-
-def calculate_pi(prec, num_processes):
-    decimal.getcontext().prec = prec
-    pool = multiprocessing.Pool(processes=num_processes)
+def calculate_pi():
+    decimal.getcontext().prec = 100_000
     s = decimal.Decimal(0)
-    with open("pi.txt", "w") as f:
-        for i, term in enumerate(pool.imap_unordered(calculate_term, range(0, prec)), 1):
-            s += term
-            if i % 100 == 0:
-                inverse_pi = (2 * decimal.Decimal(math.sqrt(2))) / decimal.Decimal(9801) * s
-                pi = 1 / inverse_pi
-                f.truncate(0)
-                f.write(f"{i}: {pi}\n")
-    pool.close()
-    pool.join()
-    inverse_pi = (2 * decimal.Decimal(math.sqrt(2))) / decimal.Decimal(9801) * s
+    for k in range(100):
+        numerator = decimal.Decimal(decimal.math.factorial(4*k)) * (1103 + 26390*k)
+        denominator = (decimal.Decimal(decimal.math.factorial(k))**4) * decimal.Decimal(396**(4*k))
+        s += numerator / denominator
+    inverse_pi = (2 * decimal.Decimal(decimal.math.sqrt(2))) / decimal.Decimal(9801) * s
     pi = 1 / inverse_pi
-    with open("pi.txt", "w") as f:
-        f.write(f"{prec}: {pi}\n")
     return pi
 
-if __name__ == '__main__':
-    start_time = time.time()
+pi = calculate_pi()
 
-    prec = 100000
-    num_processes = 8
-    pi = calculate_pi(prec, num_processes)
-
-    end_time = time.time()
-    print(f"Time taken: {end_time - start_time} seconds")
-    print(f"Calculated pi value up to {prec} decimal places.")
+print("The value of π is:", pi)

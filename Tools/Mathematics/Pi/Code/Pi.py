@@ -53,11 +53,15 @@ if __name__ == '__main__':
 
     end_time = time.time()
     total_time = end_time - start_time
+    total_time_ms = total_time * 1000
+    total_time_us = total_time_ms * 1000
+    total_time_str = time.strftime('%Y-%m-%d %H:%M:%S') + f".{int((total_time % 1) * 1000):03d}.{int((total_time % 0.001) * 1000000):06d}"
+    
     print("\n")
-    print(f"Time taken: {total_time:.2f} seconds")
+    print(f"Time taken: {total_time_str} seconds")
     print(f"Calculated pi value up to {prec} decimal places.")
     
     with open(log_path, "a") as log_file:
         log_file.write(f"Program start time: {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(start_time))}\n")
         log_file.write(f"Program end time: {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(end_time))}\n")
-        log_file.write(f"Total program execution time: {total_time:.2f} seconds\n")
+        log_file.write(f"Total program execution time: {total_time_str} seconds\n")

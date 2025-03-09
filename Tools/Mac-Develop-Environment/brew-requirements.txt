@@ -71,6 +71,7 @@ gmp
 gnupg
 gnutls
 gobject-introspection
+goclone
 gpgme
 gradle
 graphene
@@ -122,6 +123,7 @@ libgcrypt
 libgee
 libgit2
 libgit2@1.7
+libgit2@1.8
 libgpg-error
 libidn
 libidn2
@@ -152,6 +154,7 @@ libssh
 libssh2
 libtasn1
 libtiff
+libtommath
 libtool
 libunibreak
 libunistring
@@ -200,6 +203,7 @@ nasm
 ncdu
 ncurses
 neovim
+net-snmp
 nettle
 ninja
 node
@@ -232,6 +236,7 @@ postgresql@14
 protobuf
 pv
 py3cairo
+pyenv
 pygobject3
 python-packaging
 python@3.10

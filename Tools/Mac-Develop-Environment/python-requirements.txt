@@ -1,4 +1,5 @@
 absl-py==2.1.0
+addict==2.4.0
 aiobotocore==2.21.1
 aiohappyeyeballs==2.5.0
 aiohttp==3.11.13
@@ -6,6 +7,7 @@ aioitertools==0.12.0
 aiosignal==1.3.2
 alabaster==1.0.0
 alembic==1.15.1
+all-packages==1.0.1
 annotated-types==0.7.0
 app-store-server-library==1.8.0
 apple-gpu==0.3.0
@@ -19,7 +21,6 @@ astunparse==1.6.3
 attrs==25.1.0
 audioread==3.0.1
 babel==2.17.0
--e git+https://github.com/openai/baselines.git@ea25b9e8b234e6ee1bca43083f8f3cf974143998#egg=baselines
 blinker==1.9.0
 botocore==1.37.1
 cachetools==5.5.2
@@ -53,10 +54,12 @@ colcon-recursive-crawl==0.2.3
 colcon-ros==0.5.0
 colcon-test-result==0.3.8
 colcon-zsh==0.5.0
+ConfigArgParse==1.7
 contourpy==1.3.1
 coverage==7.6.12
 cryptography==44.0.2
 cycler==0.12.1
+dash==3.0.1
 databricks-sdk==0.45.0
 dataclasses==0.6
 deap==1.4.2
@@ -84,7 +87,7 @@ flake8-deprecated==2.2.1
 flake8-docstrings==1.7.0
 flake8-import-order==0.18.2
 flake8-quotes==3.4.0
-Flask==3.1.0
+Flask==3.0.3
 flatbuffers==25.2.10
 fonttools==4.56.0
 frozenlist==1.5.0
@@ -152,15 +155,19 @@ multidict==6.1.0
 mypy==0.931
 mypy-extensions==1.0.0
 namex==0.0.8
+narwhals==1.33.0
 nbformat==5.10.4
+nest-asyncio==1.6.0
 netifaces==0.11.0
 networkx==3.4.2
 nose==1.3.7
 nrf24==2.0.0
 numba==0.61.0
 numpy==1.26.4
+open3d==0.19.0
 opencv-contrib-python==4.11.0.86
 opencv-python==4.11.0.86
+opencv-python-headless==4.11.0.86
 opentelemetry-api==1.30.0
 opentelemetry-sdk==1.30.0
 opentelemetry-semantic-conventions==0.51b0
@@ -177,6 +184,7 @@ pigpio==1.78
 pillow==11.1.0
 pip-review==1.3.0
 platformdirs==4.3.6
+plotly==6.0.1
 pluggy==1.5.0
 pooch==1.8.2
 portpicker==1.6.0
@@ -360,6 +368,7 @@ pyobjc-framework-Vision==11.0
 pyobjc-framework-WebKit==11.0
 pyOpenSSL==25.0.0
 pyparsing==2.4.7
+pyquaternion==0.9.9
 pyserial==3.5
 PySocks==1.7.1
 pytest==8.3.5
@@ -375,6 +384,7 @@ referencing==0.36.2
 regex==2024.11.6
 remotezip==0.12.3
 requests==2.32.3
+retrying==1.3.4
 rich==13.9.4
 roman-numerals-py==3.1.0
 rosdep==0.25.1
@@ -424,6 +434,8 @@ termcolor==2.5.0
 test-test-test==0.2.0
 thop==0.1.1.post2209072238
 threadpoolctl==3.5.0
+timm==1.0.15
+tkinterdnd2==0.4.3
 tokenizers==0.21.0
 toml==0.10.2
 tomli==2.2.1
@@ -446,7 +458,7 @@ vcstool==0.3.0
 vcstools==0.1.42
 virtualenv==20.29.3
 websocket-client==1.8.0
-Werkzeug==3.1.3
+Werkzeug==3.0.6
 wrapt==1.17.2
 wsproto==1.2.0
 wstool==0.1.17

@@ -31,6 +31,7 @@ aws-sdk-cpp
 bash
 bash-completion
 bat
+bench
 berkeley-db@5
 bison
 blake3
@@ -44,6 +45,7 @@ ca-certificates
 cabextract
 cairo
 capstone
+cava
 cbc
 ccache
 ceres-solver
@@ -84,6 +86,7 @@ fastlane
 fcl
 fdk-aac
 ffmpeg
+fftw
 flac
 flann
 fmt
@@ -165,6 +168,7 @@ hicolor-icon-theme
 highway
 hiredis
 htop
+httrack
 hunspell
 hwloc
 hyperfine
@@ -172,6 +176,7 @@ icu4c@75
 icu4c@76
 icu4c@77
 imath
+iniparser
 ipopt
 ipsw
 isl
@@ -350,6 +355,7 @@ pmix
 poco
 poppler
 popt
+portaudio
 postgresql@14
 proj
 protobuf
@@ -465,9 +471,15 @@ zsh-you-should-use
 zstd
 zurl
 appcleaner
+background-music
+cinebench
 firefox
 freac
+geekbench
+geekbench-ai
 hiddenbar
+lyricsx
+mactex
 raspberry-pi-imager
 safe-exam-browser
 sf-symbols

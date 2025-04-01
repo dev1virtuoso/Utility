@@ -486,3 +486,4 @@ sf-symbols
 spotify
 tor-browser
 virtualbox
+visual-studio-code

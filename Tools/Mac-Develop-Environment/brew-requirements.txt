@@ -280,6 +280,7 @@ libzzip
 little-cms2
 llvm
 llvm@18
+llvm@19
 lpeg
 lporg
 lua
@@ -409,6 +410,7 @@ suite-sparse
 svt-av1
 swi-prolog
 taglib
+tape
 task
 taskwarrior-tui
 tbb

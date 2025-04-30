@@ -10,3 +10,6 @@ pip freeze > a.txt
 brew list > b.txt
 brew upgrade
 brew upgrade --cask
+
+# Save Launchpad setting
+lporg save

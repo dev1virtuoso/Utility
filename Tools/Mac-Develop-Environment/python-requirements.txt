@@ -121,11 +121,13 @@ holisticai==1.0.14
 httplib2==0.22.0
 huggingface-hub==0.29.2
 idna==3.10
+imageio==2.37.0
 imagesize==1.4.1
 immutabledict==4.2.1
 importlib_metadata==8.6.1
 importlib_resources==6.5.2
 iniconfig==2.0.0
+iopath==0.1.10
 ipython==8.12.3
 iterable-queue==1.2.2
 itsdangerous==2.2.0
@@ -214,6 +216,7 @@ platformdirs==4.3.6
 plotly==6.0.1
 pluggy==1.5.0
 pooch==1.8.2
+portalocker==3.1.1
 portpicker==1.6.0
 promise==2.3
 prompt_toolkit==3.0.51
@@ -415,6 +418,7 @@ pytest-rerunfailures==15.0
 python-dateutil==2.9.0.post0
 python-jwt==4.1.0
 pytorch-ignite==0.5.1
+-e git+https://github.com/facebookresearch/pytorch3d.git@0a59450f0ebbe12d9a8db3de937814932517633b#egg=pytorch3d
 pytz==2025.1
 PyYAML==6.0.2
 pyzmq==26.4.0
@@ -434,6 +438,7 @@ rospkg==1.6.0
 rpds-py==0.23.1
 rsa==4.9
 safetensors==0.5.3
+scikit-image==0.25.2
 scikit-learn==1.6.1
 scipy==1.15.2
 selenium==4.29.0
@@ -476,6 +481,7 @@ test-test-test==0.2.0
 tf-slim==1.1.0
 thop==0.1.1.post2209072238
 threadpoolctl==3.5.0
+tifffile==2025.3.30
 timm==1.0.15
 tinycss2==1.4.0
 tkinterdnd2==0.4.3

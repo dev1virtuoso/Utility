@@ -1,14 +1,12 @@
 #!/bin/bash
 
-smartctl -a disk3s3
-
 # Save pip freeze output to a.txt
 pip freeze > a.txt
 
 # Save brew list output to b.txt
-brew list > b.txt
 brew upgrade
 brew upgrade --cask
+brew list > b.txt
 
 # Save Launchpad setting
 lporg save
@@ -39,3 +37,5 @@ folder_path="/path/to/directory"
 
 # Call the function with the specified folder path
 update_git_repos "$folder_path"
+
+smartctl -a disk3s3

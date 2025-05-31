@@ -1,12 +1,15 @@
 #!/bin/bash
 
 # Save pip freeze output to a.txt
-pip freeze > a.txt
+pip3 freeze > python-requirements.txt
+pip3 install --upgrade python-requirements.txt
+pip3 install --upgrade pip
+pip3 install --upgrade setuptools wheel
 
 # Save brew list output to b.txt
 brew upgrade
 brew upgrade --cask
-brew list > b.txt
+brew list > brew-requirements.txt
 
 # Save Launchpad setting
 lporg save

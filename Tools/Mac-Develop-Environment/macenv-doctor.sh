@@ -11,6 +11,7 @@ which python
 which pip3
 pip3 list
 pip3 freeze > requirements.txt
+pip check
 echo
 
 # List Homebrew packages

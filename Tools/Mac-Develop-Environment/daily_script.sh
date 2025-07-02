@@ -11,6 +11,17 @@ brew upgrade
 brew upgrade --cask
 brew list > brew-requirements.txt
 
+# Upgrade necessaries
+flutter upgrade
+omz update
+rvm get stable
+nvm install lts --reinstall-packages-from=current
+npm install -g npm@latest
+yarn upgrade
+pm2 update
+gem update
+pyenv update
+
 # Save Launchpad setting
 lporg save
 

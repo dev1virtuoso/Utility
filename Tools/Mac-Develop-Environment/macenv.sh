@@ -111,6 +111,8 @@ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 # Setup Node.js and related tools
 nvm install v16.13.2
 nvm install node
+nvm install lts --reinstall-packages-from=current
+npm install -g npm@latest
 
 # Install Node.js dependencies
 if [ -f "npm-requirements.txt" ]; then

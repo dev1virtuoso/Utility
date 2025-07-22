@@ -11,6 +11,7 @@ aribb24
 asio
 aspell
 assimp
+assimp@5
 at-spi2-core
 autoconf
 autoconf-archive
@@ -56,6 +57,7 @@ cgns
 check
 cjson
 cli11
+cloc
 clp
 cmake
 cocoapods
@@ -279,7 +281,6 @@ libzzip
 little-cms2
 llvm
 llvm@18
-llvm@19
 lpeg
 lporg
 lua
@@ -472,14 +473,14 @@ zsh-you-should-use
 zstd
 zurl
 appcleaner
+chromedriver
 cinebench
 disk-inventory-x
 firefox
 freac
 geekbench
 geekbench-ai
-hiddenbar
-mactex
+latest
 raspberry-pi-imager
 safe-exam-browser
 sf-symbols

@@ -52,4 +52,4 @@ folder_path="/path/to/directory"
 # Call the function with the specified folder path
 update_git_repos "$folder_path"
 
-smartctl -a disk3s3
+smartctl --all /dev/disk0

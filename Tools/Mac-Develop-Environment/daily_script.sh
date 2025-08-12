@@ -21,6 +21,7 @@ yarn upgrade
 pm2 update
 gem update
 pyenv update
+sudo port -v selfupdate
 
 # Save Launchpad setting
 lporg save

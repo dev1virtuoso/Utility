@@ -1,0 +1,84 @@
+body {
+  background-color: #000000;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  margin: 0;
+  font-family: Arial, sans-serif;
+}
+
+.container {
+  background-color: #1a1a1a;
+  border: 2px solid #ffd700;
+  padding: 2rem;
+  border-radius: 0.5rem;
+  width: 100%;
+  max-width: 28rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+h1 {
+  font-size: 1.5rem;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.word-section {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.word-section p {
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+#wordDisplay {
+  font-size: 1.875rem;
+  font-family: monospace;
+  margin: 1rem 0;
+}
+
+.input-field {
+  background-color: #333333;
+  color: #ffffff;
+  border: 1px solid #ffd700;
+  width: 100%;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  margin-bottom: 1rem;
+}
+
+.input-field::placeholder {
+  color: #cccccc;
+}
+
+.submit-btn {
+  background-color: #ffd700;
+  color: #000000;
+  width: 100%;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.submit-btn:hover {
+  background-color: #e6c200;
+}
+
+.result-correct {
+  color: #ffd700;
+}
+
+.result-wrong {
+  color: #ff3333;
+}
+
+#result, #score {
+  text-align: center;
+  margin-top: 1rem;
+}

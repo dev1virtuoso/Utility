@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cantonese Hanzi Romanized Input System Typing Yard</title>
+    <link href="styles.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container">
+        <h1>Cantonese Pinyin Typing Practice</h1>
+        <div class="word-section">
+            <p>Please enter the Cantonese character or pinyin (without tone):</p>
+            <p id="wordDisplay"></p>
+        </div>
+        <input id="userInput" type="text" class="input-field" placeholder="Enter character or pinyin..."
+            autocomplete="off">
+        <button id="submitBtn" class="submit-btn">Submit</button>
+        <button id="continueBtn" class="submit-btn" style="display: none;">Continue</button>
+        <p id="result"></p>
+        <p id="score">Score: 0</p>
+    </div>
+    <script src="script.js"></script>
+</body>
+
+</html>

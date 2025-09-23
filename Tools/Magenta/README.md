@@ -35,6 +35,6 @@ const result = interpreter.parse(tokens);
 
 ## Contact Information
 
-If you have any questions or suggestions regarding this machine learning project, please feel free to contact me through [following methods](https://github.com/dev1virtuoso/Documentation/blob/main/dev1virtuoso/Attachment/dev1virtuoso/carson-wu.md).
+If you have any questions or suggestions regarding this machine learning project, please feel free to contact me through [following methods](https://github.com/dev1virtuoso/Documentation/blob/main/dev1virtuoso/Attachment/dev1virtuoso/carson-wu.md#contact).
 
 Thank you for your interest to the project!

@@ -18,16 +18,20 @@ def calculate_pi(prec, log_path):
     
     pi_path = os.path.join(os.path.dirname(log_path), "pi.txt")
     
-    with open(pi_path, "w") as f_pi, open(log_path, "w") as f_log:
+    with open(log_path, "w") as f_log:
         start_time = time.time()
+        
         for i, term in enumerate(pool.imap_unordered(calculate_term, range(0, prec)), 1):
             s += term
             if i % 100 == 0:
                 inverse_pi = (2 * decimal.Decimal(math.sqrt(2))) / decimal.Decimal(9801) * s
                 pi = 1 / inverse_pi
-                f_pi.write(f"{i}: {pi}\n")
+                
+                with open(pi_path, "w") as f_pi:
+                    f_pi.write(f"{i}: {pi}\n")
+                
                 progress = decimal.Decimal(i) / decimal.Decimal(prec) * 100
-                print(f"\rCurrent progress: {progress:.2f}% - Calculating up to {i} decimal places", end="")
+                print(f"\rCurrent progress: {progress:.2f}% - Updated pi.txt (only {i} terms kept)", end="")
                 sys.stdout.flush()
                 f_log.write(f"Iteration {i}: {time.strftime('%Y-%m-%d %H:%M:%S')} - Calculated pi: {pi}\n")
     
@@ -36,14 +40,15 @@ def calculate_pi(prec, log_path):
     
     inverse_pi = (2 * decimal.Decimal(math.sqrt(2))) / decimal.Decimal(9801) * s
     pi = 1 / inverse_pi
-    with open(pi_path, "a") as f_pi:
+    with open(pi_path, "w") as f_pi:  # 這裡也是 "w"，不是 "a"
         f_pi.write(f"{prec}: {pi}\n")
+        
     return pi
 
 if __name__ == '__main__':
     start_time = time.time()
 
-    prec = 10001
+    prec = 100001
     log_dir = os.getcwd()
     log_path = os.path.join(log_dir, "log.txt")
     
@@ -53,15 +58,13 @@ if __name__ == '__main__':
 
     end_time = time.time()
     total_time = end_time - start_time
-    total_time_ms = total_time * 1000
-    total_time_us = total_time_ms * 1000
-    total_time_str = time.strftime('%Y-%m-%d %H:%M:%S') + f".{int((total_time % 1) * 1000):03d}.{int((total_time % 0.001) * 1000000):06d}"
+    total_time_str = f"{total_time:.3f} seconds"
     
     print("\n")
-    print(f"Time taken: {total_time_str} seconds")
-    print(f"Calculated pi value up to {prec} decimal places.")
+    print(f"Time taken: {total_time_str}")
+    print(f"Calculated pi up to {prec} terms.")
+    print("Final result saved in pi.txt → ONLY the latest line is kept!")
     
     with open(log_path, "a") as log_file:
-        log_file.write(f"Program start time: {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(start_time))}\n")
-        log_file.write(f"Program end time: {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(end_time))}\n")
-        log_file.write(f"Total program execution time: {total_time_str} seconds\n")
+        log_file.write(f"Program completed at {time.strftime('%Y-%m-%d %H:%M:%S')}\n")
+        log_file.write(f"Total execution time: {total_time_str}\n")

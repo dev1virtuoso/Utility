@@ -63,7 +63,7 @@ if __name__ == '__main__':
     print("\n")
     print(f"Time taken: {total_time_str}")
     print(f"Calculated pi up to {prec} terms.")
-    print("Final result saved in pi.txt → ONLY the latest line is kept!")
+    print("Final result saved in pi.txt -> ONLY the latest line is kept!")
     
     with open(log_path, "a") as log_file:
         log_file.write(f"Program completed at {time.strftime('%Y-%m-%d %H:%M:%S')}\n")

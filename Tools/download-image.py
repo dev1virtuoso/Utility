@@ -14,9 +14,9 @@ image_links = [result.get("src") for result in results]  # Get image source link
 for index, link in enumerate(image_links):
 
     if not os.path.exists("images"):
-        os.mkdir("images")  # Create directory
+        os.mkdir("images")
 
-    img = requests.get(link)  # Download the image
+    img = requests.get(link)
 
-    with open("images\\" + input_image + str(index+1) + ".jpg", "wb") as file:  # Open the directory and name the image file
-        file.write(img.content)  # Write the image's binary data
+    with open("images\\" + input_image + str(index+1) + ".jpg", "wb") as file:
+        file.write(img.content)

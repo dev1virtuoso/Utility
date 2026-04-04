@@ -4,14 +4,12 @@ import time
 import math
 import pygame
 
-# Constants for the simulation
 FPS = 60
 WIDTH = 800
 HEIGHT = 600
 MAX_PARTICLES = 5000
 PARTICLE_GENERATION_RATE = 50
 
-# Color definitions for various elements
 COLOR_BLUE = (0, 0, 255, 50)
 COLOR_CYAN = (0, 255, 255, 50)
 COLOR_SKY_BLUE = (135, 206, 235)
@@ -19,36 +17,33 @@ COLOR_WHITE = (255, 255, 255)
 COLOR_GRAY = (169, 169, 169)
 COLOR_DARK_GRAY = (105, 105, 105)
 
-# Class representing a particle in the fountain
 class Particle:
 
     def __init__(self):
-        # Initializing particle's position and velocity
         self.x = 0
         self.y = 0
         self.v_x = 0
         self.v_y = 0
         self.color = COLOR_BLUE
-    # Update particle's position and velocity based on gravity and wind
+
     def update(self, dtime: float, gravity: float, wind: float) -> None:
         self.x += self.v_x * dtime + wind * dtime
         self.y += self.v_y * dtime
         self.v_y += gravity * dtime
-    # Set particle's initial position, velocity, and color
+
     def set(self, x, y, v_x, v_y, color):
         self.x = x
         self.y = y
         self.v_x = v_x
         self.v_y = v_y
         self.color = color
-    # Draw particle on the screen
+
     def draw(self, screen):
         pygame.draw.circle(screen, self.color, (int(self.x), int(self.y)), 2)
-# Class representing the fountain
+
 class Fountain:
 
     def __init__(self, max_particles: int, particles_per_frame: int, spread: float, gravity: float, wind: float):
-        # Initialize fountain properties
         self.particles_per_frame = particles_per_frame
         self.max_particles = max_particles
         self.spread = spread
@@ -57,7 +52,7 @@ class Fountain:
         self.source_x = WIDTH // 2
         self.source_y = HEIGHT - 50
         self.particles = []
-    # Update all particles in the fountain
+
     def update(self, dtime) -> None:
         new_particles = [self.init_particle(Particle()) for _ in range(self.particles_per_frame)]
         self.particles.extend(new_particles)
@@ -66,7 +61,7 @@ class Fountain:
             particle.update(dtime, self.gravity, self.wind)
             if particle.y > HEIGHT - 10 or particle.x < 0 or particle.x > WIDTH:
                 self.init_particle(particle)
-    # Render all particles and the fountain structure on the screen
+
     def render(self, screen) -> None:
         screen.fill(COLOR_SKY_BLUE)
         
@@ -79,7 +74,7 @@ class Fountain:
             particle.draw(screen)
         
         pygame.display.flip()
-    # Initialize particle with a random position and velocity
+
     def init_particle(self, particle: Particle) -> Particle:
         radius = random.random() * self.spread
         direction = random.random() * math.pi * 2
@@ -89,14 +84,12 @@ class Fountain:
         particle.set(self.source_x, self.source_y - 230, v_x, v_y, color)
         return particle
         
-# Initialize Pygame and create the renderer (window)
 def make_renderer():
     pygame.init()
     screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.RESIZABLE)
     pygame.display.set_caption("Water Fountain Simulation")
     return screen
 
-# Limit the frame rate of the simulation
 def limit_frame_rate(fps: float, cur_time: int) -> bool:
     dtime = time.time() - cur_time
     frame_duration = 1 / fps
@@ -105,14 +98,12 @@ def limit_frame_rate(fps: float, cur_time: int) -> bool:
         return True
     return False
 
-# Handle user input and events
 def handle_events() -> bool:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             return False
     return True
 
-# Prompt user for input to configure the simulation
 def prompt_user():
     print("Welcome to the Water Fountain Simulation!")
     while True:
@@ -136,7 +127,6 @@ def prompt_user():
         else:
             print("Invalid choice. Please try again.")
             
-# Main animation loop
 def main_loop(screen, fountain: Fountain) -> None:
     running = True
     cur_time = time.time()
@@ -153,7 +143,6 @@ def main_loop(screen, fountain: Fountain) -> None:
 
     pygame.quit()
 
-# Display instructions for using the simulation
 def display_instructions():
     print("\nInstructions:")
     print("1. Use the prompt to configure the simulation.")
@@ -190,7 +179,6 @@ def change_background_color():
     else:
         print("Invalid choice. Default color will be used.")
 
-# Modify the structure of the fountain
 def modify_fountain_structure():
     global HEIGHT, WIDTH, FPS, MAX_PARTICLES, PARTICLE_GENERATION_RATE
     print("\nModify Fountain Structure:")
@@ -200,7 +188,6 @@ def modify_fountain_structure():
     MAX_PARTICLES = int(input("Enter new maximum number of particles: "))
     PARTICLE_GENERATION_RATE = int(input("Enter new particle generation rate per frame: "))
 
-# Main function to run the simulation
 def main():
     display_instructions()
     additional_features()

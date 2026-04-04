@@ -17,7 +17,6 @@ from Crypto.Hash import SHA256
 
 class PasswordEncryptor:
     def __init__(self):
-        # 定義加密方法字典，包含37種加密方式
         self.encryption_methods: Dict[str, Callable[[str], str]] = {
             'md5': self.md5_encrypt,
             'sha256': self.sha256_encrypt,
@@ -259,42 +258,34 @@ class PasswordEncryptor:
         return combined
 
     def elgamal_encrypt(self, text: str) -> str:
-        # 生成 ElGamal 密鑰對
         key = ElGamal.generate(256, secrets.token_bytes)
         public_key = key.publickey()
-        
-        # 使用 AES 加密文本
         symmetric_key = get_random_bytes(16)
         cipher = AES_Cipher.new(symmetric_key, AES_Cipher.MODE_EAX)
         nonce = cipher.nonce
         ciphertext, tag = cipher.encrypt_and_digest(text.encode())
-        
-        # 模擬 ElGamal 加密對稱密鑰（簡化）
         k = secrets.randbelow(key.p - 1)
         c1 = pow(key.g, k, key.p)
         c2 = (pow(key.y, k, key.p) * int.from_bytes(symmetric_key, 'big')) % key.p
         encrypted_key = f"{c1}:{c2}"
-        
-        # 組合密文
         combined = base64.b64encode(nonce + tag + ciphertext + encrypted_key.encode()).decode()
         return combined
 
     def triple_des_encrypt(self, text: str) -> str:
-        key = secrets.token_bytes(24)  # 3DES 需要 24 字節密鑰
+        key = secrets.token_bytes(24)
         cipher = DES3.new(key, DES3.MODE_ECB)
         padded_text = pad(text.encode(), DES3.block_size)
         ciphertext = cipher.encrypt(padded_text)
         return base64.b64encode(ciphertext).decode()
 
     def camellia_encrypt(self, text: str) -> str:
-        key = secrets.token_bytes(16)  # Camellia-128 需要 16 字節密鑰
+        key = secrets.token_bytes(16)
         cipher = Camellia.new(key, Camellia.MODE_ECB)
         padded_text = pad(text.encode(), Camellia.block_size)
         ciphertext = cipher.encrypt(padded_text)
         return base64.b64encode(ciphertext).decode()
 
     def eddsa_sign(self, text: str) -> str:
-        # 使用 Ed25519 進行簽名
         key = ECC.generate(curve='Ed25519')
         signer = eddsa.new(key, 'rfc8032')
         h = SHA256.new(text.encode())
@@ -302,12 +293,10 @@ class PasswordEncryptor:
         return base64.b64encode(signature).decode()
 
     def add_encryption_method(self, name: str, method: Callable[[str], str]) -> None:
-        """允許添加新的加密方法"""
         self.encryption_methods[name] = method
         self.available_methods.append(name)
 
     def encrypt_password(self, password: str, layers: list, show_encryption_step: bool = True) -> tuple[str, list]:
-        """執行多層加密"""
         result = password
         used_methods = []
         if show_encryption_step:

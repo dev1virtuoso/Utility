@@ -40,7 +40,7 @@ def calculate_pi(prec, log_path):
     
     inverse_pi = (2 * decimal.Decimal(math.sqrt(2))) / decimal.Decimal(9801) * s
     pi = 1 / inverse_pi
-    with open(pi_path, "w") as f_pi:  # 這裡也是 "w"，不是 "a"
+    with open(pi_path, "w") as f_pi:
         f_pi.write(f"{prec}: {pi}\n")
         
     return pi

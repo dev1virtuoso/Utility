@@ -25,8 +25,6 @@ This script is used to calculate the value of the mathematical constant Pi (π).
 ### Pi.py
 
 ```python
-# Copyright (c) 2024 Carson. All rights reserved.
-
 import decimal
 import math
 import multiprocessing
@@ -100,8 +98,6 @@ After the computation is complete, the time taken for the calculation is calcula
 ### Pi3.py
 
 ```python
-# Copyright (c) 2024 Carson. All rights reserved.
-
 import decimal
 import math
 import multiprocessing

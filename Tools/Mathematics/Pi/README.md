@@ -23,20 +23,25 @@ This script is used to calculate the value of the mathematical constant Pi (π).
 ## Explanation
 
 ### Pi.py
+
 ```python
 import decimal
 import math
 import multiprocessing
-import time```
+import time
+```
 
 This script is used to calculate an approximation of the value of Pi (π).
+
 ```python
 def calculate_term(k):
     numerator = decimal.Decimal(math.factorial(4*k)) * (1103 + 26390*k)
     denominator = (decimal.Decimal(math.factorial(k))**4) * decimal.Decimal(396**(4*k))
-    return numerator / denominator```
+    return numerator / denominator
+```
 
 The `calculate_term` function is used to calculate the value of each term. Based on the formula in Ramanujan's series, it calculates the values of the numerator and denominator and divides them to obtain one term of the approximation of Pi.
+
 ```python
 def calculate_pi(prec, num_processes):
     decimal.getcontext().prec = prec
@@ -56,7 +61,8 @@ def calculate_pi(prec, num_processes):
     pi = 1 / inverse_pi
     with open("pi.txt", "w") as f:
         f.write(f"{prec}: {pi}\n")
-    return pi```
+    return pi
+```
 
 The `calculate_pi` function is used to calculate the approximation of Pi. It takes two parameters: `prec` represents the decimal precision of Pi to be calculated, and `num_processes` represents the number of processes to be used.
 
@@ -71,6 +77,7 @@ After calculating each approximation value, it writes it to the file "pi.txt" an
 Once the computation is complete, it closes the process pool and performs the final calculation to obtain the final approximation of Pi. Then, it writes the final approximation value to the file "pi.txt".
 
 Finally, it returns the approximation of Pi `pi`.
+
 ```python
 if __name__ == '__main__':
     start_time = time.time()
@@ -81,27 +88,33 @@ if __name__ == '__main__':
 
     end_time = time.time()
     print(f"Time taken: {end_time - start_time} seconds")
-    print(f"Calculated pi value up to {prec} decimal places.")```
+    print(f"Calculated pi value up to {prec} decimal places.")
+```
 
 In the main program of the script, the precision `prec` is set to 100,000, and 8 processes `num_processes` are used for parallel computation. Then, the `calculate_pi` function is called to perform the calculation of Pi.
 
 After the computation is complete, the time taken for the calculation is calculated and printed, along with the number of decimal places of the calculated approximation of Pi.
 
 ### Pi3.py
+
 ```python
 import decimal
 import math
 import multiprocessing
-import time```
+import time
+```
 
 This script is used to calculate an approximation of the value of Pi (π).
+
 ```python
 def calculate_term(k):
     numerator = decimal.Decimal(math.factorial(4*k)) * (1103 + 26390*k)
     denominator = (decimal.Decimal(math.factorial(k))**4) * decimal.Decimal(396**(4*k))
-    return numerator / denominator```
+    return numerator / denominator
+```
 
 The `calculate_term` function is used to calculate the value of each term. Based on the formula in Ramanujan's series, it calculates the values of the numerator and denominator and divides them to obtain one term of the approximation of Pi.
+
 ```python
 def calculate_pi(prec, num_processes):
     decimal.getcontext().prec = prec
@@ -122,7 +135,8 @@ def calculate_pi(prec, num_processes):
     pi = 1 / inverse_pi
     with open("pi.txt", "w") as f:
         f.write(f"{prec}: {pi}\n")
-    return pi```
+    return pi
+```
 
 The `calculate_pi` function is used to calculate the approximation of Pi. It takes two parameters: `prec` represents the decimal precision of Pi to be calculated, and `num_processes` represents the number of processes to be used.
 
@@ -137,6 +151,7 @@ After calculating each approximation value, it writes it to the file "pi.txt" an
 Once the computation is complete, it closes the process pool and performs the final calculation to obtain the final approximation of Pi. Then, it writes the final approximation value to the file "pi.txt".
 
 Finally, it returns the approximation of Pi `pi`.
+
 ```python
 if __name__ == '__main__':
     start_time = time.time()
@@ -147,7 +162,8 @@ if __name__ == '__main__':
 
     end_time = time.time()
     print(f"Time taken: {end_time - start_time} seconds")
-    print(f"Calculated pi value up to {prec} decimal places.")```
+    print(f"Calculated pi value up to {prec} decimal places.")
+```
 
 In the main program of the script, the precision `prec` is set to 100,000, and 8 processes `num_processes` are used for parallel computation. Then, the `calculate_pi` function is called to perform the calculation of Pi.
 

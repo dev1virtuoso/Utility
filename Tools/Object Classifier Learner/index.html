@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-950 text-slate-100">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Minimal Object Classifier Studio</title>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.10.0/dist/tf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.0/dist/mobilenet.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+    
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    
+    .font-mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #475569;
+    }
+
+    .smooth-transition {
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+  </style>
+</head>
+<body class="h-full flex flex-col antialiased bg-slate-950 text-slate-100">
+
+  <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur-md sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center text-slate-950 font-bold text-sm">
+          AI
+        </div>
+        <div>
+          <h1 class="text-sm font-semibold text-slate-100 tracking-tight">Classifier Studio</h1>
+          <p class="text-xs text-slate-400">Minimal On-Device Image Classifier Trainer (Interactive)</p>
+        </div>
+      </div>
+
+      <div id="engine-status" class="flex items-center space-x-2 text-xs font-medium px-3 py-1.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">
+        <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse" id="status-dot"></span>
+        <span id="status-text">Loading Neural Engine...</span>
+        <button id="retry-engine-btn" onclick="initEngine()" class="hidden text-xs underline font-semibold text-slate-200 ml-2">Retry</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="flex-1 max-w-7xl w-full mx-auto px-6 py-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
+    
+    <div class="lg:col-span-5 flex flex-col gap-6">
+      
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-sm space-y-4">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-2">
+            <i data-lucide="camera" class="w-4 h-4 text-slate-400"></i>
+            <h2 class="text-sm font-semibold text-slate-200">Camera Feed</h2>
+          </div>
+          <span id="camera-badge" class="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700">Initializing</span>
+        </div>
+
+        <div class="relative aspect-video bg-black rounded-xl overflow-hidden border border-slate-800 flex items-center justify-center group">
+          <video id="webcam" autoplay playsinline muted class="w-full h-full object-cover -scale-x-100"></video>
+          <canvas id="hidden-canvas" class="hidden"></canvas>
+
+          <div id="video-placeholder" class="absolute inset-0 flex flex-col items-center justify-center text-slate-400 space-y-2 bg-slate-950/90">
+            <i data-lucide="video-off" class="w-8 h-8 stroke-1"></i>
+            <p class="text-xs">Please allow camera access to begin</p>
+            <button onclick="startWebcam()" class="px-3 py-1.5 bg-slate-100 text-slate-950 text-xs font-medium rounded-lg hover:bg-white transition">Start Camera</button>
+          </div>
+        </div>
+
+        <div class="flex justify-between items-center text-[11px] font-mono text-slate-400 px-1">
+          <span>Resolution: <span id="res-val" class="text-slate-300">--</span></span>
+          <span>Extractor: <span id="model-type-val" class="text-slate-300">MobileNet V2</span></span>
+        </div>
+      </div>
+
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-sm space-y-3">
+        <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider">3 Steps to Train</h3>
+        <ol class="text-xs text-slate-300 space-y-2.5 list-decimal list-inside">
+          <li><strong>Add Classes & Collect Samples</strong>: Name your classes and hold the button to capture frames.</li>
+          <li><strong>Tune Hyperparameters & Train</strong>: Click parameters to read guides, then begin training.</li>
+          <li><strong>Test & Evaluate Real-time</strong>: Toggle live inference to verify your model's accuracy.</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="lg:col-span-7 flex flex-col gap-6">
+      
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-2 shadow-sm flex items-center justify-between text-xs font-medium">
+        <button onclick="switchTab('data')" id="tab-btn-data" class="tab-btn flex-1 py-2.5 rounded-xl flex items-center justify-center gap-2 bg-slate-100 text-slate-950 smooth-transition">
+          <span class="w-5 h-5 rounded-full bg-slate-950/10 flex items-center justify-center text-[10px]">1</span>
+          <span>Data Collection</span>
+        </button>
+        <button onclick="switchTab('train')" id="tab-btn-train" class="tab-btn flex-1 py-2.5 rounded-xl flex items-center justify-center gap-2 text-slate-400 hover:text-slate-200 smooth-transition">
+          <span class="w-5 h-5 rounded-full bg-slate-800 flex items-center justify-center text-[10px]">2</span>
+          <span>Training & Guide</span>
+        </button>
+        <button onclick="switchTab('predict')" id="tab-btn-predict" class="tab-btn flex-1 py-2.5 rounded-xl flex items-center justify-center gap-2 text-slate-400 hover:text-slate-200 smooth-transition">
+          <span class="w-5 h-5 rounded-full bg-slate-800 flex items-center justify-center text-[10px]">3</span>
+          <span>Real-time Testing</span>
+        </button>
+      </div>
+
+      <div id="tab-content-data" class="tab-content bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-sm space-y-6">
+        <div class="flex justify-between items-center">
+          <div>
+            <h2 class="text-base font-semibold text-slate-100">1. Define Classes</h2>
+            <p class="text-xs text-slate-400 mt-0.5">Please create at least 2 classes and collect several image samples for each.</p>
+          </div>
+          <button onclick="addClass()" class="px-3 py-1.5 bg-slate-100 hover:bg-white text-slate-950 text-xs font-medium rounded-lg flex items-center gap-1.5 smooth-transition">
+            <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+            Add Class
+          </button>
+        </div>
+
+        <div id="class-container" class="space-y-4">
+        </div>
+      </div>
+
+      <div id="tab-content-train" class="tab-content hidden bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-sm space-y-6">
+        <div>
+          <h2 class="text-base font-semibold text-slate-100">2. Hyperparameters & Training Guide</h2>
+          <p class="text-xs text-slate-400 mt-0.5">Click any parameter below to view explanations and tuning recommendations.</p>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-4 p-4 bg-slate-950/60 rounded-xl border border-slate-800">
+          
+          <div class="p-2 rounded-lg hover:bg-slate-800/50 transition cursor-pointer" onclick="showParamGuide('epochs')">
+            <div class="flex items-center justify-between mb-1">
+              <label class="block text-[11px] font-medium text-slate-300 uppercase tracking-wider cursor-pointer">Epochs</label>
+              <i data-lucide="help-circle" class="w-3.5 h-3.5 text-blue-400"></i>
+            </div>
+            <input type="number" id="hp-epochs" value="20" min="1" max="200" onfocus="showParamGuide('epochs')" class="w-full bg-slate-900 border border-slate-700 text-slate-100 rounded-lg px-3 py-1.5 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-slate-100">
+          </div>
+          
+          <div class="p-2 rounded-lg hover:bg-slate-800/50 transition cursor-pointer" onclick="showParamGuide('batch')">
+            <div class="flex items-center justify-between mb-1">
+              <label class="block text-[11px] font-medium text-slate-300 uppercase tracking-wider cursor-pointer">Batch Size</label>
+              <i data-lucide="help-circle" class="w-3.5 h-3.5 text-blue-400"></i>
+            </div>
+            <select id="hp-batch" onfocus="showParamGuide('batch')" class="w-full bg-slate-900 border border-slate-700 text-slate-100 rounded-lg px-3 py-1.5 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-slate-100">
+              <option value="8">8</option>
+              <option value="16" selected>16</option>
+              <option value="32">32</option>
+              <option value="64">64</option>
+            </select>
+          </div>
+
+          <div class="p-2 rounded-lg hover:bg-slate-800/50 transition cursor-pointer" onclick="showParamGuide('lr')">
+            <div class="flex items-center justify-between mb-1">
+              <label class="block text-[11px] font-medium text-slate-300 uppercase tracking-wider cursor-pointer">Learning Rate</label>
+              <i data-lucide="help-circle" class="w-3.5 h-3.5 text-blue-400"></i>
+            </div>
+            <select id="hp-lr" onfocus="showParamGuide('lr')" class="w-full bg-slate-900 border border-slate-700 text-slate-100 rounded-lg px-3 py-1.5 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-slate-100">
+              <option value="0.01">0.01 (Fast, potentially unstable)</option>
+              <option value="0.001" selected>0.001 (Recommended)</option>
+              <option value="0.0001">0.0001 (Fine-tuning)</option>
+            </select>
+          </div>
+
+          <div class="p-2 rounded-lg hover:bg-slate-800/50 transition cursor-pointer" onclick="showParamGuide('optimizer')">
+            <div class="flex items-center justify-between mb-1">
+              <label class="block text-[11px] font-medium text-slate-300 uppercase tracking-wider cursor-pointer">Optimizer</label>
+              <i data-lucide="help-circle" class="w-3.5 h-3.5 text-blue-400"></i>
+            </div>
+            <select id="hp-optimizer" onfocus="showParamGuide('optimizer')" class="w-full bg-slate-900 border border-slate-700 text-slate-100 rounded-lg px-3 py-1.5 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-slate-100">
+              <option value="adam" selected>Adam (Adaptive, Default)</option>
+              <option value="sgd">SGD (Gradient Descent)</option>
+              <option value="rmsprop">RMSprop (For dynamic data)</option>
+            </select>
+          </div>
+
+          <div class="p-2 rounded-lg hover:bg-slate-800/50 transition cursor-pointer" onclick="showParamGuide('units')">
+            <div class="flex items-center justify-between mb-1">
+              <label class="block text-[11px] font-medium text-slate-300 uppercase tracking-wider cursor-pointer">Hidden Units</label>
+              <i data-lucide="help-circle" class="w-3.5 h-3.5 text-blue-400"></i>
+            </div>
+            <select id="hp-units" onfocus="showParamGuide('units')" class="w-full bg-slate-900 border border-slate-700 text-slate-100 rounded-lg px-3 py-1.5 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-slate-100">
+              <option value="32">32 Units</option>
+              <option value="64" selected>64 Units (Default)</option>
+              <option value="128">128 Units</option>
+            </select>
+          </div>
+
+          <div class="flex items-end p-2">
+            <button id="start-train-btn" onclick="startTraining()" class="w-full py-2.5 bg-slate-100 hover:bg-white text-slate-950 font-medium text-xs rounded-lg flex items-center justify-center gap-2 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed smooth-transition">
+              <i data-lucide="play" class="w-3.5 h-3.5 fill-current"></i>
+              <span>Start Training</span>
+            </button>
+          </div>
+        </div>
+
+        <div id="param-guide-box" class="p-4 bg-blue-950/30 border border-blue-800/50 rounded-xl space-y-2 transition-all">
+          <div class="flex items-center space-x-2 text-blue-300 font-semibold text-xs">
+            <i data-lucide="book-open" class="w-4 h-4 text-blue-400"></i>
+            <span id="guide-title">Parameter Guide: Click any parameter above for details</span>
+          </div>
+          <p id="guide-desc" class="text-xs text-blue-200/80 leading-relaxed">
+            Each parameter impacts the speed, accuracy, and potential overfitting of your model. Finding a good balance ensures optimal performance.
+          </p>
+          <div id="guide-tip" class="text-[11px] font-mono text-blue-300 bg-blue-900/40 p-2 rounded-lg border border-blue-800/40">
+              Tip: Click parameters like Epochs or Learning Rate to see recommendations.
+          </div>
+        </div>
+
+        <div id="training-progress-container" class="space-y-2 hidden">
+          <div class="flex justify-between text-xs font-medium">
+            <span class="text-slate-300 flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-blue-500 animate-ping"></span>
+              Training in progress... (<span id="current-epoch-val">0</span>/<span id="total-epoch-val">20</span> Epochs)
+            </span>
+            <span id="train-percentage" class="font-mono text-slate-400">0%</span>
+          </div>
+          <div class="w-full bg-slate-800 rounded-full h-2 overflow-hidden border border-slate-700">
+            <div id="train-progress-bar" class="bg-slate-100 h-full w-0 transition-all duration-150"></div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-4">
+          <div class="p-3 bg-slate-950/60 rounded-xl border border-slate-800 text-center">
+            <div class="text-[10px] uppercase font-medium text-slate-400">Current Loss</div>
+            <div id="metric-loss" class="text-lg font-mono font-semibold text-slate-100 mt-0.5">--</div>
+          </div>
+          <div class="p-3 bg-slate-950/60 rounded-xl border border-slate-800 text-center">
+            <div class="text-[10px] uppercase font-medium text-slate-400">Current Accuracy</div>
+            <div id="metric-acc" class="text-lg font-mono font-semibold text-slate-100 mt-0.5">--</div>
+          </div>
+          <div class="p-3 bg-slate-950/60 rounded-xl border border-slate-800 text-center">
+            <div class="text-[10px] uppercase font-medium text-slate-400">Time Elapsed</div>
+            <div id="metric-time" class="text-lg font-mono font-semibold text-slate-100 mt-0.5">0.0s</div>
+          </div>
+        </div>
+
+        <div class="border border-slate-800 rounded-xl p-4 bg-slate-950/40 space-y-2">
+          <div class="text-xs font-semibold text-slate-300 flex items-center justify-between">
+            <span>Training Curves (Loss & Accuracy)</span>
+            <span class="text-[10px] font-normal text-slate-500">Rendered with Chart.js</span>
+          </div>
+          <div class="h-48 w-full relative">
+            <canvas id="metricsChart"></canvas>
+          </div>
+        </div>
+
+        <div class="space-y-1.5">
+          <div class="flex justify-between items-center text-xs font-medium text-slate-400">
+            <span>Console Log</span>
+            <button onclick="clearConsole()" class="text-[10px] text-slate-500 hover:text-slate-300">Clear</button>
+          </div>
+          <div id="console-log" class="h-28 bg-black/80 text-slate-300 font-mono text-[11px] p-3 rounded-xl overflow-y-auto space-y-1 border border-slate-800">
+            <div class="text-slate-600">// Live logs will appear here when training starts...</div>
+          </div>
+        </div>
+      </div>
+
+      <div id="tab-content-predict" class="tab-content hidden bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-sm space-y-6">
+        <div class="flex justify-between items-center">
+          <div>
+            <h2 class="text-base font-semibold text-slate-100">3. Real-time Inference</h2>
+            <p class="text-xs text-slate-400 mt-0.5">Start real-time prediction to classify live webcam feed.</p>
+          </div>
+          <button id="toggle-predict-btn" onclick="togglePrediction()" class="px-4 py-2 bg-slate-100 hover:bg-white text-slate-950 text-xs font-medium rounded-lg flex items-center gap-2 smooth-transition">
+            <i data-lucide="power" class="w-3.5 h-3.5"></i>
+            <span id="predict-btn-text">Start Prediction</span>
+          </button>
+        </div>
+
+        <div id="prediction-results-container" class="space-y-4">
+          <div class="text-xs font-semibold text-slate-300">Confidence Scores</div>
+          <div id="prediction-bars" class="space-y-3">
+            <p class="text-xs text-slate-500 italic">Inference not started yet...</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    let featureExtractor = null;
+    let customClassifier = null;
+    let classes = [];
+    let isWebcamActive = false;
+    let isPredicting = false;
+    let metricsChart = null;
+    let isFallbackModel = false;
+
+    const paramGuideData = {
+      epochs: {
+        title: "Epochs",
+        desc: "Number of complete passes through the entire training dataset. One epoch means the model has seen and learned from all training samples once.",
+        tip: "Tip: For small datasets (5-10 images per class), 20-30 epochs is recommended. Too high may lead to Overfitting."
+      },
+      batch: {
+        title: "Batch Size",
+        desc: "The number of training samples processed before updating internal model parameters.",
+        tip: "Tip: Smaller batch sizes (e.g., 8 or 16) update weights more frequently, ideal for browser-based on-device training."
+      },
+      lr: {
+        title: "Learning Rate",
+        desc: "Step size at each iteration while moving toward a minimum of a loss function.",
+        tip: "Tip: A rate too high (e.g., 0.01) might cause unstable convergence; too low (e.g., 0.0001) slows down learning. 0.001 is standard."
+      },
+      optimizer: {
+        title: "Optimizer",
+        desc: "The algorithm used to adjust network weights and minimize model loss.",
+        tip: "Tip: Adam is an adaptive, robust optimizer suitable for most tasks. SGD is a traditional baseline."
+      },
+      units: {
+        title: "Hidden Units",
+        desc: "The number of neurons in the dense hidden layer, dictating the model's memory capacity and feature complexity.",
+        tip: "Tip: 32 or 64 units are usually sufficient for simple classification task to avoid excessive computation."
+      }
+    };
+
+    function showParamGuide(paramKey) {
+      const data = paramGuideData[paramKey];
+      if (!data) return;
+
+      document.getElementById('guide-title').innerText = data.title;
+      document.getElementById('guide-desc').innerText = data.desc;
+      document.getElementById('guide-tip').innerText = data.tip;
+    }
+
+    const initialClassNames = ["Class 1", "Class 2"];
+
+    lucide.createIcons();
+
+    function initChart() {
+      const ctx = document.getElementById('metricsChart').getContext('2d');
+      metricsChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: [],
+          datasets: [
+            {
+              label: 'Loss',
+              data: [],
+              borderColor: '#f87171',
+              backgroundColor: 'rgba(248, 113, 113, 0.1)',
+              borderWidth: 1.5,
+              tension: 0.2,
+              yAxisID: 'y'
+            },
+            {
+              label: 'Accuracy',
+              data: [],
+              borderColor: '#34d399',
+              backgroundColor: 'rgba(52, 211, 153, 0.1)',
+              borderWidth: 1.5,
+              tension: 0.2,
+              yAxisID: 'y1'
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          animation: false,
+          scales: {
+            x: {
+              grid: { color: 'rgba(255, 255, 255, 0.05)' },
+              ticks: { font: { size: 10 }, color: '#94a3b8' }
+            },
+            y: {
+              type: 'linear',
+              display: true,
+              position: 'left',
+              grid: { color: 'rgba(255, 255, 255, 0.05)' },
+              title: { display: true, text: 'Loss', font: { size: 10 }, color: '#94a3b8' },
+              ticks: { font: { size: 10 }, color: '#94a3b8' }
+            },
+            y1: {
+              type: 'linear',
+              display: true,
+              position: 'right',
+              grid: { drawOnChartArea: false },
+              min: 0,
+              max: 1,
+              title: { display: true, text: 'Accuracy', font: { size: 10 }, color: '#94a3b8' },
+              ticks: { font: { size: 10 }, color: '#94a3b8' }
+            }
+          },
+          plugins: {
+            legend: {
+              labels: { font: { size: 11, family: 'Inter' }, color: '#cbd5e1' }
+            }
+          }
+        }
+      });
+    }
+
+    async function initEngine() {
+      const statusDot = document.getElementById('status-dot');
+      const statusText = document.getElementById('status-text');
+      const retryBtn = document.getElementById('retry-engine-btn');
+
+      statusDot.className = "w-2 h-2 rounded-full bg-amber-400 animate-pulse";
+      statusText.innerText = "Loading Feature Extractor...";
+      retryBtn.classList.add('hidden');
+
+      try {
+        if (window.mobilenet) {
+          logConsole("Attempting to load MobileNet V2 weights...");
+          featureExtractor = await mobilenet.load({ version: 2, alpha: 1.0 });
+          isFallbackModel = false;
+          document.getElementById('model-type-val').innerText = "MobileNet V2 (Pretrained)";
+          logConsole("MobileNet V2 loaded successfully!");
+        } else {
+          throw new Error("MobileNet CDN module unavailable");
+        }
+      } catch (err) {
+        console.warn("MobileNet load failed, initializing fallback CNN backbone:", err);
+        logConsole("Network/CDN restricted. Constructing local lightweight feature extractor...");
+        
+        try {
+          const fallback = tf.sequential();
+          fallback.add(tf.layers.conv2d({ inputShape: [224, 224, 3], filters: 16, kernelSize: 3, activation: 'relu' }));
+          fallback.add(tf.layers.maxPooling2d({ poolSize: 2 }));
+          fallback.add(tf.layers.conv2d({ filters: 32, kernelSize: 3, activation: 'relu' }));
+          fallback.add(tf.layers.maxPooling2d({ poolSize: 2 }));
+          fallback.add(tf.layers.globalAveragePooling2d());
+          
+          featureExtractor = {
+            infer: (imgElement) => {
+              return tf.tidy(() => {
+                let tensor = tf.browser.fromPixels(imgElement)
+                  .resizeBilinear([224, 224])
+                  .toFloat()
+                  .div(tf.scalar(255));
+                return fallback.predict(tensor.expandDims(0));
+              });
+            }
+          };
+          
+          isFallbackModel = true;
+          document.getElementById('model-type-val').innerText = "Local CNN Backbone (Fallback)";
+          logConsole("Local fallback model built!");
+        } catch (fallbackErr) {
+          statusDot.className = "w-2 h-2 rounded-full bg-red-500";
+          statusText.innerText = "Engine Initialization Failed";
+          retryBtn.classList.remove('hidden');
+          logConsole("Engine init error: " + fallbackErr.message);
+          return;
+        }
+      }
+
+      statusDot.className = "w-2 h-2 rounded-full bg-emerald-500";
+      statusText.innerText = "Engine Ready";
+      
+      startWebcam();
+    }
+
+    async function startWebcam() {
+      const video = document.getElementById('webcam');
+      const placeholder = document.getElementById('video-placeholder');
+      const badge = document.getElementById('camera-badge');
+
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { width: 640, height: 480, facingMode: "user" },
+          audio: false
+        });
+        video.srcObject = stream;
+        video.addEventListener('loadedmetadata', () => {
+          document.getElementById('res-val').innerText = `${video.videoWidth}x${video.videoHeight}`;
+          placeholder.classList.add('hidden');
+          badge.className = "text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-800";
+          badge.innerText = "LIVE Feed";
+          isWebcamActive = true;
+        });
+      } catch (err) {
+        console.error("Camera access failed:", err);
+        badge.className = "text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-red-950 text-red-400 border border-red-800";
+        badge.innerText = "Camera Disabled";
+        logConsole("Camera unavailable. You can upload local images to collect samples.");
+      }
+    }
+
+    function initDefaultClasses() {
+      const container = document.getElementById('class-container');
+      container.innerHTML = '';
+      classes = [];
+
+      initialClassNames.forEach(name => addClass(name));
+    }
+
+    function addClass(defaultName = null) {
+      const classId = Date.now() + Math.random().toString(36).substr(2, 4);
+      const className = defaultName || `Class ${classes.length + 1}`;
+
+      const classObj = {
+        id: classId,
+        name: className,
+        samples: []
+      };
+
+      classes.push(classObj);
+      renderClassCard(classObj);
+    }
+
+    function renderClassCard(classObj) {
+      const container = document.getElementById('class-container');
+      
+      const card = document.createElement('div');
+      card.id = `class-card-${classObj.id}`;
+      card.className = "p-4 bg-slate-950/60 border border-slate-800 rounded-xl space-y-3 smooth-transition";
+
+      card.innerHTML = `
+        <div class="flex items-center justify-between gap-3">
+          <input type="text" value="${classObj.name}" onchange="updateClassName('${classObj.id}', this.value)" 
+            class="font-semibold text-sm bg-transparent border-b border-transparent hover:border-slate-700 focus:border-slate-100 focus:bg-slate-900 px-1 py-0.5 rounded outline-none text-slate-100 transition">
+          <div class="flex items-center space-x-2">
+            <span id="sample-count-${classObj.id}" class="text-xs font-mono bg-slate-900 px-2.5 py-1 border border-slate-800 rounded-full text-slate-400">0 samples</span>
+            <button onclick="removeClass('${classObj.id}')" class="text-slate-500 hover:text-red-400 p-1 transition">
+              <i data-lucide="trash-2" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <button onmousedown="startCollecting('${classObj.id}')" onmouseup="stopCollecting()" onmouseleave="stopCollecting()" 
+            class="flex-1 py-2 bg-slate-100 hover:bg-white text-slate-950 text-xs font-medium rounded-lg flex items-center justify-center gap-1.5 active:scale-[0.98] transition">
+            <i data-lucide="camera" class="w-3.5 h-3.5"></i>
+            Hold to Capture Samples
+          </button>
+          
+          <label class="px-3 py-2 bg-slate-900 border border-slate-800 hover:bg-slate-800 text-slate-300 text-xs font-medium rounded-lg cursor-pointer transition">
+            Upload Image
+            <input type="file" accept="image/*" multiple onchange="handleFileUpload(event, '${classObj.id}')" class="hidden">
+          </label>
+        </div>
+
+        <div id="thumbnails-${classObj.id}" class="flex items-center gap-2 overflow-x-auto py-1">
+          <span class="text-[11px] text-slate-500 italic">No samples collected yet</span>
+        </div>
+      `;
+
+      container.appendChild(card);
+      lucide.createIcons();
+    }
+
+    function updateClassName(id, name) {
+      const c = classes.find(item => item.id === id);
+      if (c) c.name = name;
+    }
+
+    function removeClass(id) {
+      if (classes.length <= 2) {
+        alert("The model requires at least 2 classes!");
+        return;
+      }
+      classes = classes.filter(c => c.id !== id);
+      const el = document.getElementById(`class-card-${id}`);
+      if (el) el.remove();
+    }
+
+    let collectInterval = null;
+
+    function startCollecting(classId) {
+      if (!isWebcamActive) {
+        alert("Please enable camera before capturing samples!");
+        return;
+      }
+
+      captureSample(classId);
+      collectInterval = setInterval(() => captureSample(classId), 150);
+    }
+
+    function stopCollecting() {
+      if (collectInterval) clearInterval(collectInterval);
+    }
+
+    function captureSample(classId) {
+      const video = document.getElementById('webcam');
+      const classObj = classes.find(c => c.id === classId);
+      if (!classObj || !featureExtractor) return;
+
+      tf.tidy(() => {
+        let embedding = featureExtractor.infer(video);
+        classObj.samples.push(tf.keep(embedding));
+      });
+
+      addThumbnail(classId, video);
+      updateSampleCount(classId);
+    }
+
+    function handleFileUpload(event, classId) {
+      const files = event.target.files;
+      const classObj = classes.find(c => c.id === classId);
+      if (!files || !files.length || !classObj) return;
+
+      Array.from(files).forEach(file => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = new Image();
+          img.src = e.target.result;
+          img.onload = () => {
+            tf.tidy(() => {
+              let embedding = featureExtractor.infer(img);
+              classObj.samples.push(tf.keep(embedding));
+            });
+            addThumbnail(classId, img);
+            updateSampleCount(classId);
+          };
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function addThumbnail(classId, source) {
+      const container = document.getElementById(`thumbnails-${classId}`);
+      if (container.querySelector('span')) {
+        container.innerHTML = '';
+      }
+
+      const canvas = document.createElement('canvas');
+      canvas.width = 40;
+      canvas.height = 40;
+      canvas.className = "w-10 h-10 rounded-md object-cover border border-slate-800 flex-shrink-0";
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(source, 0, 0, 40, 40);
+
+      container.insertBefore(canvas, container.firstChild);
+    }
+
+    function updateSampleCount(classId) {
+      const classObj = classes.find(c => c.id === classId);
+      const countEl = document.getElementById(`sample-count-${classId}`);
+      if (countEl && classObj) {
+        countEl.innerText = `${classObj.samples.length} samples`;
+      }
+    }
+
+    async function startTraining() {
+      const totalSamples = classes.reduce((sum, c) => sum + c.samples.length, 0);
+      if (totalSamples < 4) {
+        alert("Not enough samples! Please collect at least 2 samples per class.");
+        return;
+      }
+
+      const emptyClass = classes.find(c => c.samples.length === 0);
+      if (emptyClass) {
+        alert(`Class "${emptyClass.name}" has no samples. Please collect samples before training.`);
+        return;
+      }
+
+      const trainBtn = document.getElementById('start-train-btn');
+      const progressContainer = document.getElementById('training-progress-container');
+      const progressBar = document.getElementById('train-progress-bar');
+      
+      trainBtn.disabled = true;
+      trainBtn.innerHTML = `<i data-lucide="loader-2" class="w-3.5 h-3.5 animate-spin"></i><span>Training...</span>`;
+      lucide.createIcons();
+
+      progressContainer.classList.remove('hidden');
+      progressBar.style.width = '0%';
+
+      const epochs = parseInt(document.getElementById('hp-epochs').value) || 20;
+      const batchSize = parseInt(document.getElementById('hp-batch').value) || 16;
+      const learningRate = parseFloat(document.getElementById('hp-lr').value) || 0.001;
+      const optimizerName = document.getElementById('hp-optimizer').value;
+      const hiddenUnits = parseInt(document.getElementById('hp-units').value) || 64;
+
+      document.getElementById('total-epoch-val').innerText = epochs;
+
+      logConsole(`\n--- Model Training Initiated ---`);
+      logConsole(`Config: Epochs=${epochs}, BatchSize=${batchSize}, LR=${learningRate}, Optimizer=${optimizerName}`);
+
+      const { xs, ys } = tf.tidy(() => {
+        let xList = [];
+        let yList = [];
+
+        classes.forEach((c, index) => {
+          c.samples.forEach(sampleTensor => {
+            xList.push(sampleTensor.squeeze([0]));
+            yList.push(index);
+          });
+        });
+
+        const xsTensor = tf.stack(xList);
+        const ysTensor = tf.oneHot(tf.tensor1d(yList, 'int32'), classes.length);
+        return { xs: xsTensor, ys: ysTensor };
+      });
+
+      const inputShape = xs.shape[1];
+      
+      customClassifier = tf.sequential();
+      customClassifier.add(tf.layers.dense({
+        units: hiddenUnits,
+        activation: 'relu',
+        inputShape: [inputShape]
+      }));
+      customClassifier.add(tf.layers.dropout({ rate: 0.2 }));
+      customClassifier.add(tf.layers.dense({
+        units: classes.length,
+        activation: 'softmax'
+      }));
+
+      let optimizer;
+      if (optimizerName === 'adam') optimizer = tf.train.adam(learningRate);
+      else if (optimizerName === 'sgd') optimizer = tf.train.sgd(learningRate);
+      else optimizer = tf.train.rmsprop(learningRate);
+
+      customClassifier.compile({
+        optimizer: optimizer,
+        loss: 'categoricalCrossentropy',
+        metrics: ['accuracy']
+      });
+
+      metricsChart.data.labels = [];
+      metricsChart.data.datasets[0].data = [];
+      metricsChart.data.datasets[1].data = [];
+      metricsChart.update();
+
+      const startTime = performance.now();
+
+      await customClassifier.fit(xs, ys, {
+        batchSize: Math.min(batchSize, xs.shape[0]),
+        epochs: epochs,
+        shuffle: true,
+        callbacks: {
+          onEpochEnd: async (epoch, logs) => {
+            const currentEpoch = epoch + 1;
+            const pct = Math.round((currentEpoch / epochs) * 100);
+            
+            document.getElementById('current-epoch-val').innerText = currentEpoch;
+            document.getElementById('train-percentage').innerText = `${pct}%`;
+            progressBar.style.width = `${pct}%`;
+
+            document.getElementById('metric-loss').innerText = logs.loss.toFixed(4);
+            document.getElementById('metric-acc').innerText = (logs.acc * 100).toFixed(1) + '%';
+            
+            const elapsedTime = ((performance.now() - startTime) / 1000).toFixed(1);
+            document.getElementById('metric-time').innerText = `${elapsedTime}s`;
+
+            metricsChart.data.labels.push(`E${currentEpoch}`);
+            metricsChart.data.datasets[0].data.push(logs.loss);
+            metricsChart.data.datasets[1].data.push(logs.acc);
+            metricsChart.update();
+
+            logConsole(`Epoch [${currentEpoch}/${epochs}] - Loss: ${logs.loss.toFixed(4)} - Accuracy: ${(logs.acc * 100).toFixed(1)}%`);
+
+            await tf.nextFrame();
+          }
+        }
+      });
+
+      xs.dispose();
+      ys.dispose();
+
+      trainBtn.disabled = false;
+      trainBtn.innerHTML = `<i data-lucide="play" class="w-3.5 h-3.5 fill-current"></i><span>Retrain Model</span>`;
+      lucide.createIcons();
+
+      logConsole(`Training complete! Time elapsed: ${((performance.now() - startTime) / 1000).toFixed(2)}s`);
+      alert("Model trained successfully! Go to '3. Real-time Testing' to test predictions.");
+    }
+
+    function togglePrediction() {
+      if (!customClassifier) {
+        alert("Please train your model first!");
+        return;
+      }
+
+      const btnText = document.getElementById('predict-btn-text');
+      const toggleBtn = document.getElementById('toggle-predict-btn');
+
+      isPredicting = !isPredicting;
+
+      if (isPredicting) {
+        btnText.innerText = "Stop Prediction";
+        toggleBtn.className = "px-4 py-2 bg-red-600 hover:bg-red-500 text-white text-xs font-medium rounded-lg flex items-center gap-2 smooth-transition";
+        predictLoop();
+      } else {
+        btnText.innerText = "Start Prediction";
+        toggleBtn.className = "px-4 py-2 bg-slate-100 hover:bg-white text-slate-950 text-xs font-medium rounded-lg flex items-center gap-2 smooth-transition";
+      }
+    }
+
+    async function predictLoop() {
+      const video = document.getElementById('webcam');
+      const container = document.getElementById('prediction-bars');
+
+      while (isPredicting) {
+        if (isWebcamActive && customClassifier && featureExtractor) {
+          const logits = tf.tidy(() => {
+            const embedding = featureExtractor.infer(video);
+            return customClassifier.predict(embedding);
+          });
+
+          const probabilities = await logits.data();
+          logits.dispose();
+
+          container.innerHTML = '';
+          classes.forEach((c, index) => {
+            const score = (probabilities[index] * 100).toFixed(1);
+            
+            const barWrapper = document.createElement('div');
+            barWrapper.className = "space-y-1";
+            barWrapper.innerHTML = `
+              <div class="flex justify-between text-xs font-medium">
+                <span class="text-slate-200">${c.name}</span>
+                <span class="font-mono text-slate-400">${score}%</span>
+              </div>
+              <div class="w-full bg-slate-800 rounded-full h-2.5 overflow-hidden border border-slate-700">
+                <div class="bg-slate-100 h-full transition-all duration-100" style="width: ${score}%"></div>
+              </div>
+            `;
+            container.appendChild(barWrapper);
+          });
+        }
+        await tf.nextFrame();
+      }
+    }
+
+    function logConsole(message) {
+      const consoleEl = document.getElementById('console-log');
+      const entry = document.createElement('div');
+      entry.innerText = message;
+      consoleEl.appendChild(entry);
+      consoleEl.scrollTop = consoleEl.scrollHeight;
+    }
+
+    function clearConsole() {
+      document.getElementById('console-log').innerHTML = '';
+    }
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.className = "tab-btn flex-1 py-2.5 rounded-xl flex items-center justify-center gap-2 text-slate-400 hover:text-slate-200 smooth-transition";
+      });
+
+      document.getElementById(`tab-content-${tabId}`).classList.remove('hidden');
+      const activeBtn = document.getElementById(`tab-btn-${tabId}`);
+      activeBtn.className = "tab-btn flex-1 py-2.5 rounded-xl flex items-center justify-center gap-2 bg-slate-100 text-slate-950 smooth-transition";
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      initChart();
+      initDefaultClasses();
+      initEngine();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,750 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Clef 決策實驗室 · Decision Lab</title>
+<style>
+  :root {
+    --bg: #0f1115;
+    --panel: #171a21;
+    --panel-2: #1e222b;
+    --panel-3: #242936;
+    --border: #2a2f3a;
+    --text: #e6e9ef;
+    --muted: #9aa3b2;
+    --accent: #4f8cff;
+    --accent-2: #6ea8ff;
+    --green: #3ecf8e;
+    --red: #ff6b6b;
+    --amber: #f5b64a;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --radius: 10px;
+    --shadow: 0 8px 30px rgba(0,0,0,.35);
+  }
+  @media (prefers-color-scheme: light) {
+    :root {
+      --bg: #f4f6fa;
+      --panel: #ffffff;
+      --panel-2: #f7f9fc;
+      --panel-3: #eef1f6;
+      --border: #dfe4ec;
+      --text: #1c2333;
+      --muted: #5b6575;
+      --shadow: 0 8px 24px rgba(30,40,60,.10);
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font: 15px/1.55 -apple-system, "Segoe UI", "PingFang TC", "Microsoft JhengHei", sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 1060px; margin: 0 auto; padding: 28px 20px 80px; }
+  header { display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px 16px; margin-bottom: 6px; }
+  h1 { font-size: 24px; margin: 0; letter-spacing: .3px; }
+  h1 .en { color: var(--muted); font-weight: 500; font-size: 15px; margin-left: 8px; }
+  .subtitle { color: var(--muted); margin: 4px 0 18px; }
+
+  .conn { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; padding: 12px 14px;
+    background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 18px; }
+  .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--muted); display: inline-block; margin-right: 6px; }
+  .dot.ok { background: var(--green); box-shadow: 0 0 0 3px rgba(62,207,142,.18); }
+  .dot.bad { background: var(--red); box-shadow: 0 0 0 3px rgba(255,107,107,.18); }
+  .conn label { color: var(--muted); font-size: 13px; }
+  .conn input, .conn select { background: var(--panel-2); color: var(--text); border: 1px solid var(--border);
+    border-radius: 7px; padding: 7px 10px; font-size: 13px; }
+  .conn input { width: 210px; font-family: var(--mono); }
+  .conn select { min-width: 160px; }
+  .conn .grow { flex: 1; min-width: 80px; }
+  .conn .status { font-size: 13px; color: var(--muted); }
+
+  .tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--border); margin-bottom: 18px; }
+  .tabs button { appearance: none; background: transparent; border: none; color: var(--muted);
+    font-size: 15px; padding: 10px 18px; cursor: pointer; border-bottom: 2px solid transparent; }
+  .tabs button.active { color: var(--text); border-bottom-color: var(--accent); font-weight: 600; }
+  .tabs button:hover { color: var(--text); }
+
+  .card { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 16px; margin-bottom: 16px; }
+  .card h2 { font-size: 15px; margin: 0 0 10px; }
+  .card .hint { color: var(--muted); font-size: 13px; margin: 4px 0 10px; }
+  textarea, input[type=text] { width: 100%; background: var(--panel-2); color: var(--text);
+    border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; font-size: 14px; resize: vertical; }
+  textarea { font-family: var(--mono); min-height: 88px; }
+  textarea:focus, input:focus, select:focus { outline: none; border-color: var(--accent); }
+  .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+
+  .preset { display: flex; gap: 10px; align-items: center; margin-bottom: 14px; flex-wrap: wrap; }
+  .preset select { background: var(--panel-2); color: var(--text); border: 1px solid var(--border);
+    border-radius: 7px; padding: 8px 10px; font-size: 14px; flex: 1; min-width: 200px; }
+
+  .q-item { background: var(--panel-2); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 13px; margin-bottom: 12px; }
+  .q-head { display: flex; gap: 8px; align-items: center; margin-bottom: 9px; flex-wrap: wrap; }
+  .q-head input[type=text] { flex: 1; min-width: 140px; font-family: var(--mono); font-size: 13px; }
+  .q-head select { background: var(--panel-3); color: var(--text); border: 1px solid var(--border);
+    border-radius: 7px; padding: 7px 9px; font-size: 13px; }
+  .q-inst { margin-bottom: 9px; }
+  .q-inst input { font-size: 13px; }
+  .q-crit { display: flex; flex-direction: column; gap: 6px; }
+  .crit-row { display: flex; gap: 8px; align-items: center; }
+  .crit-row input { font-size: 13px; padding: 7px 9px; }
+  .crit-row .opt { width: 120px; flex: none; font-family: var(--mono); }
+  .tag { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 20px;
+    background: var(--panel-3); color: var(--muted); border: 1px solid var(--border); }
+  .tag.noul { color: var(--accent-2); }
+  .tag.choice { color: var(--amber); }
+  .tag.score { color: var(--green); }
+
+  .btn { appearance: none; border: 1px solid var(--border); background: var(--panel-3); color: var(--text);
+    border-radius: 8px; padding: 8px 14px; font-size: 14px; cursor: pointer; }
+  .btn:hover { border-color: var(--accent); }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+  .btn.primary:hover { background: var(--accent-2); }
+  .btn.danger { color: var(--red); }
+  .btn:disabled { opacity: .55; cursor: not-allowed; }
+  .btn.small { padding: 5px 9px; font-size: 12px; }
+  .icon-btn { background: transparent; border: none; color: var(--muted); cursor: pointer; font-size: 15px; }
+  .icon-btn:hover { color: var(--red); }
+
+  #run-row { display: flex; gap: 12px; align-items: center; margin: 4px 0 20px; }
+  #run { font-size: 15px; padding: 11px 22px; }
+
+  .result-card { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 16px; margin-bottom: 14px; }
+  .result-head { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; flex-wrap: wrap; }
+  .result-head .qname { font-family: var(--mono); font-weight: 600; font-size: 14px; }
+  .result-head .qinst { color: var(--muted); font-size: 13px; flex: 1; min-width: 160px; }
+  .verdict { font-size: 22px; font-weight: 700; margin: 8px 0 2px; }
+  .verdict.yes { color: var(--green); }
+  .verdict.no { color: var(--red); }
+  .verdict.neutral { color: var(--accent-2); }
+  .sub-verdict { color: var(--muted); font-size: 13px; margin-bottom: 10px; }
+
+  .bars { display: flex; flex-direction: column; gap: 7px; margin: 8px 0; }
+  .bar-row { display: grid; grid-template-columns: 130px 1fr 64px; gap: 10px; align-items: center; }
+  .bar-row .lbl { font-size: 13px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .bar-row .pct { font-size: 13px; text-align: right; font-family: var(--mono); color: var(--text); }
+  .bar-track { height: 12px; background: var(--panel-3); border-radius: 6px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 6px; background: var(--accent); transition: width .4s ease; }
+  .bar-row.win .lbl { color: var(--text); font-weight: 600; }
+  .bar-row.win .bar-fill { background: var(--green); }
+
+  .conf { font-size: 12px; color: var(--muted); margin-top: 6px; }
+  .meta { font-size: 12px; color: var(--muted); margin-top: 10px; font-family: var(--mono); }
+  .error { background: rgba(255,107,107,.08); border: 1px solid rgba(255,107,107,.4); color: var(--red);
+    border-radius: var(--radius); padding: 13px 15px; margin-bottom: 16px; font-size: 14px; white-space: pre-wrap; }
+  .notice { background: var(--panel-2); border: 1px solid var(--border); border-left: 3px solid var(--amber);
+    border-radius: var(--radius); padding: 13px 15px; margin-bottom: 16px; font-size: 14px; }
+  .notice code, .card code { background: var(--panel-3); padding: 1px 6px; border-radius: 5px; font-family: var(--mono); font-size: 12.5px; }
+
+  .drop { border: 2px dashed var(--border); border-radius: var(--radius); padding: 26px; text-align: center;
+    color: var(--muted); cursor: pointer; transition: border-color .15s, background .15s; }
+  .drop:hover, .drop.over { border-color: var(--accent); background: var(--panel-2); }
+  .preview { max-width: 100%; max-height: 340px; border-radius: 8px; border: 1px solid var(--border); display: block; margin: 10px 0; }
+  .preview-row { display: flex; gap: 14px; align-items: flex-start; flex-wrap: wrap; }
+  .preview-col { flex: 1; min-width: 240px; }
+
+  details { margin-top: 8px; }
+  summary { cursor: pointer; color: var(--muted); font-size: 13px; }
+  pre { background: var(--panel-2); border: 1px solid var(--border); border-radius: 8px; padding: 12px;
+    overflow: auto; font-size: 12px; font-family: var(--mono); max-height: 420px; }
+
+  footer { color: var(--muted); font-size: 13px; margin-top: 26px; }
+  footer ul { margin: 8px 0 0; padding-left: 20px; }
+  footer li { margin: 4px 0; }
+  .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,.4);
+    border-top-color: #fff; border-radius: 50%; animation: spin .8s linear infinite; vertical-align: -2px; margin-right: 8px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Clef 決策實驗室<span class="en">Decision Lab</span></h1>
+  </header>
+  <p class="subtitle">透過 Ollama 的 <code>clef</code>（System One 決策模型）展示「文字 / 圖片」的 是/否、分類、分數 與各自機率、信心度。</p>
+
+  <section class="conn">
+    <span><span class="dot" id="conn-dot"></span><span class="status" id="conn-text">連線中…</span></span>
+    <label>模型
+      <select id="model-select"><option>clef-flash</option></select>
+    </label>
+    <label>Ollama 網址
+      <input id="base-url" type="text" value="http://127.0.0.1:11434" spellcheck="false">
+    </label>
+    <button class="btn small" id="reconnect">重新連線</button>
+    <span class="grow"></span>
+    <span class="status" id="models-info"></span>
+  </section>
+
+  <nav class="tabs" id="tabs">
+    <button data-tab="text" class="active">文字 Text</button>
+    <button data-tab="image">圖片 Image</button>
+    <button data-tab="audio">聲音 Audio</button>
+  </nav>
+
+  <section id="input-area"></section>
+
+  <section class="card">
+    <h2>問題（Questions）</h2>
+    <div class="hint">定義要 Clef 回答的問題。每個問題有型別：<b>是/否 (noul)</b>、<b>分類 (choice)</b>、<b>分數 (score)</b>。所有問題與選項會在同一次前向傳播中同時評分。</div>
+    <div class="preset">
+      <label style="color:var(--muted);font-size:13px;">預設範例</label>
+      <select id="preset-select"></select>
+      <button class="btn small" id="preset-load">載入</button>
+    </div>
+    <div id="questions"></div>
+    <button class="btn" id="add-question">＋ 新增問題</button>
+  </section>
+
+  <div id="run-row">
+    <button class="btn primary" id="run">執行決策</button>
+    <span class="status" id="run-status"></span>
+  </div>
+
+  <div id="error-box"></div>
+  <section id="results"></section>
+
+  <footer>
+    <b>說明與限制</b>
+    <ul>
+      <li>Clef 是「決策模型」，回傳的是 <b>機率 + 信心度(confidence)</b>，不是逐字生成的文字。信心度代表「機率有多集中」，不等於正確率。</li>
+      <li>支援輸入：<b>文字 (state)</b> 與 <b>圖片 (images)</b>。圖片會和文字一起被評分。</li>
+      <li>不支援：<b>語音輸入</b>（Ollama 的 <code>/v1/systemone</code> 目前只收文字與圖片）；<b>物體邊界框座標</b>（Clef 不是物件偵測器，不會回傳框框）。</li>
+      <li>「框出物體」需求請改用可輸出座標的視覺模型（如 moondream / 接地模型）；「留意聲音」可先用語音轉錄模型（whisper / SenseVoice）轉文字，再交給 Clef 決策。</li>
+    </ul>
+  </footer>
+</div>
+
+<script>
+"use strict";
+(function () {
+  const $ = (s) => document.querySelector(s);
+  const baseUrlEl = $('#base-url'), modelEl = $('#model-select');
+
+  const settings = {
+    get baseUrl() { return (baseUrlEl.value || 'http://127.0.0.1:11434').replace(/\/+$/, ''); },
+    get model() { return modelEl.value || 'clef-flash'; },
+  };
+  // persisted
+  try {
+    baseUrlEl.value = localStorage.getItem('clef.baseUrl') || baseUrlEl.value;
+  } catch (e) {}
+  baseUrlEl.addEventListener('change', () => { try { localStorage.setItem('clef.baseUrl', baseUrlEl.value); } catch (e) {} });
+
+  // ---------------- tab state ----------------
+  const TABS = ['text', 'image', 'audio'];
+  let activeTab = 'text';
+  const tabData = {
+    text:    { state: '', questions: [], results: null },
+    image:   { state: '', questions: [], image: null, imageName: '', results: null }, // image = {b64, dataUrl}
+    audio:   { state: '', questions: [], results: null },
+  };
+
+  function newQuestion(type) {
+    type = type || 'noul';
+    const q = { id: 'q' + Math.random().toString(36).slice(2, 8), name: 'q' + (Math.floor(Math.random()*1e4)), type, instructions: '' };
+    if (type === 'noul') q.criteria = { true: '', false: '' };
+    else if (type === 'choice') q.criteria = [{ option: 'a', desc: '' }, { option: 'b', desc: '' }];
+    else q.criteria = [{ label: '低' }, { label: '高' }];
+    return q;
+  }
+
+  // ---------------- presets ----------------
+  const presets = {
+    text: [
+      { name: '垃圾郵件 / 詐騙偵測', state: 'CONGRATULATIONS! You have won a $5000 gift card. Click here to claim your prize now: http://spam.example/claim', questions: [
+        { name: 'spam', type: 'noul', instructions: 'Is this message spam or a scam?' },
+        { name: 'urgency', type: 'score', instructions: 'How urgent or alarming is the tone?', criteria: ['Calm', 'Normal', 'Urgent'] },
+        { name: 'category', type: 'choice', instructions: 'What best describes this message?', criteria: { spam: null, legitimate: null, phishing: null } },
+      ]},
+      { name: '客服工單：分類＋緊急度＋退款', state: 'I was charged twice for my order. Please refund the extra payment immediately.', questions: [
+        { name: 'team', type: 'choice', instructions: 'Which team should handle this ticket?', criteria: { billing: 'Payments and refunds', technical: 'Bugs and integrations', other: 'None of the above' } },
+        { name: 'refund', type: 'noul', instructions: 'Does the customer explicitly ask for a refund?' },
+        { name: 'urgency', type: 'score', instructions: 'How urgent is this ticket?', criteria: ['Routine', 'Soon', 'Urgent'] },
+      ]},
+      { name: '工具呼叫安全審查', state: 'send_email(to="all-customers", subject="FINAL NOTICE: account will be suspended today")', questions: [
+        { name: 'harmful', type: 'noul', instructions: 'Could this tool call cause harm?' },
+        { name: 'severity', type: 'score', instructions: 'How harmful could this tool call be?', criteria: ['None', 'Minor', 'Serious'] },
+      ]},
+      { name: '空白', state: '', questions: [] },
+    ],
+    image: [
+      { name: '收據：可讀性＋分類＋含酒精', state: 'An employee submitted this receipt for reimbursement.', questions: [
+        { name: 'legible', type: 'noul', instructions: 'Is the receipt total legible?' },
+        { name: 'category', type: 'choice', instructions: 'What kind of purchase is this?', criteria: { meals: null, travel: null, office: null, other: null } },
+        { name: 'alcohol', type: 'noul', instructions: 'Does the receipt include alcohol?' },
+      ]},
+      { name: '畫面：敏感資訊檢查', state: 'A screenshot from a user device.', questions: [
+        { name: 'sensitive', type: 'noul', instructions: 'Does the image contain sensitive personal information (passwords, credit card numbers)?' },
+        { name: 'kind', type: 'choice', instructions: 'What kind of content is shown?', criteria: { document: null, code: null, photo: null, chart: null } },
+        { name: 'clarity', type: 'score', instructions: 'How clear and legible is the image?', criteria: ['Blurry', 'Readable', 'Crisp'] },
+      ]},
+      { name: '空白', state: '', questions: [] },
+    ],
+    audio: [
+      { name: '（先轉錄成文字，再對文字決策）', state: '', questions: [
+        { name: 'attention', type: 'noul', instructions: 'Does this message require urgent attention?' },
+        { name: 'emotion', type: 'choice', instructions: 'What is the dominant tone?', criteria: { calm: null, urgent: null, angry: null, sad: null } },
+      ]},
+    ],
+  };
+
+  // normalize preset question criteria -> internal representation
+  function normalizeQ(q) {
+    const type = q.type;
+    let criteria;
+    if (type === 'noul') criteria = { true: (q.criteria && q.criteria.true) || '', false: (q.criteria && q.criteria.false) || '' };
+    else if (type === 'choice') {
+      const src = q.criteria || {};
+      criteria = Object.entries(src).map(([option, desc]) => ({ option, desc: desc || '' }));
+    } else {
+      criteria = (q.criteria || []).map((label) => ({ label }));
+    }
+    return { id: 'q' + Math.random().toString(36).slice(2, 8), name: q.name, type, instructions: q.instructions || '', criteria };
+  }
+
+  // ---------------- rendering ----------------
+  function renderTabs() {
+    document.querySelectorAll('#tabs button').forEach(b => b.classList.toggle('active', b.dataset.tab === activeTab));
+  }
+
+  function renderInput() {
+    const area = $('#input-area');
+    if (activeTab === 'text') {
+      area.innerHTML = `
+        <section class="card">
+          <h2>要判斷的內容（State）</h2>
+          <textarea id="state-text" placeholder="貼上要判斷的文字、JSON、訊息…">${esc(tabData.text.state)}</textarea>
+        </section>`;
+      $('#state-text').addEventListener('input', e => tabData.text.state = e.target.value);
+    } else if (activeTab === 'image') {
+      const d = tabData.image;
+      area.innerHTML = `
+        <section class="card">
+          <h2>圖片（Image）</h2>
+          <div class="preview-row">
+            <div class="preview-col">
+              <div class="drop" id="drop">點擊上傳、拖曳圖片，或貼上 (Ctrl/⌘+V)</div>
+              <input type="file" id="file-input" accept="image/*" class="hidden">
+              <img id="preview" class="preview hidden" alt="preview">
+              <div class="hint" id="img-name" style="margin-top:8px;"></div>
+            </div>
+            <div class="preview-col">
+              <h2 style="font-size:15px;margin:0 0 8px;">情境文字（State，可選）</h2>
+              <textarea id="state-text">${esc(d.state)}</textarea>
+            </div>
+          </div>
+        </section>`;
+      const drop = $('#drop'), fileInput = $('#file-input'), preview = $('#preview'), imgName = $('#img-name');
+      $('#state-text').addEventListener('input', e => tabData.image.state = e.target.value);
+      drop.addEventListener('click', () => fileInput.click());
+      fileInput.addEventListener('change', () => { if (fileInput.files[0]) loadImageFile(fileInput.files[0]); });
+      drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('over'); });
+      drop.addEventListener('dragleave', () => drop.classList.remove('over'));
+      drop.addEventListener('drop', e => { e.preventDefault(); drop.classList.remove('over');
+        if (e.dataTransfer.files[0]) loadImageFile(e.dataTransfer.files[0]); });
+      function refreshPreview() {
+        if (d.image) { preview.src = d.image.dataUrl; preview.classList.remove('hidden'); imgName.textContent = d.imageName + ' · 已載入'; }
+        else { preview.classList.add('hidden'); imgName.textContent = ''; }
+      }
+      refreshPreview();
+    } else { // audio
+      area.innerHTML = `
+        <section class="notice">
+          <b>Clef 目前不支援直接輸入語音。</b> Ollama 的 <code>/v1/systemone</code> 只接受 <code>state</code>（文字）與 <code>images</code>（圖片）。
+          要「判斷這個聲音該不該留意」，可先安裝語音轉錄模型把聲音轉成文字，再把文字交給 Clef 決策。
+        </section>
+        <section class="card">
+          <h2>語音轉錄 → 文字決策（實驗性）</h2>
+          <div class="hint" id="audio-model-hint">偵測語音模型中…</div>
+          <div class="row">
+            <input type="file" id="audio-file" accept="audio/*" class="hidden">
+            <button class="btn" id="audio-pick" disabled>選擇 / 錄製音檔</button>
+            <span class="status" id="audio-name"></span>
+          </div>
+          <div class="hint" style="margin-top:10px;">轉錄出的文字會自動填入下方「要判斷的內容」，接著就能用 Clef 對它做決策。</div>
+          <h2 style="margin-top:14px;">要判斷的內容（轉錄結果）</h2>
+          <textarea id="state-text" placeholder="在此貼上轉錄文字，或由上方音檔自動填入">${esc(tabData.audio.state)}</textarea>
+        </section>`;
+      $('#state-text').addEventListener('input', e => tabData.audio.state = e.target.value);
+      setupAudioTab();
+    }
+  }
+
+  function renderPresets() {
+    const sel = $('#preset-select');
+    const list = presets[activeTab] || [];
+    sel.innerHTML = '';
+    list.forEach((p, i) => { const o = document.createElement('option'); o.value = String(i); o.textContent = p.name; sel.appendChild(o); });
+  }
+
+  function renderQuestions() {
+    const box = $('#questions');
+    const qs = tabData[activeTab].questions;
+    box.innerHTML = '';
+    if (!qs.length) {
+      box.innerHTML = '<div class="hint">還沒有問題。點「＋ 新增問題」，或載入上方預設範例。</div>';
+      return;
+    }
+    qs.forEach((q, idx) => box.appendChild(questionEl(q, idx)));
+  }
+
+  function questionEl(q, idx) {
+    const root = document.createElement('div');
+    root.className = 'q-item';
+    root.innerHTML = `
+      <div class="q-head">
+        <span class="tag ${q.type}">${typeLabel(q.type)}</span>
+        <input type="text" class="q-name" value="${esc(q.name)}" title="問題名稱（回傳結果的 key）" spellcheck="false">
+        <select class="q-type">
+          <option value="noul" ${q.type==='noul'?'selected':''}>是/否 (noul)</option>
+          <option value="choice" ${q.type==='choice'?'selected':''}>分類 (choice)</option>
+          <option value="score" ${q.type==='score'?'selected':''}>分數 (score)</option>
+        </select>
+        <button class="icon-btn" title="刪除">✕</button>
+      </div>
+      <div class="q-inst"><input type="text" class="q-instructions" value="${esc(q.instructions)}" placeholder="問題描述（instructions）"></div>
+      <div class="q-crit"></div>`;
+    const nameEl = root.querySelector('.q-name'), typeEl = root.querySelector('.q-type'), instEl = root.querySelector('.q-instructions');
+    nameEl.addEventListener('input', e => q.name = e.target.value);
+    instEl.addEventListener('input', e => q.instructions = e.target.value);
+    root.querySelector('.icon-btn').addEventListener('click', () => { tabData[activeTab].questions.splice(idx, 1); renderQuestions(); });
+    typeEl.addEventListener('change', () => { const t = typeEl.value; const nq = newQuestion(t); nq.name = q.name; nq.instructions = q.instructions; q.type = t; q.criteria = nq.criteria; renderQuestions(); });
+    const critBox = root.querySelector('.q-crit');
+    if (q.type === 'noul') critBox.appendChild(noulCriteriaEl(q));
+    else if (q.type === 'choice') critBox.appendChild(choiceCriteriaEl(q));
+    else critBox.appendChild(scoreCriteriaEl(q));
+    return root;
+  }
+
+  function noulCriteriaEl(q) {
+    const el = document.createElement('div');
+    el.className = 'q-crit';
+    const mk = (label, key) => {
+      const row = document.createElement('div'); row.className = 'crit-row';
+      row.innerHTML = `<span class="opt">${label}</span><input type="text" value="${esc(q.criteria[key]||'')}" placeholder="（可選）描述這一邊的含義">`;
+      row.querySelector('input').addEventListener('input', e => q.criteria[key] = e.target.value);
+      return row;
+    };
+    el.appendChild(mk('true 是', 'true'));
+    el.appendChild(mk('false 否', 'false'));
+    return el;
+  }
+
+  function choiceCriteriaEl(q) {
+    const el = document.createElement('div');
+    el.className = 'q-crit';
+    function row(c, i) {
+      const r = document.createElement('div'); r.className = 'crit-row';
+      r.innerHTML = `<input type="text" class="opt" value="${esc(c.option)}" placeholder="選項名稱"><input type="text" value="${esc(c.desc)}" placeholder="描述（可留空＝用名稱）"><button class="icon-btn" title="刪除選項">✕</button>`;
+      r.querySelector('.opt').addEventListener('input', e => c.option = e.target.value);
+      r.querySelectorAll('input')[1].addEventListener('input', e => c.desc = e.target.value);
+      r.querySelector('.icon-btn').addEventListener('click', () => { q.criteria.splice(i, 1); renderQuestions(); });
+      return r;
+    }
+    q.criteria.forEach((c, i) => el.appendChild(row(c, i)));
+    const add = document.createElement('button'); add.className = 'btn small'; add.textContent = '＋ 選項';
+    add.addEventListener('click', () => { q.criteria.push({ option: 'opt' + (q.criteria.length+1), desc: '' }); renderQuestions(); });
+    el.appendChild(add);
+    return el;
+  }
+
+  function scoreCriteriaEl(q) {
+    const el = document.createElement('div');
+    el.className = 'q-crit';
+    const hint = document.createElement('div'); hint.className = 'hint';
+    hint.textContent = '等級由低到高排列（最低在前）。最多 10 級，回傳的分數是機率加權後的等級。';
+    el.appendChild(hint);
+    function row(c, i) {
+      const r = document.createElement('div'); r.className = 'crit-row';
+      r.innerHTML = `<span class="opt">等級 ${i}</span><input type="text" value="${esc(c.label)}" placeholder="等級描述"><button class="icon-btn" title="刪除等級">✕</button>`;
+      r.querySelector('input').addEventListener('input', e => c.label = e.target.value);
+      r.querySelector('.icon-btn').addEventListener('click', () => { q.criteria.splice(i, 1); renderQuestions(); });
+      return r;
+    }
+    q.criteria.forEach((c, i) => el.appendChild(row(c, i)));
+    const add = document.createElement('button'); add.className = 'btn small'; add.textContent = '＋ 等級';
+    add.addEventListener('click', () => { if (q.criteria.length >= 10) return; q.criteria.push({ label: '等級 ' + (q.criteria.length) }); renderQuestions(); });
+    el.appendChild(add);
+    return el;
+  }
+
+  // ---------------- connection ----------------
+  async function listModels() {
+    const res = await fetch(settings.baseUrl + '/api/tags');
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    return (data.models || []).map(m => m.name);
+  }
+
+  async function refreshConnection() {
+    setConn(false, '連線中…', '');
+    try {
+      const models = await listModels();
+      const current = settings.model;
+      modelEl.innerHTML = '';
+      models.forEach(name => { const o = document.createElement('option'); o.value = name; o.textContent = name; modelEl.appendChild(o); });
+      const prefer = models.find(m => /clef/i.test(m)) || models[0] || 'clef-flash';
+      modelEl.value = models.includes(current) ? current : prefer;
+      try { localStorage.setItem('clef.model', modelEl.value); } catch (e) {}
+      setConn(true, '已連線', `${models.length} 個模型`);
+      return models;
+    } catch (e) {
+      setConn(false, '未連線：' + (e.message || e), '');
+      return [];
+    }
+  }
+  function setConn(ok, text, info) {
+    $('#conn-dot').className = 'dot ' + (ok ? 'ok' : 'bad');
+    $('#conn-text').textContent = text;
+    $('#models-info').textContent = info || '';
+  }
+  modelEl.addEventListener('change', () => { try { localStorage.setItem('clef.model', modelEl.value); } catch (e) {} });
+
+  // ---------------- audio tab ----------------
+  const SPEECH_RE = /whisper|speech|audio|sensevoice|parakeet|vox|stt/i;
+  let speechModel = null;
+  function setupAudioTab() {
+    const pick = $('#audio-pick'), file = $('#audio-file'), nameEl = $('#audio-name'), hint = $('#audio-model-hint');
+    pick.addEventListener('click', () => file.click());
+    file.addEventListener('change', () => { if (file.files[0]) transcribe(file.files[0]); });
+    listModels().then(models => {
+      speechModel = models.find(m => SPEECH_RE.test(m)) || null;
+      if (speechModel) {
+        hint.innerHTML = `偵測到語音模型 <b>${esc(speechModel)}</b>，可轉錄。`;
+        pick.disabled = false;
+        nameEl.textContent = '';
+      } else {
+        hint.innerHTML = `未偵測到語音轉錄模型。請先安裝：<code>ollama pull whisper</code>（或其他語音模型），再點「重新連線」。`;
+        pick.disabled = true;
+        nameEl.textContent = '';
+      }
+    }).catch(() => { hint.textContent = '無法連線 Ollama，無法偵測語音模型。'; });
+  }
+
+  async function transcribe(file) {
+    const nameEl = $('#audio-name');
+    nameEl.textContent = file.name + ' · 轉錄中…';
+    const b64 = await fileToBase64(file);
+    // Ollama chat API with audio input (experimental; model-dependent)
+    const res = await fetch(settings.baseUrl + '/api/chat', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model: speechModel, messages: [{ role: 'user', content: 'Transcribe this audio.', audio: b64 }], stream: false }),
+    });
+    if (!res.ok) { nameEl.textContent = '轉錄失敗：HTTP ' + res.status; throw new Error('HTTP ' + res.status); }
+    const data = await res.json();
+    const text = data && data.message ? data.message.content : (data && data.response) || '';
+    tabData.audio.state = text;
+    const ta = $('#state-text'); if (ta) ta.value = text;
+    nameEl.textContent = file.name + ' · 完成';
+  }
+
+  function fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+      const r = new FileReader();
+      r.onload = () => resolve(String(r.result).split(',')[1] || '');
+      r.onerror = reject;
+      r.readAsDataURL(file);
+    });
+  }
+
+  function loadImageFile(file) {
+    const d = tabData.image;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataUrl = String(reader.result);
+      d.image = { dataUrl, b64: dataUrl.split(',')[1] || '' };
+      d.imageName = file.name;
+      renderInput();
+    };
+    reader.readAsDataURL(file);
+  }
+
+  // ---------------- run ----------------
+  function buildPayload() {
+    const d = tabData[activeTab];
+    const questions = {};
+    for (const q of d.questions) {
+      const qq = { type: q.type, instructions: q.instructions || '' };
+      if (q.type === 'choice') {
+        const crit = {};
+        for (const c of q.criteria) crit[c.option] = (c.desc && c.desc.trim()) ? c.desc.trim() : null;
+        qq.criteria = crit;
+      } else if (q.type === 'score') {
+        qq.criteria = q.criteria.map(c => c.label || ('等級'));
+      } else if (q.type === 'noul') {
+        if (q.criteria && (q.criteria.true || q.criteria.false)) qq.criteria = { true: q.criteria.true || '', false: q.criteria.false || '' };
+      }
+      questions[q.name] = qq;
+    }
+    const payload = { model: settings.model, state: d.state || '', questions };
+    if (activeTab === 'image' && d.image) payload.images = [d.image.b64];
+    return payload;
+  }
+
+  async function run() {
+    const errBox = $('#error-box'); errBox.innerHTML = '';
+    const d = tabData[activeTab];
+    if (!d.questions.length) { errBox.innerHTML = '<div class="error">請先新增至少一個問題（或載入預設範例）。</div>'; return; }
+    const payload = buildPayload();
+    const btn = $('#run'), status = $('#run-status');
+    btn.disabled = true; status.innerHTML = '<span class="spinner"></span>決策中…（首次執行需載入模型，可能較久）';
+    try {
+      const res = await fetch(settings.baseUrl + '/v1/systemone', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) throw new Error((await res.text()) || ('HTTP ' + res.status));
+      const data = await res.json();
+      d.results = data;
+      status.textContent = '';
+      renderResults(data);
+    } catch (e) {
+      errBox.innerHTML = '<div class="error">執行失敗：' + esc(String(e && e.message ? e.message : e)) + '</div>';
+      $('#results').innerHTML = '';
+    } finally {
+      btn.disabled = false;
+    }
+  }
+
+  function renderResults(data) {
+    const box = $('#results');
+    const d = tabData[activeTab];
+    box.innerHTML = '';
+    const head = document.createElement('h2');
+    head.style.cssText = 'font-size:16px;margin:0 0 12px;';
+    head.textContent = '結果（' + (data.model || settings.model) + '）';
+    box.appendChild(head);
+
+    for (const q of d.questions) {
+      const a = data.answers && data.answers[q.name];
+      if (!a) continue;
+      box.appendChild(resultCard(q, a));
+    }
+    if (data.usage) {
+      const meta = document.createElement('div'); meta.className = 'meta';
+      meta.textContent = 'input_tokens=' + (data.usage.input_tokens ?? '?') + '  output_tokens=' + (data.usage.output_tokens ?? '0');
+      box.appendChild(meta);
+    }
+    const det = document.createElement('details');
+    det.innerHTML = '<summary>原始 JSON 回應</summary><pre>' + esc(JSON.stringify(data, null, 2)) + '</pre>';
+    box.appendChild(det);
+  }
+
+  function resultCard(q, a) {
+    const card = document.createElement('div'); card.className = 'result-card';
+    const head = document.createElement('div'); head.className = 'result-head';
+    head.innerHTML = `<span class="tag ${q.type}">${typeLabel(q.type)}</span><span class="qname">${esc(q.name)}</span><span class="qinst">${esc(q.instructions)}</span>`;
+    card.appendChild(head);
+
+    if (a.type === 'noul') {
+      const p = a.noul;
+      const yes = p >= 0.5;
+      const pct = (p * 100).toFixed(1);
+      const v = document.createElement('div');
+      v.className = 'verdict ' + (yes ? 'yes' : 'no');
+      v.textContent = (yes ? '是 YES' : '否 NO') + ' · ' + pct + '%';
+      card.appendChild(v);
+      const sub = document.createElement('div'); sub.className = 'sub-verdict';
+      sub.textContent = '「是」的機率 ' + pct + '%　｜　「否」的機率 ' + ((1 - p) * 100).toFixed(1) + '%';
+      card.appendChild(sub);
+      card.appendChild(bars([
+        { label: '是 true', pct: p * 100, win: yes },
+        { label: '否 false', pct: (1 - p) * 100, win: !yes },
+      ]));
+    } else if (a.type === 'choice') {
+      const chosen = a.choice;
+      const probs = a.probabilities || {};
+      const v = document.createElement('div');
+      v.className = 'verdict neutral';
+      v.textContent = chosen;
+      card.appendChild(v);
+      const items = Object.keys(probs).map(k => ({ label: k, pct: (probs[k] ?? 0) * 100, win: k === chosen }));
+      card.appendChild(bars(items));
+      if (a.confidence != null) {
+        const c = document.createElement('div'); c.className = 'conf';
+        c.textContent = '信心度 confidence = ' + (a.confidence * 100).toFixed(1) + '%（機率集中程度）';
+        card.appendChild(c);
+      }
+    } else if (a.type === 'score') {
+      const score = a.score;
+      const legend = a.legend || {};
+      const probs = a.probabilities || {};
+      const levels = Object.keys(legend).sort((x, y) => +x - +y);
+      const label = legend[String(Math.round(score))] || '';
+      const v = document.createElement('div');
+      v.className = 'verdict neutral';
+      v.textContent = (score != null ? score.toFixed(2) : '?') + (label ? ' — ' + label : '');
+      card.appendChild(v);
+      const sub = document.createElement('div'); sub.className = 'sub-verdict';
+      sub.textContent = '分數為機率加權後的等級（0 起算，範圍 ' + (levels.length ? levels.length - 1 : '?') + '）。';
+      card.appendChild(sub);
+      const items = levels.map(lv => ({ label: lv + ' · ' + legend[lv], pct: (probs[lv] ?? 0) * 100, win: String(Math.round(score)) === lv }));
+      card.appendChild(bars(items));
+      if (a.confidence != null) {
+        const c = document.createElement('div'); c.className = 'conf';
+        c.textContent = '信心度 confidence = ' + (a.confidence * 100).toFixed(1) + '%（機率集中程度）';
+        card.appendChild(c);
+      }
+    }
+    return card;
+  }
+
+  function bars(items) {
+    const el = document.createElement('div'); el.className = 'bars';
+    items.forEach(it => {
+      const row = document.createElement('div'); row.className = 'bar-row' + (it.win ? ' win' : '');
+      row.innerHTML = `<span class="lbl">${esc(it.label)}</span><div class="bar-track"><div class="bar-fill" style="width:${Math.max(0, Math.min(100, it.pct))}%"></div></div><span class="pct">${it.pct.toFixed(1)}%</span>`;
+      el.appendChild(row);
+    });
+    return el;
+  }
+
+  function typeLabel(t) { return { noul: '是/否', choice: '分類', score: '分數' }[t] || t; }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"'`$]/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;', '`':'&#96;', '$':'&#36;' }[c])); }
+
+  // ---------------- wire events ----------------
+  document.querySelectorAll('#tabs button').forEach(b => {
+    b.addEventListener('click', () => { activeTab = b.dataset.tab; renderTabs(); renderInput(); renderPresets(); renderQuestions(); });
+  });
+  $('#add-question').addEventListener('click', () => { tabData[activeTab].questions.push(newQuestion('noul')); renderQuestions(); });
+  $('#preset-load').addEventListener('click', () => {
+    const list = presets[activeTab] || [];
+    const p = list[Number($('#preset-select').value)];
+    if (!p) return;
+    const d = tabData[activeTab];
+    d.state = p.state || '';
+    d.questions = (p.questions || []).map(normalizeQ);
+    renderInput(); renderQuestions();
+  });
+  $('#run').addEventListener('click', run);
+  $('#reconnect').addEventListener('click', () => { refreshConnection().then(renderInput); });
+  document.addEventListener('paste', (e) => {
+    if (activeTab !== 'image') return;
+    const items = e.clipboardData && e.clipboardData.items;
+    if (!items) return;
+    for (const it of items) {
+      if (it.type && it.type.indexOf('image') === 0) {
+        const f = it.getAsFile();
+        if (f) { loadImageFile(f); e.preventDefault(); }
+        return;
+      }
+    }
+  });
+
+  // ---------------- init ----------------
+  (async function init() {
+    try { modelEl.value = localStorage.getItem('clef.model') || modelEl.value; } catch (e) {}
+    renderTabs(); renderInput(); renderPresets(); renderQuestions();
+    await refreshConnection();
+  })();
+})();
+</script>
+</body>
+</html>

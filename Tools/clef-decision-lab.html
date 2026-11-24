@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="zh-Hant">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Clef 決策實驗室 · Decision Lab</title>
+<title>Clef Decision Lab</title>
 <style>
   :root {
     --bg: #0f1115;
@@ -45,7 +45,6 @@
   .wrap { max-width: 1060px; margin: 0 auto; padding: 28px 20px 80px; }
   header { display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px 16px; margin-bottom: 6px; }
   h1 { font-size: 24px; margin: 0; letter-spacing: .3px; }
-  h1 .en { color: var(--muted); font-weight: 500; font-size: 15px; margin-left: 8px; }
   .subtitle { color: var(--muted); margin: 4px 0 18px; }
 
   .conn { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; padding: 12px 14px;
@@ -165,45 +164,45 @@
 <body>
 <div class="wrap">
   <header>
-    <h1>Clef 決策實驗室<span class="en">Decision Lab</span></h1>
+    <h1>Clef Decision Lab</h1>
   </header>
-  <p class="subtitle">透過 Ollama 的 <code>clef</code>（System One 決策模型）展示「文字 / 圖片」的 是/否、分類、分數 與各自機率、信心度。</p>
+  <p class="subtitle">Explore what the <code>clef</code> decision model (System One) can do over <b>text</b> and <b>images</b> — yes/no, classification, and scored levels, with probabilities and confidence — through Ollama.</p>
 
   <section class="conn">
-    <span><span class="dot" id="conn-dot"></span><span class="status" id="conn-text">連線中…</span></span>
-    <label>模型
+    <span><span class="dot" id="conn-dot"></span><span class="status" id="conn-text">Connecting…</span></span>
+    <label>Model
       <select id="model-select"><option>clef-flash</option></select>
     </label>
-    <label>Ollama 網址
+    <label>Ollama URL
       <input id="base-url" type="text" value="http://127.0.0.1:11434" spellcheck="false">
     </label>
-    <button class="btn small" id="reconnect">重新連線</button>
+    <button class="btn small" id="reconnect">Reconnect</button>
     <span class="grow"></span>
     <span class="status" id="models-info"></span>
   </section>
 
   <nav class="tabs" id="tabs">
-    <button data-tab="text" class="active">文字 Text</button>
-    <button data-tab="image">圖片 Image</button>
-    <button data-tab="audio">聲音 Audio</button>
+    <button data-tab="text" class="active">Text</button>
+    <button data-tab="image">Image</button>
+    <button data-tab="audio">Audio</button>
   </nav>
 
   <section id="input-area"></section>
 
   <section class="card">
-    <h2>問題（Questions）</h2>
-    <div class="hint">定義要 Clef 回答的問題。每個問題有型別：<b>是/否 (noul)</b>、<b>分類 (choice)</b>、<b>分數 (score)</b>。所有問題與選項會在同一次前向傳播中同時評分。</div>
+    <h2>Questions</h2>
+    <div class="hint">Define the questions Clef should answer. Each question has a type: <b>Yes/no (noul)</b>, <b>Choice</b>, or <b>Score</b>. All questions and options are scored together in a single forward pass.</div>
     <div class="preset">
-      <label style="color:var(--muted);font-size:13px;">預設範例</label>
+      <label style="color:var(--muted);font-size:13px;">Presets</label>
       <select id="preset-select"></select>
-      <button class="btn small" id="preset-load">載入</button>
+      <button class="btn small" id="preset-load">Load</button>
     </div>
     <div id="questions"></div>
-    <button class="btn" id="add-question">＋ 新增問題</button>
+    <button class="btn" id="add-question">+ Add question</button>
   </section>
 
   <div id="run-row">
-    <button class="btn primary" id="run">執行決策</button>
+    <button class="btn primary" id="run">Run decision</button>
     <span class="status" id="run-status"></span>
   </div>
 
@@ -211,12 +210,12 @@
   <section id="results"></section>
 
   <footer>
-    <b>說明與限制</b>
+    <b>Notes &amp; limitations</b>
     <ul>
-      <li>Clef 是「決策模型」，回傳的是 <b>機率 + 信心度(confidence)</b>，不是逐字生成的文字。信心度代表「機率有多集中」，不等於正確率。</li>
-      <li>支援輸入：<b>文字 (state)</b> 與 <b>圖片 (images)</b>。圖片會和文字一起被評分。</li>
-      <li>不支援：<b>語音輸入</b>（Ollama 的 <code>/v1/systemone</code> 目前只收文字與圖片）；<b>物體邊界框座標</b>（Clef 不是物件偵測器，不會回傳框框）。</li>
-      <li>「框出物體」需求請改用可輸出座標的視覺模型（如 moondream / 接地模型）；「留意聲音」可先用語音轉錄模型（whisper / SenseVoice）轉文字，再交給 Clef 決策。</li>
+      <li>Clef is a <b>decision model</b>: it returns <b>probabilities and confidence</b>, not generated text. Confidence measures how concentrated the probabilities are — it is not the chance the answer is correct.</li>
+      <li>Supported inputs: <b>text (state)</b> and <b>images</b>. Images are scored together with the text.</li>
+      <li>Not supported: <b>audio input</b> (Ollama's <code>/v1/systemone</code> currently accepts only text and images); <b>object bounding-box coordinates</b> (Clef is not an object detector).</li>
+      <li>For bounding boxes, use a vision model that outputs coordinates (e.g. moondream / a grounding model); to decide about audio, transcribe it first with a speech model (whisper / SenseVoice), then hand the text to Clef.</li>
     </ul>
   </footer>
 </div>
@@ -251,44 +250,44 @@
     const q = { id: 'q' + Math.random().toString(36).slice(2, 8), name: 'q' + (Math.floor(Math.random()*1e4)), type, instructions: '' };
     if (type === 'noul') q.criteria = { true: '', false: '' };
     else if (type === 'choice') q.criteria = [{ option: 'a', desc: '' }, { option: 'b', desc: '' }];
-    else q.criteria = [{ label: '低' }, { label: '高' }];
+    else q.criteria = [{ label: 'Low' }, { label: 'High' }];
     return q;
   }
 
   // ---------------- presets ----------------
   const presets = {
     text: [
-      { name: '垃圾郵件 / 詐騙偵測', state: 'CONGRATULATIONS! You have won a $5000 gift card. Click here to claim your prize now: http://spam.example/claim', questions: [
+      { name: 'Spam / scam detection', state: 'CONGRATULATIONS! You have won a $5000 gift card. Click here to claim your prize now: http://spam.example/claim', questions: [
         { name: 'spam', type: 'noul', instructions: 'Is this message spam or a scam?' },
         { name: 'urgency', type: 'score', instructions: 'How urgent or alarming is the tone?', criteria: ['Calm', 'Normal', 'Urgent'] },
         { name: 'category', type: 'choice', instructions: 'What best describes this message?', criteria: { spam: null, legitimate: null, phishing: null } },
       ]},
-      { name: '客服工單：分類＋緊急度＋退款', state: 'I was charged twice for my order. Please refund the extra payment immediately.', questions: [
+      { name: 'Support ticket: route + urgency + refund', state: 'I was charged twice for my order. Please refund the extra payment immediately.', questions: [
         { name: 'team', type: 'choice', instructions: 'Which team should handle this ticket?', criteria: { billing: 'Payments and refunds', technical: 'Bugs and integrations', other: 'None of the above' } },
         { name: 'refund', type: 'noul', instructions: 'Does the customer explicitly ask for a refund?' },
         { name: 'urgency', type: 'score', instructions: 'How urgent is this ticket?', criteria: ['Routine', 'Soon', 'Urgent'] },
       ]},
-      { name: '工具呼叫安全審查', state: 'send_email(to="all-customers", subject="FINAL NOTICE: account will be suspended today")', questions: [
+      { name: 'Tool-call safety review', state: 'send_email(to="all-customers", subject="FINAL NOTICE: account will be suspended today")', questions: [
         { name: 'harmful', type: 'noul', instructions: 'Could this tool call cause harm?' },
         { name: 'severity', type: 'score', instructions: 'How harmful could this tool call be?', criteria: ['None', 'Minor', 'Serious'] },
       ]},
-      { name: '空白', state: '', questions: [] },
+      { name: 'Blank', state: '', questions: [] },
     ],
     image: [
-      { name: '收據：可讀性＋分類＋含酒精', state: 'An employee submitted this receipt for reimbursement.', questions: [
+      { name: 'Receipt: legibility + category + alcohol', state: 'An employee submitted this receipt for reimbursement.', questions: [
         { name: 'legible', type: 'noul', instructions: 'Is the receipt total legible?' },
         { name: 'category', type: 'choice', instructions: 'What kind of purchase is this?', criteria: { meals: null, travel: null, office: null, other: null } },
         { name: 'alcohol', type: 'noul', instructions: 'Does the receipt include alcohol?' },
       ]},
-      { name: '畫面：敏感資訊檢查', state: 'A screenshot from a user device.', questions: [
+      { name: 'Screenshot: sensitive info check', state: 'A screenshot from a user device.', questions: [
         { name: 'sensitive', type: 'noul', instructions: 'Does the image contain sensitive personal information (passwords, credit card numbers)?' },
         { name: 'kind', type: 'choice', instructions: 'What kind of content is shown?', criteria: { document: null, code: null, photo: null, chart: null } },
         { name: 'clarity', type: 'score', instructions: 'How clear and legible is the image?', criteria: ['Blurry', 'Readable', 'Crisp'] },
       ]},
-      { name: '空白', state: '', questions: [] },
+      { name: 'Blank', state: '', questions: [] },
     ],
     audio: [
-      { name: '（先轉錄成文字，再對文字決策）', state: '', questions: [
+      { name: '(transcribe first, then decide on text)', state: '', questions: [
         { name: 'attention', type: 'noul', instructions: 'Does this message require urgent attention?' },
         { name: 'emotion', type: 'choice', instructions: 'What is the dominant tone?', criteria: { calm: null, urgent: null, angry: null, sad: null } },
       ]},
@@ -319,24 +318,24 @@
     if (activeTab === 'text') {
       area.innerHTML = `
         <section class="card">
-          <h2>要判斷的內容（State）</h2>
-          <textarea id="state-text" placeholder="貼上要判斷的文字、JSON、訊息…">${esc(tabData.text.state)}</textarea>
+          <h2>Content to evaluate (state)</h2>
+          <textarea id="state-text" placeholder="Paste the text, JSON, or message to evaluate…">${esc(tabData.text.state)}</textarea>
         </section>`;
       $('#state-text').addEventListener('input', e => tabData.text.state = e.target.value);
     } else if (activeTab === 'image') {
       const d = tabData.image;
       area.innerHTML = `
         <section class="card">
-          <h2>圖片（Image）</h2>
+          <h2>Image</h2>
           <div class="preview-row">
             <div class="preview-col">
-              <div class="drop" id="drop">點擊上傳、拖曳圖片，或貼上 (Ctrl/⌘+V)</div>
+              <div class="drop" id="drop">Click to upload, drag &amp; drop, or paste (Ctrl/⌘+V)</div>
               <input type="file" id="file-input" accept="image/*" class="hidden">
               <img id="preview" class="preview hidden" alt="preview">
               <div class="hint" id="img-name" style="margin-top:8px;"></div>
             </div>
             <div class="preview-col">
-              <h2 style="font-size:15px;margin:0 0 8px;">情境文字（State，可選）</h2>
+              <h2 style="font-size:15px;margin:0 0 8px;">Context (state, optional)</h2>
               <textarea id="state-text">${esc(d.state)}</textarea>
             </div>
           </div>
@@ -350,27 +349,27 @@
       drop.addEventListener('drop', e => { e.preventDefault(); drop.classList.remove('over');
         if (e.dataTransfer.files[0]) loadImageFile(e.dataTransfer.files[0]); });
       function refreshPreview() {
-        if (d.image) { preview.src = d.image.dataUrl; preview.classList.remove('hidden'); imgName.textContent = d.imageName + ' · 已載入'; }
+        if (d.image) { preview.src = d.image.dataUrl; preview.classList.remove('hidden'); imgName.textContent = d.imageName + ' · loaded'; }
         else { preview.classList.add('hidden'); imgName.textContent = ''; }
       }
       refreshPreview();
     } else { // audio
       area.innerHTML = `
         <section class="notice">
-          <b>Clef 目前不支援直接輸入語音。</b> Ollama 的 <code>/v1/systemone</code> 只接受 <code>state</code>（文字）與 <code>images</code>（圖片）。
-          要「判斷這個聲音該不該留意」，可先安裝語音轉錄模型把聲音轉成文字，再把文字交給 Clef 決策。
+          <b>Clef does not accept audio input directly.</b> Ollama's <code>/v1/systemone</code> only takes <code>state</code> (text) and <code>images</code>.
+          To decide whether a sound needs attention, transcribe it to text first (with a speech model), then hand the text to Clef.
         </section>
         <section class="card">
-          <h2>語音轉錄 → 文字決策（實驗性）</h2>
-          <div class="hint" id="audio-model-hint">偵測語音模型中…</div>
+          <h2>Speech-to-text → decision (experimental)</h2>
+          <div class="hint" id="audio-model-hint">Detecting speech models…</div>
           <div class="row">
             <input type="file" id="audio-file" accept="audio/*" class="hidden">
-            <button class="btn" id="audio-pick" disabled>選擇 / 錄製音檔</button>
+            <button class="btn" id="audio-pick" disabled>Choose / record audio</button>
             <span class="status" id="audio-name"></span>
           </div>
-          <div class="hint" style="margin-top:10px;">轉錄出的文字會自動填入下方「要判斷的內容」，接著就能用 Clef 對它做決策。</div>
-          <h2 style="margin-top:14px;">要判斷的內容（轉錄結果）</h2>
-          <textarea id="state-text" placeholder="在此貼上轉錄文字，或由上方音檔自動填入">${esc(tabData.audio.state)}</textarea>
+          <div class="hint" style="margin-top:10px;">The transcript is filled into the content box below, ready to hand to Clef.</div>
+          <h2 style="margin-top:14px;">Content to evaluate (transcript)</h2>
+          <textarea id="state-text" placeholder="Paste the transcript here, or let the audio above fill it">${esc(tabData.audio.state)}</textarea>
         </section>`;
       $('#state-text').addEventListener('input', e => tabData.audio.state = e.target.value);
       setupAudioTab();
@@ -389,7 +388,7 @@
     const qs = tabData[activeTab].questions;
     box.innerHTML = '';
     if (!qs.length) {
-      box.innerHTML = '<div class="hint">還沒有問題。點「＋ 新增問題」，或載入上方預設範例。</div>';
+      box.innerHTML = '<div class="hint">No questions yet. Click “+ Add question”, or load a preset above.</div>';
       return;
     }
     qs.forEach((q, idx) => box.appendChild(questionEl(q, idx)));
@@ -401,15 +400,15 @@
     root.innerHTML = `
       <div class="q-head">
         <span class="tag ${q.type}">${typeLabel(q.type)}</span>
-        <input type="text" class="q-name" value="${esc(q.name)}" title="問題名稱（回傳結果的 key）" spellcheck="false">
+        <input type="text" class="q-name" value="${esc(q.name)}" title="Question name (the key in the result)" spellcheck="false">
         <select class="q-type">
-          <option value="noul" ${q.type==='noul'?'selected':''}>是/否 (noul)</option>
-          <option value="choice" ${q.type==='choice'?'selected':''}>分類 (choice)</option>
-          <option value="score" ${q.type==='score'?'selected':''}>分數 (score)</option>
+          <option value="noul" ${q.type==='noul'?'selected':''}>Yes/no (noul)</option>
+          <option value="choice" ${q.type==='choice'?'selected':''}>Choice</option>
+          <option value="score" ${q.type==='score'?'selected':''}>Score</option>
         </select>
-        <button class="icon-btn" title="刪除">✕</button>
+        <button class="icon-btn" title="Remove">✕</button>
       </div>
-      <div class="q-inst"><input type="text" class="q-instructions" value="${esc(q.instructions)}" placeholder="問題描述（instructions）"></div>
+      <div class="q-inst"><input type="text" class="q-instructions" value="${esc(q.instructions)}" placeholder="Instructions"></div>
       <div class="q-crit"></div>`;
     const nameEl = root.querySelector('.q-name'), typeEl = root.querySelector('.q-type'), instEl = root.querySelector('.q-instructions');
     nameEl.addEventListener('input', e => q.name = e.target.value);
@@ -428,12 +427,12 @@
     el.className = 'q-crit';
     const mk = (label, key) => {
       const row = document.createElement('div'); row.className = 'crit-row';
-      row.innerHTML = `<span class="opt">${label}</span><input type="text" value="${esc(q.criteria[key]||'')}" placeholder="（可選）描述這一邊的含義">`;
+      row.innerHTML = `<span class="opt">${label}</span><input type="text" value="${esc(q.criteria[key]||'')}" placeholder="(optional) describe this side">`;
       row.querySelector('input').addEventListener('input', e => q.criteria[key] = e.target.value);
       return row;
     };
-    el.appendChild(mk('true 是', 'true'));
-    el.appendChild(mk('false 否', 'false'));
+    el.appendChild(mk('true (yes)', 'true'));
+    el.appendChild(mk('false (no)', 'false'));
     return el;
   }
 
@@ -442,14 +441,14 @@
     el.className = 'q-crit';
     function row(c, i) {
       const r = document.createElement('div'); r.className = 'crit-row';
-      r.innerHTML = `<input type="text" class="opt" value="${esc(c.option)}" placeholder="選項名稱"><input type="text" value="${esc(c.desc)}" placeholder="描述（可留空＝用名稱）"><button class="icon-btn" title="刪除選項">✕</button>`;
+      r.innerHTML = `<input type="text" class="opt" value="${esc(c.option)}" placeholder="Option name"><input type="text" value="${esc(c.desc)}" placeholder="Description (empty = use name)"><button class="icon-btn" title="Remove option">✕</button>`;
       r.querySelector('.opt').addEventListener('input', e => c.option = e.target.value);
       r.querySelectorAll('input')[1].addEventListener('input', e => c.desc = e.target.value);
       r.querySelector('.icon-btn').addEventListener('click', () => { q.criteria.splice(i, 1); renderQuestions(); });
       return r;
     }
     q.criteria.forEach((c, i) => el.appendChild(row(c, i)));
-    const add = document.createElement('button'); add.className = 'btn small'; add.textContent = '＋ 選項';
+    const add = document.createElement('button'); add.className = 'btn small'; add.textContent = '+ option';
     add.addEventListener('click', () => { q.criteria.push({ option: 'opt' + (q.criteria.length+1), desc: '' }); renderQuestions(); });
     el.appendChild(add);
     return el;
@@ -459,18 +458,18 @@
     const el = document.createElement('div');
     el.className = 'q-crit';
     const hint = document.createElement('div'); hint.className = 'hint';
-    hint.textContent = '等級由低到高排列（最低在前）。最多 10 級，回傳的分數是機率加權後的等級。';
+    hint.textContent = 'Levels are ordered lowest first (up to 10). The returned score is the probability-weighted level.';
     el.appendChild(hint);
     function row(c, i) {
       const r = document.createElement('div'); r.className = 'crit-row';
-      r.innerHTML = `<span class="opt">等級 ${i}</span><input type="text" value="${esc(c.label)}" placeholder="等級描述"><button class="icon-btn" title="刪除等級">✕</button>`;
+      r.innerHTML = `<span class="opt">Level ${i}</span><input type="text" value="${esc(c.label)}" placeholder="Level description"><button class="icon-btn" title="Remove level">✕</button>`;
       r.querySelector('input').addEventListener('input', e => c.label = e.target.value);
       r.querySelector('.icon-btn').addEventListener('click', () => { q.criteria.splice(i, 1); renderQuestions(); });
       return r;
     }
     q.criteria.forEach((c, i) => el.appendChild(row(c, i)));
-    const add = document.createElement('button'); add.className = 'btn small'; add.textContent = '＋ 等級';
-    add.addEventListener('click', () => { if (q.criteria.length >= 10) return; q.criteria.push({ label: '等級 ' + (q.criteria.length) }); renderQuestions(); });
+    const add = document.createElement('button'); add.className = 'btn small'; add.textContent = '+ level';
+    add.addEventListener('click', () => { if (q.criteria.length >= 10) return; q.criteria.push({ label: 'Level ' + (q.criteria.length) }); renderQuestions(); });
     el.appendChild(add);
     return el;
   }
@@ -484,7 +483,7 @@
   }
 
   async function refreshConnection() {
-    setConn(false, '連線中…', '');
+    setConn(false, 'Connecting…', '');
     try {
       const models = await listModels();
       const current = settings.model;
@@ -493,10 +492,10 @@
       const prefer = models.find(m => /clef/i.test(m)) || models[0] || 'clef-flash';
       modelEl.value = models.includes(current) ? current : prefer;
       try { localStorage.setItem('clef.model', modelEl.value); } catch (e) {}
-      setConn(true, '已連線', `${models.length} 個模型`);
+      setConn(true, 'Connected', models.length + ' models');
       return models;
     } catch (e) {
-      setConn(false, '未連線：' + (e.message || e), '');
+      setConn(false, 'Not connected: ' + (e.message || e), '');
       return [];
     }
   }
@@ -517,32 +516,32 @@
     listModels().then(models => {
       speechModel = models.find(m => SPEECH_RE.test(m)) || null;
       if (speechModel) {
-        hint.innerHTML = `偵測到語音模型 <b>${esc(speechModel)}</b>，可轉錄。`;
+        hint.innerHTML = `Detected speech model <b>${esc(speechModel)}</b> — ready to transcribe.`;
         pick.disabled = false;
         nameEl.textContent = '';
       } else {
-        hint.innerHTML = `未偵測到語音轉錄模型。請先安裝：<code>ollama pull whisper</code>（或其他語音模型），再點「重新連線」。`;
+        hint.innerHTML = `No speech model found. Install one first: <code>ollama pull whisper</code> (or another speech model), then click Reconnect.`;
         pick.disabled = true;
         nameEl.textContent = '';
       }
-    }).catch(() => { hint.textContent = '無法連線 Ollama，無法偵測語音模型。'; });
+    }).catch(() => { hint.textContent = 'Cannot reach Ollama; cannot detect speech models.'; });
   }
 
   async function transcribe(file) {
     const nameEl = $('#audio-name');
-    nameEl.textContent = file.name + ' · 轉錄中…';
+    nameEl.textContent = file.name + ' · transcribing…';
     const b64 = await fileToBase64(file);
     // Ollama chat API with audio input (experimental; model-dependent)
     const res = await fetch(settings.baseUrl + '/api/chat', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ model: speechModel, messages: [{ role: 'user', content: 'Transcribe this audio.', audio: b64 }], stream: false }),
     });
-    if (!res.ok) { nameEl.textContent = '轉錄失敗：HTTP ' + res.status; throw new Error('HTTP ' + res.status); }
+    if (!res.ok) { nameEl.textContent = 'Transcription failed: HTTP ' + res.status; throw new Error('HTTP ' + res.status); }
     const data = await res.json();
     const text = data && data.message ? data.message.content : (data && data.response) || '';
     tabData.audio.state = text;
     const ta = $('#state-text'); if (ta) ta.value = text;
-    nameEl.textContent = file.name + ' · 完成';
+    nameEl.textContent = file.name + ' · done';
   }
 
   function fileToBase64(file) {
@@ -577,7 +576,7 @@
         for (const c of q.criteria) crit[c.option] = (c.desc && c.desc.trim()) ? c.desc.trim() : null;
         qq.criteria = crit;
       } else if (q.type === 'score') {
-        qq.criteria = q.criteria.map(c => c.label || ('等級'));
+        qq.criteria = q.criteria.map(c => c.label || ('Level'));
       } else if (q.type === 'noul') {
         if (q.criteria && (q.criteria.true || q.criteria.false)) qq.criteria = { true: q.criteria.true || '', false: q.criteria.false || '' };
       }
@@ -591,10 +590,10 @@
   async function run() {
     const errBox = $('#error-box'); errBox.innerHTML = '';
     const d = tabData[activeTab];
-    if (!d.questions.length) { errBox.innerHTML = '<div class="error">請先新增至少一個問題（或載入預設範例）。</div>'; return; }
+    if (!d.questions.length) { errBox.innerHTML = '<div class="error">Add at least one question first (or load a preset).</div>'; return; }
     const payload = buildPayload();
     const btn = $('#run'), status = $('#run-status');
-    btn.disabled = true; status.innerHTML = '<span class="spinner"></span>決策中…（首次執行需載入模型，可能較久）';
+    btn.disabled = true; status.innerHTML = '<span class="spinner"></span>Deciding… (first run loads the model, may take a while)';
     try {
       const res = await fetch(settings.baseUrl + '/v1/systemone', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -606,7 +605,7 @@
       status.textContent = '';
       renderResults(data);
     } catch (e) {
-      errBox.innerHTML = '<div class="error">執行失敗：' + esc(String(e && e.message ? e.message : e)) + '</div>';
+      errBox.innerHTML = '<div class="error">Run failed: ' + esc(String(e && e.message ? e.message : e)) + '</div>';
       $('#results').innerHTML = '';
     } finally {
       btn.disabled = false;
@@ -619,7 +618,7 @@
     box.innerHTML = '';
     const head = document.createElement('h2');
     head.style.cssText = 'font-size:16px;margin:0 0 12px;';
-    head.textContent = '結果（' + (data.model || settings.model) + '）';
+    head.textContent = 'Results (' + (data.model || settings.model) + ')';
     box.appendChild(head);
 
     for (const q of d.questions) {
@@ -633,7 +632,7 @@
       box.appendChild(meta);
     }
     const det = document.createElement('details');
-    det.innerHTML = '<summary>原始 JSON 回應</summary><pre>' + esc(JSON.stringify(data, null, 2)) + '</pre>';
+    det.innerHTML = '<summary>Raw JSON response</summary><pre>' + esc(JSON.stringify(data, null, 2)) + '</pre>';
     box.appendChild(det);
   }
 
@@ -649,14 +648,14 @@
       const pct = (p * 100).toFixed(1);
       const v = document.createElement('div');
       v.className = 'verdict ' + (yes ? 'yes' : 'no');
-      v.textContent = (yes ? '是 YES' : '否 NO') + ' · ' + pct + '%';
+      v.textContent = (yes ? 'Yes' : 'No') + ' · ' + pct + '%';
       card.appendChild(v);
       const sub = document.createElement('div'); sub.className = 'sub-verdict';
-      sub.textContent = '「是」的機率 ' + pct + '%　｜　「否」的機率 ' + ((1 - p) * 100).toFixed(1) + '%';
+      sub.textContent = 'Probability of yes = ' + pct + '%  |  probability of no = ' + ((1 - p) * 100).toFixed(1) + '%';
       card.appendChild(sub);
       card.appendChild(bars([
-        { label: '是 true', pct: p * 100, win: yes },
-        { label: '否 false', pct: (1 - p) * 100, win: !yes },
+        { label: 'true (yes)', pct: p * 100, win: yes },
+        { label: 'false (no)', pct: (1 - p) * 100, win: !yes },
       ]));
     } else if (a.type === 'choice') {
       const chosen = a.choice;
@@ -669,7 +668,7 @@
       card.appendChild(bars(items));
       if (a.confidence != null) {
         const c = document.createElement('div'); c.className = 'conf';
-        c.textContent = '信心度 confidence = ' + (a.confidence * 100).toFixed(1) + '%（機率集中程度）';
+        c.textContent = 'Confidence = ' + (a.confidence * 100).toFixed(1) + '% (how concentrated the probabilities are)';
         card.appendChild(c);
       }
     } else if (a.type === 'score') {
@@ -683,13 +682,13 @@
       v.textContent = (score != null ? score.toFixed(2) : '?') + (label ? ' — ' + label : '');
       card.appendChild(v);
       const sub = document.createElement('div'); sub.className = 'sub-verdict';
-      sub.textContent = '分數為機率加權後的等級（0 起算，範圍 ' + (levels.length ? levels.length - 1 : '?') + '）。';
+      sub.textContent = 'Score is the probability-weighted level (0-based, range ' + (levels.length ? levels.length - 1 : '?') + ').';
       card.appendChild(sub);
       const items = levels.map(lv => ({ label: lv + ' · ' + legend[lv], pct: (probs[lv] ?? 0) * 100, win: String(Math.round(score)) === lv }));
       card.appendChild(bars(items));
       if (a.confidence != null) {
         const c = document.createElement('div'); c.className = 'conf';
-        c.textContent = '信心度 confidence = ' + (a.confidence * 100).toFixed(1) + '%（機率集中程度）';
+        c.textContent = 'Confidence = ' + (a.confidence * 100).toFixed(1) + '% (how concentrated the probabilities are)';
         card.appendChild(c);
       }
     }
@@ -706,7 +705,7 @@
     return el;
   }
 
-  function typeLabel(t) { return { noul: '是/否', choice: '分類', score: '分數' }[t] || t; }
+  function typeLabel(t) { return { noul: 'Yes/no', choice: 'Choice', score: 'Score' }[t] || t; }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"'`$]/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;', '`':'&#96;', '$':'&#36;' }[c])); }
 
   // ---------------- wire events ----------------

@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#06080b" />
+<title>EMBER · Wildfire Lab</title>
+<link rel="stylesheet" href="style.css" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23ff8a3d' d='M12 2c2.6 4 5.5 5.5 5.5 9.4a5.5 5.5 0 1 1-11 0c0-2.2 1-3.8 2.8-5.5.4 1.6 1 2.7 2 3.4.5-2.3.5-4.6.7-7.3z'/%3E%3C/svg%3E" />
+</head>
+<body>
+<div class="grain" aria-hidden="true"></div>
+
+<div class="app">
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M12 2.2c2.6 4.1 5.5 5.6 5.5 9.4a5.5 5.5 0 1 1-11 0c0-2.2 1.2-3.8 3-5.5.4 1.6 1 2.7 2 3.4.6-2.3.4-4.7.5-7.3z" fill="url(#fg)"/>
+          <path d="M12 11.6c1.3 1.5 2.2 2.2 2.2 3.6a2.2 2.2 0 1 1-4.4 0c0-1.2.9-2 2.2-3.6z" fill="#ffe0ae" opacity=".9"/>
+          <defs>
+            <linearGradient id="fg" x1="12" y1="2" x2="12" y2="22" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#ffd08a"/><stop offset=".45" stop-color="#ff8b3d"/><stop offset="1" stop-color="#e14e12"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+      <div class="brand-copy">
+        <h1>EMBER</h1>
+        <p>WILDFIRE LAB</p>
+      </div>
+    </div>
+
+    <nav class="mode-switch" id="modeSwitch" data-active="sandbox" aria-label="Mode">
+      <div class="mode-glider"></div>
+      <button class="active" data-mode="sandbox" type="button">Sandbox</button>
+      <button data-mode="missions" type="button">Missions</button>
+      <button data-mode="smother" type="button">Smother</button>
+    </nav>
+
+    <div class="top-actions">
+      <span class="hint-key">SPACE PAUSE · M MUTE</span>
+      <button class="icon-btn" id="soundBtn" type="button" aria-label="Toggle sound" title="Sound (M)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6.5 9H3v6h3.5L11 19V5z"/><path class="wave1" d="M15.5 8.5a5 5 0 0 1 0 7"/><path class="wave2" d="M18.5 6a9 9 0 0 1 0 12"/></svg>
+      </button>
+      <button class="icon-btn" id="helpBtn" type="button" aria-label="How to play" title="How to play">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.5 2.5 0 1 1 3.6 2.3c-.8.5-1.2 1-1.2 2"/><circle cx="12" cy="17" r="0.6" fill="currentColor" stroke="none"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main class="workspace">
+    <section class="stage-area">
+      <div class="stage" id="stage">
+        <canvas id="mainCanvas"></canvas>
+        <canvas id="glowCanvas"></canvas>
+
+        <div class="hud">
+          <div class="hud-top">
+            <div class="wind-pill" id="windPill" title="Wind direction and strength">
+              <span class="wind-arrow" id="windArrow">→</span>
+              <span class="wind-label">WIND</span>
+              <span class="wind-bars" id="windBars"><i></i><i></i><i></i><i></i></span>
+              <span class="wind-val" id="windVal">0.2</span>
+            </div>
+            <div class="mission-hud" id="missionHud" hidden>
+              <div class="mh-row">
+                <span class="mh-tag" id="mhTag">MISSION 1</span>
+                <span class="mh-time" id="mhTime">01:40</span>
+              </div>
+              <div class="mh-name" id="mhName">Cabin Watch</div>
+              <div class="mh-goal" id="mhGoal">Extinguish all fires · Save 60% of trees</div>
+            </div>
+          </div>
+
+          <div class="hud-bottom">
+            <div class="water-wrap" id="waterWrap" hidden>
+              <span class="water-icon">💧</span>
+              <div class="water-bar"><i id="waterFill"></i></div>
+              <span class="water-num" id="waterNum">160</span>
+            </div>
+            <div class="score-pill" id="scorePill" hidden>
+              <span class="score-label">SCORE</span>
+              <span class="score-num" id="scoreNum">0</span>
+              <span class="combo" id="comboTag">×2</span>
+            </div>
+          </div>
+
+          <div class="countdown" id="countdown" hidden>3</div>
+          <div class="toasts" id="toasts"></div>
+          <div class="popups" id="popups"></div>
+          <div class="stage-tip" id="stageTip">
+            Draw <strong>wood</strong>, light it with <strong>Fire</strong>, then put it out with <strong>Water</strong>
+            <small>Stone blocks fire · Wind bends it · Try a mission</small>
+          </div>
+        </div>
+
+        <div class="firelight" id="firelight"></div>
+        <div class="fire-alert" id="fireAlert" hidden></div>
+        <div class="brush-ring" id="brushRing" hidden></div>
+        <button class="stage-play" id="playBtn" type="button" aria-label="Pause"></button>
+        <div class="stage-vignette"></div>
+      </div>
+
+      <div class="stage-foot">
+        <p class="foot-hint" id="footHint">Draw wood, ignite it, then put it out with water</p>
+        <p class="foot-stats" id="footStats">FPS 60 · Fire 0</p>
+      </div>
+    </section>
+
+    <aside class="panel">
+      <div class="mission-card" id="missionCard" hidden>
+        <div class="mc-head"><span class="mc-tag" id="mcTag">MISSION 1</span><span class="mc-time" id="mcTime">01:40</span></div>
+        <h2 id="mcName">Cabin Watch</h2>
+        <p id="mcGoal">Extinguish all fires. Save the cabin and at least 60% of the trees.</p>
+        <div class="mc-bar"><i id="mcProgress"></i></div>
+        <div class="mc-foot"><span id="mcTrees">Trees 100%</span><button class="text-btn" id="mcQuit" type="button">Quit Mission</button></div>
+      </div>
+
+      <div class="panel-section" id="sceneSection">
+        <div class="section-head"><h3>SCENES</h3><span class="kbd-hint">6 PRESETS</span></div>
+        <div class="scene-grid" id="sceneSeg" aria-label="Sandbox scene">
+          <button class="scene-btn" data-scene="blank" type="button"><span class="ico">▢</span>Blank</button>
+          <button class="scene-btn" data-scene="forest" type="button"><span class="ico">🌲</span>Forest</button>
+          <button class="scene-btn" data-scene="deep" type="button"><span class="ico">🌳</span>Deep Forest</button>
+          <button class="scene-btn active" data-scene="city" type="button"><span class="ico">🏙️</span>City</button>
+          <button class="scene-btn" data-scene="refinery" type="button"><span class="ico">🛢️</span>Refinery</button>
+          <button class="scene-btn" data-scene="reservoir" type="button"><span class="ico">💧</span>Reservoir</button>
+        </div>
+      </div>
+
+      <div class="panel-section">
+        <div class="section-head"><h3>TOOLS</h3><span class="kbd-hint">1 — 8</span></div>
+        <div class="tool-grid" id="toolGrid"></div>
+      </div>
+
+      <div class="panel-section">
+        <div class="section-head"><h3>BRUSH</h3><span class="value" id="brushVal">6</span></div>
+        <input class="range ember" id="brushRange" type="range" min="2" max="14" step="1" value="6" aria-label="Brush size" />
+      </div>
+
+      <div class="panel-section">
+        <div class="section-head"><h3>ENVIRONMENT</h3><span class="kbd-hint">LIVE</span></div>
+        <div class="slider-row">
+          <label for="windRange">Wind <b id="windLabel">0.2 →</b></label>
+          <input class="range sky" id="windRange" type="range" min="-100" max="100" step="1" value="20" aria-label="Wind" />
+        </div>
+        <div class="slider-row">
+          <label for="powerRange">Fire <b id="powerLabel">1.0×</b></label>
+          <input class="range ember" id="powerRange" type="range" min="40" max="190" step="1" value="100" aria-label="Fire power" />
+        </div>
+        <div class="segmented" id="speedSeg" aria-label="Time speed">
+          <button data-speed="0.5" type="button">0.5×</button>
+          <button data-speed="1" class="active" type="button">1×</button>
+          <button data-speed="2" type="button">2×</button>
+        </div>
+        <div class="quality-row">
+          <span>QUALITY</span>
+          <div class="segmented" id="qualitySeg" aria-label="Render quality">
+            <button data-q="1" type="button">Fast</button>
+            <button data-q="2" class="active" type="button">Clear</button>
+            <button data-q="3" type="button">Ultra</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-section actions">
+        <button class="action-btn sky" id="rainBtn" type="button"><span>☂</span> Rain <em id="rainCount"></em></button>
+        <button class="action-btn" id="resetBtn" type="button"><span>↺</span> Reset Scene</button>
+      </div>
+
+      <div class="panel-foot">
+        <span id="statFire">Fire 0</span><span class="dot"></span>
+        <span id="statTrees">Trees —</span><span class="dot"></span>
+        <span id="statFps">60 FPS</span>
+      </div>
+    </aside>
+  </main>
+</div>
+
+<div id="modalRoot" class="modal-root" hidden></div>
+<script src="sim.js"></script>
+<script src="city.js"></script>
+<script src="renderer.js"></script>
+<script src="ui.js"></script>
+</body>
+</html>

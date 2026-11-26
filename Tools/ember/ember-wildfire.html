@@ -1,0 +1,4797 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#06080b" />
+<title>EMBER · Wildfire Lab</title>
+<style>
+/* ============================================================
+   EMBER · Wildfire Lab
+   ============================================================ */
+:root {
+  --bg: #06080b;
+  --panel: rgba(17, 22, 29, 0.72);
+  --panel-solid: #0e1319;
+  --line: rgba(255, 255, 255, 0.075);
+  --line-soft: rgba(255, 255, 255, 0.045);
+  --line-strong: rgba(255, 255, 255, 0.14);
+  --text: #eef2f6;
+  --muted: #8b97a4;
+  --muted-2: #5f6b78;
+  --ember: #ff7a2f;
+  --ember-hi: #ffb15c;
+  --sky: #4cc3ff;
+  --leaf: #86c06c;
+  --radius: 16px;
+  --font: "SF Pro Display", "SF Pro Text", -apple-system, BlinkMacSystemFont,
+    "Segoe UI", "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+  --mono: "SF Mono", ui-monospace, "JetBrains Mono", Menlo, monospace;
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(1100px 640px at 74% -12%, rgba(52, 68, 100, 0.5) 0%, transparent 62%),
+    radial-gradient(900px 620px at 6% 108%, rgba(120, 64, 18, 0.28) 0%, transparent 58%),
+    var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 14px;
+  line-height: 1.45;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+button, input { font-family: inherit; color: inherit; }
+button { cursor: pointer; }
+::selection { background: rgba(255, 122, 47, 0.35); }
+
+[hidden] { display: none !important; }
+
+/* film grain */
+.grain {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  pointer-events: none;
+  opacity: 0.05;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+}
+
+.app {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* ---------------------------------------------------------- header */
+.topbar {
+  flex: 0 0 auto;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 0 26px;
+}
+.brand { display: flex; align-items: center; gap: 12px; min-width: 210px; }
+.brand-mark {
+  width: 38px; height: 38px;
+  display: grid; place-items: center;
+  border-radius: 12px;
+  background:
+    radial-gradient(120% 120% at 20% 0%, rgba(255, 177, 92, 0.22), transparent 60%),
+    linear-gradient(160deg, #241a13, #120e0b);
+  border: 1px solid rgba(255, 158, 90, 0.28);
+  box-shadow: 0 0 26px -6px rgba(255, 122, 47, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+.brand-mark svg { width: 20px; height: 20px; filter: drop-shadow(0 0 6px rgba(255, 122, 47, 0.8)); }
+.brand-copy h1 {
+  margin: 0;
+  font-size: 17px;
+  letter-spacing: 0.26em;
+  font-weight: 700;
+  line-height: 1;
+}
+.brand-copy p {
+  margin: 5px 0 0;
+  font-size: 10.5px;
+  letter-spacing: 0.3em;
+  color: var(--muted);
+}
+
+.mode-switch {
+  position: relative;
+  display: flex;
+  padding: 4px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid var(--line);
+}
+.mode-switch button {
+  position: relative;
+  z-index: 1;
+  width: 92px;
+  height: 32px;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font-size: 12.5px;
+  letter-spacing: 0.08em;
+  border-radius: 999px;
+  transition: color 0.25s ease;
+}
+.mode-switch button.active { color: #fff; }
+.mode-glider {
+  position: absolute;
+  z-index: 0;
+  top: 4px; bottom: 4px; left: 4px;
+  width: 92px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.045));
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 6px 18px -8px #000;
+  transition: transform 0.32s cubic-bezier(0.34, 1.3, 0.64, 1);
+}
+.mode-switch[data-active="missions"] .mode-glider { transform: translateX(92px); }
+.mode-switch[data-active="smother"] .mode-glider { transform: translateX(184px); }
+.quality-row { display: flex; align-items: center; gap: 9px; margin-top: 11px; }
+.quality-row > span { font-size: 10px; letter-spacing: 0.12em; color: var(--muted-2); flex: 0 0 auto; }
+.quality-row .segmented { flex: 1; margin-top: 0; }
+
+.top-actions { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+.hint-key {
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  color: var(--muted-2);
+  margin-right: 6px;
+  text-transform: uppercase;
+}
+.icon-btn {
+  width: 36px; height: 36px;
+  display: grid; place-items: center;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--muted);
+  transition: 0.2s ease;
+}
+.icon-btn:hover { color: var(--text); border-color: var(--line-strong); background: rgba(255, 255, 255, 0.06); }
+.icon-btn svg { width: 17px; height: 17px; }
+.icon-btn.off { color: var(--muted-2); opacity: 0.6; }
+
+/* ---------------------------------------------------------- layout */
+.workspace {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 302px;
+  gap: 22px;
+  padding: 0 26px 22px;
+}
+.stage-area {
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.stage-foot {
+  flex: 0 0 auto;
+  height: 26px;
+  width: 100%;
+  max-width: 1200px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 0 4px;
+  font-size: 11.5px;
+  color: var(--muted-2);
+  letter-spacing: 0.02em;
+}
+.foot-stats { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.05em; }
+.foot-hint { margin: 0; transition: color 0.3s; }
+.foot-hint b { color: var(--muted); font-weight: 500; }
+
+/* ---------------------------------------------------------- stage */
+.stage {
+  position: relative;
+  flex: 0 0 auto;
+  border-radius: 18px;
+  overflow: hidden;
+  background: #04060a;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  box-shadow:
+    0 40px 90px -30px rgba(0, 0, 0, 0.95),
+    0 0 0 1px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  touch-action: none;
+  cursor: none;
+  isolation: isolate;
+}
+.stage canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+#glowCanvas {
+  mix-blend-mode: screen;
+  filter: blur(18px) saturate(1.4);
+  opacity: 1;
+  transform: scale(1.015);
+  pointer-events: none;
+}
+.firelight {
+  position: absolute;
+  left: 50%; top: 50%;
+  z-index: 2;
+  width: 300px; height: 300px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle, rgba(255, 146, 66, 0.34) 0%, rgba(255, 110, 40, 0.12) 42%, transparent 70%);
+  filter: blur(26px);
+  mix-blend-mode: screen;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+.stage-vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 3;
+  background:
+    radial-gradient(125% 105% at 50% 42%, transparent 52%, rgba(0, 0, 0, 0.45) 86%, rgba(0, 0, 0, 0.72) 100%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.22), transparent 15%, transparent 82%, rgba(0, 0, 0, 0.3));
+  mix-blend-mode: multiply;
+}
+.stage::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 4;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.035);
+}
+
+/* hud */
+.hud {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.hud-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.hud-bottom { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; }
+
+.wind-pill {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 11px 7px 9px;
+  border-radius: 999px;
+  background: rgba(8, 19, 28, 0.55);
+  border: 1px solid rgba(120, 205, 255, 0.18);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  font-size: 11px;
+  color: #bfe7ff;
+  box-shadow: 0 8px 24px -14px #000;
+}
+.wind-arrow {
+  width: 22px; height: 22px;
+  display: grid; place-items: center;
+  border-radius: 50%;
+  background: rgba(76, 195, 255, 0.12);
+  color: var(--sky);
+  font-size: 13px;
+  line-height: 1;
+  transition: transform 0.5s cubic-bezier(0.3, 1.4, 0.5, 1);
+}
+.wind-pill .wind-label { letter-spacing: 0.18em; color: rgba(191, 231, 255, 0.55); font-size: 9.5px; }
+.wind-pill .wind-val { font-family: var(--mono); font-size: 10.5px; opacity: 0.85; }
+.wind-bars { display: flex; align-items: flex-end; gap: 2px; height: 10px; margin-left: 1px; }
+.wind-bars i { width: 2px; border-radius: 1px; background: currentColor; opacity: 0.25; }
+.wind-bars i.on { opacity: 0.9; }
+.wind-bars i:nth-child(1) { height: 4px; }
+.wind-bars i:nth-child(2) { height: 6px; }
+.wind-bars i:nth-child(3) { height: 8px; }
+.wind-bars i:nth-child(4) { height: 10px; }
+
+.mission-hud {
+  min-width: 208px;
+  max-width: 280px;
+  padding: 11px 13px 12px;
+  border-radius: 13px;
+  background: rgba(8, 12, 17, 0.62);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 14px 40px -24px #000;
+  text-align: right;
+}
+.mh-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.mh-tag {
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  color: var(--ember-hi);
+  text-transform: uppercase;
+}
+.mh-time {
+  font-family: var(--mono);
+  font-size: 15px;
+  letter-spacing: 0.04em;
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+}
+.mh-time.warn { color: #ff6b6b; animation: pulse 1s infinite; }
+.mh-name { margin-top: 5px; font-size: 13.5px; font-weight: 600; letter-spacing: 0.02em; }
+.mh-goal { margin-top: 3px; font-size: 10.5px; color: var(--muted); line-height: 1.4; }
+
+@keyframes pulse { 50% { opacity: 0.55; } }
+
+.water-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px 8px 9px;
+  border-radius: 999px;
+  background: rgba(6, 14, 22, 0.6);
+  border: 1px solid rgba(76, 195, 255, 0.18);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+.water-icon { font-size: 12px; filter: saturate(0.8); }
+.water-bar {
+  width: 116px;
+  height: 5px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+}
+.water-bar i {
+  display: block;
+  height: 100%;
+  width: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #2f9de0, #6fe0ff);
+  box-shadow: 0 0 12px rgba(76, 195, 255, 0.7);
+  transition: width 0.15s linear;
+}
+.water-num { font-family: var(--mono); font-size: 10.5px; color: #9fdcff; min-width: 28px; text-align: right; }
+.water-wrap.low .water-bar i { background: linear-gradient(90deg, #d94f3d, #ff8a5c); box-shadow: 0 0 12px rgba(255, 100, 60, 0.7); }
+
+.score-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 12px;
+  border-radius: 999px;
+  background: rgba(20, 12, 6, 0.55);
+  border: 1px solid rgba(255, 158, 90, 0.18);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+.score-label { font-size: 9.5px; letter-spacing: 0.18em; color: rgba(255, 177, 92, 0.6); }
+.score-num { font-family: var(--mono); font-size: 13px; color: #ffd7a8; font-variant-numeric: tabular-nums; }
+.combo {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: #ffcf7d;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: rgba(255, 158, 90, 0.14);
+  opacity: 0;
+  transform: scale(0.8);
+  transition: 0.2s ease;
+}
+.combo.show { opacity: 1; transform: scale(1); }
+
+/* play / pause */
+.stage-play {
+  position: absolute;
+  z-index: 6;
+  left: 50%;
+  bottom: 14px;
+  transform: translateX(-50%);
+  width: 34px; height: 34px;
+  display: grid; place-items: center;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(10, 14, 19, 0.55);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: var(--muted);
+  transition: 0.2s;
+}
+.stage-play:hover { color: #fff; background: rgba(255, 255, 255, 0.08); transform: translateX(-50%) scale(1.06); }
+
+.stage.paused::before {
+  content: "PAUSED";
+  position: absolute;
+  z-index: 8;
+  left: 50%; top: 50%;
+  transform: translate(-50%, -50%);
+  padding: 10px 22px;
+  border-radius: 999px;
+  background: rgba(8, 12, 17, 0.62);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  font-size: 12px;
+  letter-spacing: 0.32em;
+  color: rgba(255, 255, 255, 0.82);
+  pointer-events: none;
+}
+.stage.paused canvas { filter: saturate(0.45) brightness(0.6); transition: filter 0.3s; }
+.stage canvas { transition: filter 0.3s; }
+
+.icon-btn .wave1, .icon-btn .wave2 { transition: opacity 0.2s; }
+.icon-btn.off .wave1, .icon-btn.off .wave2 { opacity: 0; }
+.stage-play svg { width: 12px; height: 12px; }
+
+/* fire alert */
+.fire-alert {
+  position: absolute;
+  z-index: 6;
+  width: 54px; height: 54px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 92, 60, 0.9);
+  box-shadow: 0 0 30px rgba(255, 92, 60, 0.55), inset 0 0 18px rgba(255, 92, 60, 0.25);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  animation: alertPulse 0.8s ease-in-out infinite;
+}
+.fire-alert::after {
+  content: "";
+  position: absolute;
+  left: 50%; top: 50%;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: #ff7a3d;
+  box-shadow: 0 0 14px #ff7a3d;
+  transform: translate(-50%, -50%);
+}
+@keyframes alertPulse {
+  0%, 100% { opacity: 0.4; transform: translate(-50%, -50%) scale(0.7); }
+  50% { opacity: 1; transform: translate(-50%, -50%) scale(1.05); }
+}
+
+/* brush ring */
+.brush-ring {
+  position: absolute;
+  left: -120px;
+  top: -120px;
+  z-index: 6;
+  width: 60px; height: 60px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.62);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25), inset 0 0 18px rgba(255, 255, 255, 0.05);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  transition: border-color 0.2s, opacity 0.15s;
+  mix-blend-mode: screen;
+}
+.brush-ring::after {
+  content: "";
+  position: absolute;
+  left: 50%; top: 50%;
+  width: 3px; height: 3px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.85);
+  transform: translate(-50%, -50%);
+}
+
+/* countdown */
+.countdown {
+  position: absolute;
+  left: 50%; top: 46%;
+  transform: translate(-50%, -50%);
+  z-index: 7;
+  font-size: clamp(64px, 9vw, 118px);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #fff4e2;
+  text-shadow: 0 0 40px rgba(255, 138, 74, 0.75), 0 0 140px rgba(255, 122, 47, 0.45);
+  pointer-events: none;
+  animation: cdPulse 1s ease-in-out infinite;
+}
+@keyframes cdPulse {
+  0%, 100% { opacity: 0.35; transform: translate(-50%, -50%) scale(0.92); }
+  30% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+@media (max-width: 640px) { .countdown { font-size: 56px; } }
+
+/* toasts & popups */
+.toasts {
+  position: absolute;
+  left: 50%;
+  bottom: 58px;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  pointer-events: none;
+  z-index: 7;
+  width: max-content;
+  max-width: 88%;
+}
+.toast {
+  padding: 7px 14px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  letter-spacing: 0.02em;
+  color: #f4f7fa;
+  background: rgba(9, 13, 18, 0.78);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 10px 30px -16px #000;
+  animation: toastIn 0.28s cubic-bezier(0.2, 1.2, 0.4, 1) both;
+}
+.toast.out { animation: toastOut 0.35s ease both; }
+.toast.warm { border-color: rgba(255, 158, 90, 0.35); color: #ffe0c0; }
+@keyframes toastIn { from { opacity: 0; transform: translateY(8px) scale(0.96); } }
+@keyframes toastOut { to { opacity: 0; transform: translateY(-6px); } }
+
+.popups { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 7; }
+.popup {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 600;
+  color: #ffce8a;
+  text-shadow: 0 2px 12px rgba(255, 122, 47, 0.6);
+  animation: popUp 1.05s cubic-bezier(0.2, 0.7, 0.3, 1) forwards;
+  white-space: nowrap;
+}
+.popup.big { font-size: 17px; color: #fff0d6; }
+@keyframes popUp {
+  0% { opacity: 0; transform: translate(-50%, -40%) scale(0.7); }
+  18% { opacity: 1; transform: translate(-50%, -70%) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -180%) scale(0.95); }
+}
+
+/* ---------------------------------------------------------- panel */
+.panel {
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+  padding-right: 3px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.12) transparent;
+}
+.panel::-webkit-scrollbar { width: 5px; }
+.panel::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.12); border-radius: 4px; }
+
+.panel-section, .mission-card {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.014));
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 13px 14px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+.section-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 11px; }
+.section-head h3 {
+  margin: 0;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  color: var(--muted);
+}
+.kbd-hint { font-family: var(--mono); font-size: 9px; color: var(--muted-2); letter-spacing: 0.08em; }
+.value { font-family: var(--mono); font-size: 11px; color: var(--ember-hi); }
+
+.tool-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+.tool-btn {
+  position: relative;
+  height: 56px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  border-radius: 11px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.025);
+  color: var(--muted);
+  transition: 0.18s ease;
+  overflow: hidden;
+}
+.tool-btn svg { width: 19px; height: 19px; color: var(--accent, #9aa6b2); transition: 0.18s; }
+.tool-btn span { font-size: 10.5px; letter-spacing: 0.04em; }
+.tool-btn .key {
+  position: absolute;
+  top: 4px; right: 6px;
+  font-family: var(--mono);
+  font-size: 8px;
+  color: var(--muted-2);
+  opacity: 0.6;
+}
+.tool-btn:hover:not(:disabled) { background: rgba(255, 255, 255, 0.055); border-color: var(--line-strong); color: var(--text); }
+.tool-btn:disabled { opacity: 0.28; cursor: not-allowed; filter: saturate(0.4); }
+.range:disabled { opacity: 0.35; }
+.segmented button:disabled { opacity: 0.32; cursor: not-allowed; }
+.tool-btn.active {
+  color: #fff;
+  border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+  background:
+    radial-gradient(120% 130% at 50% 0%, color-mix(in srgb, var(--accent) 22%, transparent), transparent 70%),
+    rgba(255, 255, 255, 0.045);
+  box-shadow: 0 8px 22px -14px var(--accent), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+.tool-btn.active svg { color: var(--accent); filter: drop-shadow(0 0 6px color-mix(in srgb, var(--accent) 55%, transparent)); }
+.tool-btn.active .key { color: rgba(255, 255, 255, 0.45); }
+
+/* ranges */
+.range {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  border-radius: 3px;
+  outline: none;
+  margin: 11px 0 2px;
+  background: linear-gradient(
+    90deg,
+    var(--accent, #ff7a2f) 0%,
+    var(--accent, #ff7a2f) var(--p, 50%),
+    rgba(255, 255, 255, 0.1) var(--p, 50%),
+    rgba(255, 255, 255, 0.1) 100%
+  );
+}
+.range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 13px; height: 13px;
+  border-radius: 50%;
+  background: #f4f7fa;
+  border: 0;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.09), 0 2px 8px rgba(0, 0, 0, 0.6);
+  transition: transform 0.15s;
+}
+.range::-webkit-slider-thumb:hover { transform: scale(1.15); }
+.range::-moz-range-thumb {
+  width: 13px; height: 13px; border: 0; border-radius: 50%;
+  background: #f4f7fa; box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.09);
+}
+.range.ember { --accent: #ff7a2f; }
+.range.sky { --accent: #4cc3ff; }
+
+.slider-row { margin-bottom: 10px; }
+.slider-row:last-child { margin-bottom: 0; }
+.slider-row label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 0.03em;
+}
+.slider-row label b { font-family: var(--mono); font-weight: 500; font-size: 10.5px; color: var(--text); }
+
+.segmented {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+  margin-top: 12px;
+  padding: 3px;
+  border-radius: 9px;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid var(--line-soft);
+}
+.segmented button {
+  height: 26px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--muted-2);
+  font-family: var(--mono);
+  font-size: 10px;
+  transition: 0.18s;
+}
+.segmented button:hover { color: var(--text); }
+.segmented.two { grid-template-columns: 1fr 1fr; }
+.segmented button.active {
+  background: rgba(255, 255, 255, 0.09);
+  color: #fff;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.08) inset;
+}
+
+.actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 11px; }
+.action-btn {
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--muted);
+  font-size: 11.5px;
+  letter-spacing: 0.03em;
+  transition: 0.18s;
+}
+.action-btn:hover { background: rgba(255, 255, 255, 0.065); color: var(--text); border-color: var(--line-strong); }
+.action-btn span { font-size: 14px; opacity: 0.8; }
+.action-btn em { font-style: normal; font-family: var(--mono); font-size: 9px; color: var(--sky); }
+.action-btn.sky:hover { border-color: rgba(76, 195, 255, 0.4); }
+.action-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+.panel-foot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 2px 4px 6px;
+  font-family: var(--mono);
+  font-size: 9.5px;
+  color: var(--muted-2);
+  letter-spacing: 0.04em;
+}
+.panel-foot .dot { width: 2px; height: 2px; border-radius: 50%; background: var(--muted-2); opacity: 0.6; }
+
+/* scene picker */
+.scene-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+.scene-btn {
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 0 3px;
+  border-radius: 9px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.025);
+  color: var(--muted);
+  font-size: 9px;
+  letter-spacing: 0.02em;
+  transition: 0.18s ease;
+}
+.scene-btn .ico { font-size: 11px; line-height: 1; opacity: 0.8; filter: saturate(0.8); }
+.scene-btn:hover { color: var(--text); background: rgba(255, 255, 255, 0.055); border-color: var(--line-strong); }
+.scene-btn.active {
+  color: #fff;
+  border-color: rgba(255, 158, 90, 0.45);
+  background:
+    radial-gradient(120% 130% at 50% 0%, rgba(255, 158, 90, 0.2), transparent 70%),
+    rgba(255, 255, 255, 0.04);
+  box-shadow: 0 8px 20px -14px rgba(255, 122, 47, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.07);
+}
+.scene-btn:disabled { cursor: not-allowed; opacity: 0.5; }
+
+/* mission card in panel */
+.mission-card {
+  border-color: rgba(255, 158, 90, 0.2);
+  background:
+    radial-gradient(120% 100% at 100% 0%, rgba(255, 122, 47, 0.1), transparent 55%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.012));
+}
+.mc-head { display: flex; justify-content: space-between; align-items: center; }
+.mc-tag { font-size: 9px; letter-spacing: 0.22em; color: var(--ember-hi); }
+.mc-time { font-family: var(--mono); font-size: 12px; color: #fff; font-variant-numeric: tabular-nums; }
+.mc-time.warn { color: #ff6b6b; }
+.mission-card h2 { margin: 7px 0 0; font-size: 16px; letter-spacing: 0.03em; font-weight: 600; }
+.mission-card p { margin: 5px 0 0; font-size: 10.5px; color: var(--muted); line-height: 1.5; }
+.mc-bar { height: 4px; margin-top: 11px; border-radius: 2px; background: rgba(255, 255, 255, 0.08); overflow: hidden; }
+.mc-bar i { display: block; height: 100%; width: 100%; background: linear-gradient(90deg, #6ec49a, #b7e38a); border-radius: inherit; transition: width 0.3s; }
+.mc-foot { display: flex; align-items: center; justify-content: space-between; margin-top: 9px; font-size: 10px; color: var(--muted-2); }
+.mc-foot .text-btn { border: 0; background: none; color: var(--muted); font-size: 10px; padding: 0; text-decoration: underline; text-underline-offset: 3px; }
+.mc-foot .text-btn:hover { color: #ff9a6a; }
+
+/* ---------------------------------------------------------- modal */
+.modal-root {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(3, 5, 8, 0.72);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  animation: fadeIn 0.25s ease both;
+}
+.modal-root[hidden] { display: none; }
+@keyframes fadeIn { from { opacity: 0; } }
+.modal {
+  width: min(660px, 100%);
+  max-height: min(84vh, 760px);
+  overflow-y: auto;
+  background:
+    radial-gradient(90% 60% at 100% 0%, rgba(255, 122, 47, 0.08), transparent 60%),
+    #0d1218;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 26px;
+  box-shadow: 0 50px 120px -40px #000, inset 0 1px 0 rgba(255, 255, 255, 0.07);
+  animation: modalIn 0.35s cubic-bezier(0.2, 1.1, 0.4, 1) both;
+  scrollbar-width: thin;
+}
+@keyframes modalIn { from { opacity: 0; transform: translateY(14px) scale(0.97); } }
+.modal-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; margin-bottom: 20px; }
+.modal-kicker { font-size: 9.5px; letter-spacing: 0.26em; color: var(--ember-hi); text-transform: uppercase; }
+.modal h2 { margin: 7px 0 0; font-size: 24px; letter-spacing: 0.02em; font-weight: 650; }
+.modal-sub { margin: 7px 0 0; color: var(--muted); font-size: 12px; line-height: 1.6; }
+.modal-close {
+  flex: 0 0 auto;
+  width: 32px; height: 32px;
+  border-radius: 9px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--muted);
+  font-size: 17px;
+  line-height: 1;
+}
+.modal-close:hover { color: #fff; background: rgba(255, 255, 255, 0.07); }
+
+.mission-list { display: flex; flex-direction: column; gap: 9px; }
+.mission-item {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 14px 16px;
+  border-radius: 13px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.022);
+  text-align: left;
+  transition: 0.2s;
+  width: 100%;
+}
+.mission-item:hover:not(:disabled) { border-color: rgba(255, 158, 90, 0.4); background: rgba(255, 158, 90, 0.05); transform: translateY(-1px); }
+.mission-item:disabled { opacity: 0.42; cursor: not-allowed; }
+.mission-num {
+  flex: 0 0 auto;
+  width: 42px; height: 42px;
+  display: grid; place-items: center;
+  border-radius: 11px;
+  background: linear-gradient(160deg, rgba(255, 158, 90, 0.15), rgba(255, 158, 90, 0.03));
+  border: 1px solid rgba(255, 158, 90, 0.16);
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--ember-hi);
+}
+.mission-item h3 { margin: 0; font-size: 14px; font-weight: 600; letter-spacing: 0.02em; }
+.mission-item p { margin: 3px 0 0; font-size: 10.5px; color: #9aa6b3; line-height: 1.5; }
+.mission-meta { margin-left: auto; display: flex; flex-direction: column; align-items: flex-end; gap: 5px; }
+.stars { display: flex; gap: 2px; color: #ffce7a; font-size: 11px; letter-spacing: 1px; }
+.stars .dim { color: rgba(255, 255, 255, 0.14); }
+.mission-best { font-family: var(--mono); font-size: 9px; color: var(--muted-2); }
+
+/* help */
+.help-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.help-item {
+  padding: 13px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.025);
+}
+.help-item h4 { margin: 0 0 5px; font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 7px; }
+.help-item h4 span { font-size: 14px; }
+.help-item p { margin: 0; font-size: 11px; color: #b3bdc8; line-height: 1.6; }
+.help-note {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line-soft);
+  font-size: 10px;
+  color: var(--muted-2);
+  line-height: 1.6;
+}
+.help-note a { color: var(--muted); }
+kbd {
+  display: inline-block;
+  min-width: 17px;
+  padding: 1px 4px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.06);
+  font-family: var(--mono);
+  font-size: 9px;
+  line-height: 1.5;
+  text-align: center;
+  color: #cfd8e1;
+}
+
+/* result */
+.result {
+  text-align: center;
+  padding: 8px 10px 4px;
+}
+.result-badge {
+  width: 62px; height: 62px;
+  margin: 0 auto 14px;
+  display: grid; place-items: center;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 30%, rgba(255, 177, 92, 0.3), rgba(255, 122, 47, 0.05));
+  border: 1px solid rgba(255, 158, 90, 0.35);
+  font-size: 26px;
+  box-shadow: 0 0 50px -8px rgba(255, 122, 47, 0.45);
+}
+.result-badge.lose { background: radial-gradient(circle at 50% 30%, rgba(255, 90, 90, 0.22), rgba(255, 60, 60, 0.03)); border-color: rgba(255, 110, 110, 0.3); box-shadow: 0 0 50px -8px rgba(255, 60, 60, 0.3); }
+.result h2 { font-size: 25px; margin: 0; }
+.result .stars-big { margin: 12px 0 4px; font-size: 25px; letter-spacing: 6px; color: #ffce7a; }
+.result .stars-big .dim { color: rgba(255, 255, 255, 0.12); }
+.result-sub { color: var(--muted); font-size: 12px; margin: 6px 0 0; }
+.result-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin: 22px 0;
+}
+.result-stat {
+  padding: 12px 8px;
+  border-radius: 11px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--line);
+}
+.result-stat b { display: block; font-family: var(--mono); font-size: 16px; font-weight: 500; color: #fff; }
+.result-stat span { display: block; margin-top: 3px; font-size: 9px; letter-spacing: 0.16em; color: var(--muted-2); }
+.result-actions { display: flex; gap: 9px; justify-content: center; }
+
+.btn {
+  height: 42px;
+  padding: 0 22px;
+  border-radius: 11px;
+  border: 1px solid var(--line-strong);
+  background: rgba(255, 255, 255, 0.05);
+  color: #e8edf2;
+  font-size: 12.5px;
+  letter-spacing: 0.04em;
+  transition: 0.18s;
+}
+.btn:hover { background: rgba(255, 255, 255, 0.09); transform: translateY(-1px); }
+.btn.primary {
+  background: linear-gradient(180deg, #ff9a52, #ee6a1e);
+  border-color: rgba(255, 190, 140, 0.5);
+  color: #1a0d04;
+  font-weight: 650;
+  box-shadow: 0 12px 30px -12px rgba(255, 122, 47, 0.8);
+}
+.btn.primary:hover { filter: brightness(1.06); }
+.btn.ghost { background: transparent; }
+
+/* intro tooltip inside stage */
+.stage-tip {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%) scale(0.96);
+  z-index: 7;
+  padding: 13px 18px;
+  border-radius: 14px;
+  background: rgba(8, 12, 17, 0.62);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  font-size: 12px;
+  color: #dfe7ee;
+  text-align: center;
+  line-height: 1.7;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.6s ease, transform 0.6s ease;
+  box-shadow: 0 20px 60px -26px #000;
+}
+.stage-tip.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+.stage-tip b { color: var(--ember-hi); font-weight: 600; }
+.stage-tip small { display: block; margin-top: 4px; color: var(--muted-2); font-size: 10px; letter-spacing: 0.04em; }
+
+/* ---------------------------------------------------------- responsive */
+@media (max-width: 1180px) {
+  .workspace { grid-template-columns: minmax(0, 1fr) 280px; gap: 16px; padding: 0 18px 18px; }
+  .topbar { padding: 0 18px; }
+}
+@media (max-width: 980px) {
+  body { overflow: auto; }
+  .app { height: auto; min-height: 100%; }
+  .topbar { height: 62px; gap: 14px; position: sticky; top: 0; z-index: 20; background: rgba(6, 8, 11, 0.8); backdrop-filter: blur(16px); }
+  .brand { min-width: 0; }
+  .brand-copy p { display: none; }
+  .hint-key { display: none; }
+  .workspace { grid-template-columns: 1fr; display: flex; flex-direction: column; padding: 0 14px 24px; }
+  .stage-area { display: block; }
+  .stage { width: 100%; height: auto; aspect-ratio: 16 / 9; }
+  .stage-foot { height: 22px; margin-top: 6px; }
+  .panel { overflow: visible; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+  .panel .mission-card { grid-column: 1 / -1; }
+  .panel .panel-foot { grid-column: 1 / -1; }
+}
+@media (max-width: 640px) {
+  .topbar { padding: 0 12px; height: 56px; gap: 8px; }
+  .brand-mark { width: 32px; height: 32px; border-radius: 10px; }
+  .brand-copy h1 { font-size: 14px; }
+  .mode-switch button { width: 54px; height: 30px; font-size: 10px; }
+  .mode-glider { width: 54px; }
+  .mode-switch[data-active="missions"] .mode-glider { transform: translateX(54px); }
+  .mode-switch[data-active="smother"] .mode-glider { transform: translateX(108px); }
+  .icon-btn { width: 32px; height: 32px; }
+  .workspace { padding: 0 10px 20px; }
+  .stage { border-radius: 13px; }
+  .hud { padding: 9px; }
+  .wind-pill { padding: 5px 9px; }
+  .mission-hud { min-width: 0; max-width: 195px; padding: 8px 10px; }
+  .mh-name { font-size: 12px; }
+  .mh-goal { font-size: 9px; }
+  .water-wrap { padding: 6px 9px; }
+  .water-bar { width: 74px; }
+  .panel { grid-template-columns: 1fr; }
+  .tool-grid { grid-template-columns: repeat(4, 1fr); }
+  .tool-btn { height: 52px; }
+  .help-grid { grid-template-columns: 1fr; }
+  .modal { padding: 20px; border-radius: 16px; }
+  .modal h2 { font-size: 20px; }
+  .result-stats { grid-template-columns: 1fr 1fr 1fr; }
+  .result-actions { flex-direction: column; }
+  .stage-play { width: 28px; height: 28px; bottom: 9px; }
+  .stage-tip { font-size: 11px; padding: 9px 12px; width: 82%; line-height: 1.6; }
+  .stage-tip small { display: none; }
+  .mission-hud { max-width: 152px; padding: 7px 9px; }
+  .mission-hud .mh-goal { display: none; }
+  .mh-name { font-size: 11.5px; margin-top: 3px; }
+  .mh-time { font-size: 12.5px; }
+  .mh-tag { font-size: 8px; }
+  .water-bar { width: 66px; }
+  .score-pill { padding: 5px 9px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+}
+
+</style>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23ff8a3d' d='M12 2c2.6 4 5.5 5.5 5.5 9.4a5.5 5.5 0 1 1-11 0c0-2.2 1-3.8 2.8-5.5.4 1.6 1 2.7 2 3.4.5-2.3.5-4.6.7-7.3z'/%3E%3C/svg%3E" />
+</head>
+<body>
+<div class="grain" aria-hidden="true"></div>
+
+<div class="app">
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M12 2.2c2.6 4.1 5.5 5.6 5.5 9.4a5.5 5.5 0 1 1-11 0c0-2.2 1.2-3.8 3-5.5.4 1.6 1 2.7 2 3.4.6-2.3.4-4.7.5-7.3z" fill="url(#fg)"/>
+          <path d="M12 11.6c1.3 1.5 2.2 2.2 2.2 3.6a2.2 2.2 0 1 1-4.4 0c0-1.2.9-2 2.2-3.6z" fill="#ffe0ae" opacity=".9"/>
+          <defs>
+            <linearGradient id="fg" x1="12" y1="2" x2="12" y2="22" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#ffd08a"/><stop offset=".45" stop-color="#ff8b3d"/><stop offset="1" stop-color="#e14e12"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+      <div class="brand-copy">
+        <h1>EMBER</h1>
+        <p>WILDFIRE LAB</p>
+      </div>
+    </div>
+
+    <nav class="mode-switch" id="modeSwitch" data-active="sandbox" aria-label="Mode">
+      <div class="mode-glider"></div>
+      <button class="active" data-mode="sandbox" type="button">Sandbox</button>
+      <button data-mode="missions" type="button">Missions</button>
+      <button data-mode="smother" type="button">Smother</button>
+    </nav>
+
+    <div class="top-actions">
+      <span class="hint-key">SPACE PAUSE · M MUTE</span>
+      <button class="icon-btn" id="soundBtn" type="button" aria-label="Toggle sound" title="Sound (M)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6.5 9H3v6h3.5L11 19V5z"/><path class="wave1" d="M15.5 8.5a5 5 0 0 1 0 7"/><path class="wave2" d="M18.5 6a9 9 0 0 1 0 12"/></svg>
+      </button>
+      <button class="icon-btn" id="helpBtn" type="button" aria-label="How to play" title="How to play">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.5 2.5 0 1 1 3.6 2.3c-.8.5-1.2 1-1.2 2"/><circle cx="12" cy="17" r="0.6" fill="currentColor" stroke="none"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main class="workspace">
+    <section class="stage-area">
+      <div class="stage" id="stage">
+        <canvas id="mainCanvas"></canvas>
+        <canvas id="glowCanvas"></canvas>
+
+        <div class="hud">
+          <div class="hud-top">
+            <div class="wind-pill" id="windPill" title="Wind direction and strength">
+              <span class="wind-arrow" id="windArrow">→</span>
+              <span class="wind-label">WIND</span>
+              <span class="wind-bars" id="windBars"><i></i><i></i><i></i><i></i></span>
+              <span class="wind-val" id="windVal">0.2</span>
+            </div>
+            <div class="mission-hud" id="missionHud" hidden>
+              <div class="mh-row">
+                <span class="mh-tag" id="mhTag">MISSION 1</span>
+                <span class="mh-time" id="mhTime">01:40</span>
+              </div>
+              <div class="mh-name" id="mhName">Cabin Watch</div>
+              <div class="mh-goal" id="mhGoal">Extinguish all fires · Save 60% of trees</div>
+            </div>
+          </div>
+
+          <div class="hud-bottom">
+            <div class="water-wrap" id="waterWrap" hidden>
+              <span class="water-icon">💧</span>
+              <div class="water-bar"><i id="waterFill"></i></div>
+              <span class="water-num" id="waterNum">160</span>
+            </div>
+            <div class="score-pill" id="scorePill" hidden>
+              <span class="score-label">SCORE</span>
+              <span class="score-num" id="scoreNum">0</span>
+              <span class="combo" id="comboTag">×2</span>
+            </div>
+          </div>
+
+          <div class="countdown" id="countdown" hidden>3</div>
+          <div class="toasts" id="toasts"></div>
+          <div class="popups" id="popups"></div>
+          <div class="stage-tip" id="stageTip">
+            Draw <strong>wood</strong>, light it with <strong>Fire</strong>, then put it out with <strong>Water</strong>
+            <small>Stone blocks fire · Wind bends it · Try a mission</small>
+          </div>
+        </div>
+
+        <div class="firelight" id="firelight"></div>
+        <div class="fire-alert" id="fireAlert" hidden></div>
+        <div class="brush-ring" id="brushRing" hidden></div>
+        <button class="stage-play" id="playBtn" type="button" aria-label="Pause"></button>
+        <div class="stage-vignette"></div>
+      </div>
+
+      <div class="stage-foot">
+        <p class="foot-hint" id="footHint">Draw wood, ignite it, then put it out with water</p>
+        <p class="foot-stats" id="footStats">FPS 60 · Fire 0</p>
+      </div>
+    </section>
+
+    <aside class="panel">
+      <div class="mission-card" id="missionCard" hidden>
+        <div class="mc-head"><span class="mc-tag" id="mcTag">MISSION 1</span><span class="mc-time" id="mcTime">01:40</span></div>
+        <h2 id="mcName">Cabin Watch</h2>
+        <p id="mcGoal">Extinguish all fires. Save the cabin and at least 60% of the trees.</p>
+        <div class="mc-bar"><i id="mcProgress"></i></div>
+        <div class="mc-foot"><span id="mcTrees">Trees 100%</span><button class="text-btn" id="mcQuit" type="button">Quit Mission</button></div>
+      </div>
+
+      <div class="panel-section" id="sceneSection">
+        <div class="section-head"><h3>SCENES</h3><span class="kbd-hint">6 PRESETS</span></div>
+        <div class="scene-grid" id="sceneSeg" aria-label="Sandbox scene">
+          <button class="scene-btn" data-scene="blank" type="button"><span class="ico">▢</span>Blank</button>
+          <button class="scene-btn" data-scene="forest" type="button"><span class="ico">🌲</span>Forest</button>
+          <button class="scene-btn" data-scene="deep" type="button"><span class="ico">🌳</span>Deep Forest</button>
+          <button class="scene-btn active" data-scene="city" type="button"><span class="ico">🏙️</span>City</button>
+          <button class="scene-btn" data-scene="refinery" type="button"><span class="ico">🛢️</span>Refinery</button>
+          <button class="scene-btn" data-scene="reservoir" type="button"><span class="ico">💧</span>Reservoir</button>
+        </div>
+      </div>
+
+      <div class="panel-section">
+        <div class="section-head"><h3>TOOLS</h3><span class="kbd-hint">1 — 8</span></div>
+        <div class="tool-grid" id="toolGrid"></div>
+      </div>
+
+      <div class="panel-section">
+        <div class="section-head"><h3>BRUSH</h3><span class="value" id="brushVal">6</span></div>
+        <input class="range ember" id="brushRange" type="range" min="2" max="14" step="1" value="6" aria-label="Brush size" />
+      </div>
+
+      <div class="panel-section">
+        <div class="section-head"><h3>ENVIRONMENT</h3><span class="kbd-hint">LIVE</span></div>
+        <div class="slider-row">
+          <label for="windRange">Wind <b id="windLabel">0.2 →</b></label>
+          <input class="range sky" id="windRange" type="range" min="-100" max="100" step="1" value="20" aria-label="Wind" />
+        </div>
+        <div class="slider-row">
+          <label for="powerRange">Fire <b id="powerLabel">1.0×</b></label>
+          <input class="range ember" id="powerRange" type="range" min="40" max="190" step="1" value="100" aria-label="Fire power" />
+        </div>
+        <div class="segmented" id="speedSeg" aria-label="Time speed">
+          <button data-speed="0.5" type="button">0.5×</button>
+          <button data-speed="1" class="active" type="button">1×</button>
+          <button data-speed="2" type="button">2×</button>
+        </div>
+        <div class="quality-row">
+          <span>QUALITY</span>
+          <div class="segmented" id="qualitySeg" aria-label="Render quality">
+            <button data-q="1" type="button">Fast</button>
+            <button data-q="2" class="active" type="button">Clear</button>
+            <button data-q="3" type="button">Ultra</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-section actions">
+        <button class="action-btn sky" id="rainBtn" type="button"><span>☂</span> Rain <em id="rainCount"></em></button>
+        <button class="action-btn" id="resetBtn" type="button"><span>↺</span> Reset Scene</button>
+      </div>
+
+      <div class="panel-foot">
+        <span id="statFire">Fire 0</span><span class="dot"></span>
+        <span id="statTrees">Trees —</span><span class="dot"></span>
+        <span id="statFps">60 FPS</span>
+      </div>
+    </aside>
+  </main>
+</div>
+
+<div id="modalRoot" class="modal-root" hidden></div>
+<script>
+/* ============================================================
+   EMBER · simulation core
+   Stable-fluids air field + cellular fire / water / materials
+   ============================================================ */
+'use strict';
+
+const W = 240;
+const H = 135;
+const N = W * H;
+const AMBIENT = 20;
+const GROUND_Y = 106;
+
+const AIR = 0, WOOD = 1, LEAF = 2, STONE = 3, WATER = 4, OIL = 5,
+      ASH = 6, CHAR = 7, GRASS = 8, SOIL = 9, CONCRETE = 10, GLASS = 11, METAL = 12, LAMP = 13;
+
+/* per-material behaviour */
+const MAT = [];
+MAT[AIR]   = { fuel: 0,   ign: 1e9, burn: 0,    heat: 0,   cond: 0.42, cool: 0.10, solid: 0 };
+MAT[WOOD]  = { fuel: 1.0, ign: 245, burn: 0.20, heat: 760, cond: 0.075, cool: 0.16, solid: 1 };
+MAT[LEAF]  = { fuel: 0.55, ign: 170, burn: 0.42, heat: 560, cond: 0.16, cool: 0.22, solid: 1 };
+MAT[STONE] = { fuel: 0,   ign: 1e9, burn: 0,    heat: 0,   cond: 0.07, cool: 0.06, solid: 1 };
+MAT[WATER] = { fuel: 0,   ign: 1e9, burn: 0,    heat: 0,   cond: 0.55, cool: 0.10, solid: 0 };
+MAT[OIL]   = { fuel: 2.4, ign: 105, burn: 0.34, heat: 1020, cond: 0.11, cool: 0.25, solid: 1 };
+MAT[ASH]   = { fuel: 0,   ign: 1e9, burn: 0,    heat: 0,   cond: 0.10, cool: 0.12, solid: 1 };
+MAT[CHAR]  = { fuel: 0,   ign: 1e9, burn: 0,    heat: 0,   cond: 0.13, cool: 0.14, solid: 1 };
+MAT[GRASS] = { fuel: 0.32, ign: 125, burn: 0.62, heat: 400, cond: 0.30, cool: 0.30, solid: 1 };
+MAT[SOIL]  = { fuel: 0,   ign: 1e9, burn: 0,    heat: 0,   cond: 0.08, cool: 0.07, solid: 1 };
+MAT[CONCRETE] = { fuel: 0, ign: 1e9, burn: 0, heat: 0, cond: 0.07, cool: 0.05, solid: 1 };
+MAT[GLASS]    = { fuel: 0, ign: 1e9, burn: 0, heat: 0, cond: 0.32, cool: 0.08, solid: 1 };
+MAT[METAL]    = { fuel: 0, ign: 1e9, burn: 0, heat: 0, cond: 0.55, cool: 0.06, solid: 1 };
+MAT[LAMP]     = { fuel: 0, ign: 1e9, burn: 0, heat: 0, cond: 0.10, cool: 0.05, solid: 1 };
+
+const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
+const lerp = (a, b, t) => a + (b - a) * t;
+const smoothstep = (a, b, x) => {
+  const t = clamp((x - a) / (b - a), 0, 1);
+  return t * t * (3 - 2 * t);
+};
+function hash2(x, y) {
+  let n = (x | 0) * 374761393 + (y | 0) * 668265263;
+  n = (n ^ (n >> 13)) * 1274126177;
+  return ((n ^ (n >> 16)) >>> 0) / 4294967295;
+}
+
+class Simulation {
+  constructor() {
+    const n = N;
+    this.n = n;
+    this.mat = new Uint8Array(n);
+    this.solid = new Uint8Array(n);
+    this.fuel = new Float32Array(n);
+    this.temp = new Float32Array(n);
+    this.smoke = new Float32Array(n);
+    this.flame = new Float32Array(n);
+    this.wet = new Float32Array(n);
+    this.burn = new Float32Array(n);
+    this.boom = new Uint8Array(n);
+    this.moved = new Uint8Array(n);
+    this.noise = new Float32Array(n);
+    for (let i = 0; i < n; i++) this.noise[i] = hash2(i % W, (i / W) | 0);
+
+    this.u = new Float32Array(n);
+    this.v = new Float32Array(n);
+    this.u2 = new Float32Array(n);
+    this.v2 = new Float32Array(n);
+    this.p = new Float32Array(n);
+    this.div = new Float32Array(n);
+    this.curl = new Float32Array(n);
+    this.tmp = new Float32Array(n);
+    this.tmp2 = new Float32Array(n);
+
+    this.embers = [];
+    this.trees = [];
+    this.cabins = [];
+    this.buildings = [];
+    this.ignoredFire = new Set();
+    this.steamVents = [];
+    this.fireSources = new Set();
+    this.onSmother = null;
+    this.missionTrees = null;
+    this.missionCabins = null;
+    this.missionBuildings = null;
+    this.treeSeq = 0;
+
+    this.wind = { x: 0.2 };
+    this.windTarget = 0.2;
+    this.windTimeline = null;
+    this.windTime = 0;
+    this.firePower = 1;
+    this.rainTimer = 0;
+    this.time = 0;
+    this.fireCount = 0;
+    this.burningTotal = 0;
+    this.extinguished = 0;
+    this.shake = 0;
+    this.onExtinguish = null;
+    this.onExplode = null;
+
+    this.clear();
+  }
+
+  clear() {
+    this.mat.fill(AIR);
+    this.solid.fill(0);
+    this.fuel.fill(0);
+    this.temp.fill(AMBIENT);
+    this.smoke.fill(0);
+    this.flame.fill(0);
+    this.wet.fill(0);
+    this.burn.fill(0);
+    this.boom.fill(0);
+    this.moved.fill(0);
+    this.u.fill(0);
+    this.v.fill(0);
+    this.u2.fill(0);
+    this.v2.fill(0);
+    this.p.fill(0);
+    this.div.fill(0);
+    this.curl.fill(0);
+    this.embers.length = 0;
+    this.trees.length = 0;
+    this.cabins.length = 0;
+    this.buildings.length = 0;
+    this.ignoredFire.clear();
+    this.steamVents.length = 0;
+    this.fireSources.clear();
+    this.missionTrees = null;
+    this.missionCabins = null;
+    this.missionBuildings = null;
+    this.treeSeq = 0;
+    this.wind.x = 0.2;
+    this.windTarget = 0.2;
+    this.windTimeline = null;
+    this.windTime = 0;
+    this.rainTimer = 0;
+    this.time = 0;
+    this.fireCount = 0;
+    this.extinguished = 0;
+    this.shake = 0;
+  }
+
+  inside(x, y) { return x >= 0 && y >= 0 && x < W && y < H; }
+  idx(x, y) { return (y | 0) * W + (x | 0); }
+
+  setMat(i, m) {
+    this.mat[i] = m;
+    const pr = MAT[m];
+    this.solid[i] = pr.solid;
+    this.fuel[i] = pr.fuel;
+    this.burn[i] = 0;
+    this.boom[i] = 0;
+    if (m === AIR) { this.wet[i] = 0; this.smoke[i] = Math.max(this.smoke[i], 0.05); }
+    if (m === WATER) { this.wet[i] = 0; this.temp[i] = Math.min(this.temp[i], 30); }
+    if (pr.solid) { this.u[i] = 0; this.v[i] = 0; }
+  }
+
+  /* ---------------------------------------------------- scene pieces */
+  addGround(top = GROUND_Y) {
+    for (let x = 0; x < W; x++) {
+      const wobble = Math.round(Math.sin(x * 0.11) * 1.2 + Math.sin(x * 0.037 + 2) * 1.1);
+      const gy = top + wobble;
+      for (let y = gy; y < H; y++) {
+        const i = y * W + x;
+        this.setMat(i, SOIL);
+        this.temp[i] = AMBIENT;
+      }
+      if (hash2(x, 7) > 0.72) {
+        const i = (gy - 1) * W + x;
+        if (this.mat[i] === AIR) this.setMat(i, GRASS);
+      }
+    }
+  }
+
+  addGrassLine(top = GROUND_Y, from = 6, to = W - 6) {
+    for (let x = from; x < to; x++) {
+      const base = top - 1;
+      const tall = hash2(x, 3) > 0.72 ? 1 : 0;
+      for (let k = 0; k <= 2 + tall; k++) {
+        const i = (base - k) * W + x;
+        if (this.mat[i] === AIR || this.mat[i] === GRASS) this.setMat(i, GRASS);
+      }
+    }
+  }
+
+  addPine(cx, baseY, height) {
+    cx = Math.round(cx);
+    const tree = { id: ++this.treeSeq, leafCells: [], leafTotal: 1 };
+    const trunkTop = baseY - Math.round(height * 0.3);
+    for (let y = trunkTop; y <= baseY; y++) {
+      for (let dx = -1; dx <= 1; dx++) {
+        const i = this.idx(cx + dx, y);
+        if (this.inside(cx + dx, y) && (this.mat[i] === AIR || this.mat[i] === WATER || this.mat[i] === GRASS)) {
+          this.setMat(i, WOOD);
+        }
+      }
+    }
+    const top = baseY - height;
+    const bottom = baseY - 2;
+    for (let y = top; y <= bottom; y++) {
+      const p = (y - top) / Math.max(1, bottom - top);
+      let half = Math.round(1 + Math.pow(p, 0.8) * height * 0.23);
+      for (let dx = -half; dx <= half; dx++) {
+        const edge = Math.abs(dx) === half;
+        if (edge && hash2(cx + dx, y) < 0.45) continue;
+        const x = cx + dx;
+        if (!this.inside(x, y)) continue;
+        const i = y * W + x;
+        if (this.mat[i] === AIR || this.mat[i] === WATER) {
+          this.setMat(i, LEAF);
+          tree.leafCells.push(i);
+        }
+      }
+    }
+    tree.leafTotal = Math.max(1, tree.leafCells.length);
+    tree.x = cx; tree.y = baseY - height * 0.5;
+    this.trees.push(tree);
+    return tree;
+  }
+
+  addCabin(cx, baseY, w = 40, h = 20) {
+    const left = Math.round(cx - w / 2);
+    const right = left + w;
+    const bodyTop = baseY - h;
+    const cells = new Set();
+    const put = (x, y, m) => {
+      if (!this.inside(x, y)) return;
+      const i = y * W + x;
+      this.setMat(i, m);
+      if (m === WOOD || m === STONE) cells.add(i);
+      else cells.delete(i);
+    };
+    // foundation
+    for (let x = left - 1; x <= right + 1; x++)
+      for (let y = baseY - 2; y <= baseY; y++) put(x, y, STONE);
+    // walls (solid timber body)
+    for (let y = bodyTop; y < baseY - 2; y++) {
+      for (let x = left; x <= right; x++) put(x, y, WOOD);
+    }
+    // roof (pitched)
+    const roofH = Math.round(h * 0.32);
+    for (let k = 0; k < roofH; k++) {
+      const y = bodyTop - k;
+      const inset = Math.round((k / roofH) * (w * 0.5 - 2));
+      for (let x = left - 2 + inset; x <= right + 2 - inset; x++) put(x, y, WOOD);
+    }
+    // chimney
+    const chx = right - 6;
+    for (let y = bodyTop - roofH - 2; y < bodyTop + 2; y++)
+      for (let x = chx; x < chx + 3; x++) put(x, y, STONE);
+    // door
+    for (let y = baseY - 10; y <= baseY - 3; y++)
+      for (let x = cx - 2; x <= cx + 2; x++) put(x, y, AIR);
+    // windows
+    for (let y = bodyTop + 4; y < bodyTop + 8; y++)
+      for (let x = left + 4; x < left + 8; x++) put(x, y, AIR);
+    for (let y = bodyTop + 4; y < bodyTop + 8; y++)
+      for (let x = right - 8; x < right - 4; x++) put(x, y, AIR);
+
+    const cabin = { cells: [...cells], total: Math.max(1, cells.size), x: cx, y: baseY, w, h };
+    this.cabins.push(cabin);
+    return cabin;
+  }
+
+  addCampfire(cx, baseY) {
+    cx = Math.round(cx);
+    for (let k = 0; k < 9; k++) {
+      const a = (k / 9) * Math.PI * 2;
+      const i = this.idx(cx + Math.cos(a) * 7, baseY - 1 + Math.sin(a) * 2.2);
+      if (this.mat[i] !== AIR) continue;
+      this.setMat(i, STONE);
+    }
+    for (let k = 0; k < 4; k++) {
+      const y = baseY - 2 - k;
+      const spread = k === 0 ? 6 : k === 1 ? 5 : 3;
+      for (let x = cx - spread; x <= cx + spread; x++) {
+        const i = this.idx(x, y);
+        if (!this.inside(x, y)) continue;
+        this.setMat(i, WOOD);
+        this.fuel[i] = 6;
+        this.temp[i] = 760 - k * 90;
+        this.burn[i] = 1;
+        this.wet[i] = 0;
+      }
+    }
+    this.temp[this.idx(cx, baseY - 4)] = 520;
+    this.flame[this.idx(cx, baseY - 5)] = 0.7;
+    this.smoke[this.idx(cx, baseY - 6)] = 0.5;
+  }
+
+  addOilDrum(cx, baseY) {
+    cx = Math.round(cx);
+    for (let y = baseY - 7; y <= baseY - 1; y++) {
+      for (let x = cx - 3; x <= cx + 3; x++) {
+        if (!this.inside(x, y)) continue;
+        const edge = Math.abs(x - cx) === 3 || y === baseY - 7 || y === baseY - 1;
+        if (edge && hash2(x, y) < 0.25) continue;
+        this.setMat(y * W + x, OIL);
+      }
+    }
+  }
+
+  igniteArea(cx, cy, r, strength = 1) {
+    cx = Math.round(cx); cy = Math.round(cy);
+    for (let y = cy - r; y <= cy + r; y++) {
+      for (let x = cx - r; x <= cx + r; x++) {
+        if (!this.inside(x, y)) continue;
+        const d = Math.hypot(x - cx, y - cy);
+        if (d > r) continue;
+        const i = y * W + x;
+        const m = this.mat[i];
+        if (MAT[m].fuel > 0) {
+          this.wet[i] = 0;
+          this.temp[i] = Math.max(this.temp[i], MAT[m].ign + 120);
+          this.burn[i] = Math.max(this.burn[i], 0.25 + 0.5 * (1 - d / r) * strength);
+          if (m === OIL && !this.boom[i]) {
+            this.boom[i] = 1;
+            this.explode(x, y);
+          }
+        } else if (m === AIR) {
+          this.temp[i] = Math.max(this.temp[i], 550 * (1 - d / (r + 1)) * strength + 120);
+          this.flame[i] = Math.min(1.4, this.flame[i] + 0.5);
+        }
+      }
+    }
+    this.temp[this.idx(cx, cy)] = 900;
+  }
+
+  explode(cx, cy) {
+    if (this.time - (this.lastExplode || -99) < 0.14) return;
+    this.lastExplode = this.time;
+    const R = 17;
+    for (let y = Math.max(1, cy - R); y <= Math.min(H - 2, cy + R); y++) {
+      for (let x = Math.max(1, cx - R); x <= Math.min(W - 2, cx + R); x++) {
+        const dx = x - cx, dy = y - cy;
+        const d = Math.hypot(dx, dy);
+        if (d > R || d < 0.001) continue;
+        const i = y * W + x;
+        const f = (1 - d / R) ** 2;
+        if (this.solid[i]) {
+          if (MAT[this.mat[i]].fuel > 0 && this.wet[i] < 0.5) {
+            this.temp[i] = Math.max(this.temp[i], 500);
+            this.burn[i] = Math.max(this.burn[i], 0.35);
+            if (this.mat[i] === OIL) this.boom[i] = 1;
+          }
+          continue;
+        }
+        this.u[i] += (dx / d) * 260 * f;
+        this.v[i] += (dy / d) * 260 * f;
+        this.temp[i] = Math.max(this.temp[i], 900 * f + AMBIENT);
+        this.flame[i] = Math.min(1.6, this.flame[i] + 1.2 * f);
+        this.smoke[i] = Math.min(1.6, this.smoke[i] + 0.9 * f);
+      }
+    }
+    for (let k = 0; k < 34; k++) {
+      const a = Math.random() * Math.PI * 2;
+      const sp = 14 + Math.random() * 44;
+      this.embers.push({
+        x: cx, y: cy,
+        vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 12,
+        life: 1.1 + Math.random() * 1.8, max: 3,
+      });
+    }
+    if (this.embers.length > 460) this.embers.splice(0, this.embers.length - 460);
+    this.shake = Math.min(1.4, this.shake + 1);
+    if (this.onExplode) this.onExplode(cx, cy);
+  }
+
+  /* ---------------------------------------------------------- paint */
+  paint(cx, cy, radius, tool, opts = {}) {
+    cx = Math.round(cx); cy = Math.round(cy);
+    const r2 = radius * radius;
+    let painted = 0;
+    const minY = Math.max(1, cy - radius), maxY = Math.min(H - 2, cy + radius);
+    const minX = Math.max(1, cx - radius), maxX = Math.min(W - 2, cx + radius);
+    for (let y = minY; y <= maxY; y++) {
+      for (let x = minX; x <= maxX; x++) {
+        const dx = x - cx, dy = y - cy;
+        if (dx * dx + dy * dy > r2) continue;
+        const i = y * W + x;
+        switch (tool) {
+          case 'wood':
+            if (opts.smother && (this.fireSources.has(i) || this.burn[i] > 0.02)) {
+              const wasSource = this.fireSources.has(i);
+              this.setMat(i, WOOD);
+              this.wet[i] = 1;
+              this.temp[i] = 24;
+              this.burn[i] = 0;
+              this.flame[i] = 0;
+              this.fireSources.delete(i);
+              if (this.onSmother) this.onSmother(x, y, wasSource);
+              painted++;
+              break;
+            }
+            if (opts.smother && this.mat[i] !== AIR) break;
+            this.setMat(i, WOOD); this.wet[i] = 0;
+            break;
+          case 'stone':
+            this.setMat(i, STONE);
+            break;
+          case 'oil':
+            this.setMat(i, OIL);
+            break;
+          case 'water': {
+            if (this.mat[i] === AIR) {
+              if (opts.budget != null && painted >= opts.budget) break;
+              this.setMat(i, WATER);
+              this.temp[i] = 22;
+              painted++;
+            } else if (this.solid[i]) {
+              this.wet[i] = Math.min(1, this.wet[i] + 0.75);
+              if (this.burn[i] > 0.02) {
+                this.extinguishCell(i, x, y);
+              }
+              this.temp[i] = Math.max(20, this.temp[i] - 60);
+            }
+            break;
+          }
+          case 'fire': {
+            const m = this.mat[i];
+            if (MAT[m].fuel > 0) {
+              this.wet[i] = 0;
+              this.temp[i] = Math.max(this.temp[i], 640);
+              this.burn[i] = Math.max(this.burn[i], 0.6);
+              if (m === OIL && !this.boom[i]) { this.boom[i] = 1; this.explode(x, y); }
+            } else if (m === AIR) {
+              this.temp[i] = Math.max(this.temp[i], 520);
+              this.flame[i] = Math.min(1.4, this.flame[i] + 0.4);
+              this.smoke[i] = Math.min(1.2, this.smoke[i] + 0.08);
+            }
+            break;
+          }
+          case 'wind': {
+            if (!this.solid[i]) {
+              this.u[i] += (opts.dx || 0) * 110;
+              this.v[i] += (opts.dy || 0) * 110;
+            }
+            break;
+          }
+          case 'erase':
+            this.setMat(i, AIR);
+            this.burn[i] = 0;
+            this.temp[i] = AMBIENT;
+            break;
+          default:
+            break;
+        }
+      }
+    }
+    return painted;
+  }
+
+  /* -------------------------------------------------------- physics */
+  stepWind(dt) {
+    this.windTime += dt;
+    if (this.windTimeline) {
+      this.windTarget = this.windTimeline(this.windTime);
+    }
+    const w = this.wind;
+    w.x += (this.windTarget - w.x) * Math.min(1, dt * 2.2);
+    w.x += (Math.sin(this.windTime * 2.1) * 0.012 + Math.sin(this.windTime * 0.63 + 1.1) * 0.02) * dt * 6;
+    w.x = clamp(w.x, -1.4, 1.4);
+  }
+
+  applyForces(dt) {
+    const { u, v, temp, flame, solid, n } = this;
+    const wx = this.wind.x;
+    const power = this.firePower;
+    for (let y = 1; y < H - 1; y++) {
+      const row = y * W;
+      for (let x = 1; x < W - 1; x++) {
+        const i = row + x;
+        if (solid[i]) continue;
+        const t = temp[i];
+        const buoy = Math.max(0, t - 50) * 0.085 + flame[i] * 52;
+        u[i] += (wx * 62 + Math.sin(y * 0.23 + this.windTime * 0.7) * 3.5) * dt;
+        v[i] -= buoy * dt * power;
+        u[i] *= 1 - 0.9 * dt;
+        v[i] *= 1 - 0.9 * dt;
+        const sp = Math.abs(u[i]) + Math.abs(v[i]);
+        if (sp > 150) { u[i] *= 150 / sp; v[i] *= 150 / sp; }
+      }
+    }
+  }
+
+  advectVel(dt) {
+    const { u, v, u2, v2, solid } = this;
+    u2.fill(0); v2.fill(0);
+    for (let y = 1; y < H - 1; y++) {
+      const row = y * W;
+      for (let x = 1; x < W - 1; x++) {
+        const i = row + x;
+        if (solid[i]) continue;
+        const sx = clamp(x - u[i] * dt, 0.6, W - 1.6);
+        const sy = clamp(y - v[i] * dt, 0.6, H - 1.6);
+        const x0 = sx | 0, y0 = sy | 0;
+        const fx = sx - x0, fy = sy - y0;
+        const j = y0 * W + x0;
+        // don't let zero-velocity solid cells drag the flow down at boundaries
+        let w00 = (1 - fx) * (1 - fy), w10 = fx * (1 - fy),
+            w01 = (1 - fx) * fy, w11 = fx * fy;
+        if (solid[j]) w00 = 0;
+        if (solid[j + 1]) w10 = 0;
+        if (solid[j + W]) w01 = 0;
+        if (solid[j + W + 1]) w11 = 0;
+        const tw = w00 + w10 + w01 + w11;
+        if (tw > 1e-4) {
+          u2[i] = (u[j] * w00 + u[j + 1] * w10 + u[j + W] * w01 + u[j + W + 1] * w11) / tw;
+          v2[i] = (v[j] * w00 + v[j + 1] * w10 + v[j + W] * w01 + v[j + W + 1] * w11) / tw;
+        } else {
+          u2[i] = u[i]; v2[i] = v[i];
+        }
+      }
+    }
+    u.set(u2); v.set(v2);
+  }
+
+  project(iters) {
+    const { u, v, p, div, solid } = this;
+    p.fill(0);
+    for (let y = 1; y < H - 1; y++) {
+      const row = y * W;
+      for (let x = 1; x < W - 1; x++) {
+        const i = row + x;
+        if (solid[i]) { div[i] = 0; continue; }
+        div[i] = -0.5 * (
+          (solid[i + 1] ? 0 : u[i + 1]) - (solid[i - 1] ? 0 : u[i - 1]) +
+          (solid[i + W] ? 0 : v[i + W]) - (solid[i - W] ? 0 : v[i - W])
+        );
+      }
+    }
+    for (let k = 0; k < iters; k++) {
+      for (let y = 1; y < H - 1; y++) {
+        const row = y * W;
+        for (let x = 1; x < W - 1; x++) {
+          const i = row + x;
+          if (solid[i]) continue;
+          const pl = solid[i - 1] ? p[i] : p[i - 1];
+          const pr = solid[i + 1] ? p[i] : p[i + 1];
+          const pu = solid[i - W] ? p[i] : p[i - W];
+          const pd = solid[i + W] ? p[i] : p[i + W];
+          p[i] = (div[i] + pl + pr + pu + pd) * 0.25;
+        }
+      }
+    }
+    for (let y = 1; y < H - 1; y++) {
+      const row = y * W;
+      for (let x = 1; x < W - 1; x++) {
+        const i = row + x;
+        if (solid[i]) continue;
+        const pl = solid[i - 1] ? p[i] : p[i - 1];
+        const pr = solid[i + 1] ? p[i] : p[i + 1];
+        const pu = solid[i - W] ? p[i] : p[i - W];
+        const pd = solid[i + W] ? p[i] : p[i + W];
+        u[i] -= 0.5 * (pr - pl);
+        v[i] -= 0.5 * (pd - pu);
+      }
+    }
+  }
+
+  vorticity(dt) {
+    const { u, v, curl, solid } = this;
+    const eps = 6.5;
+    for (let y = 1; y < H - 1; y++) {
+      for (let x = 1; x < W - 1; x++) {
+        const i = y * W + x;
+        if (solid[i]) { curl[i] = 0; continue; }
+        curl[i] = 0.5 * ((v[i + 1] - v[i - 1]) - (u[i + W] - u[i - W]));
+      }
+    }
+    for (let y = 2; y < H - 2; y++) {
+      for (let x = 2; x < W - 2; x++) {
+        const i = y * W + x;
+        if (solid[i]) continue;
+        const gx = Math.abs(curl[i + 1]) - Math.abs(curl[i - 1]);
+        const gy = Math.abs(curl[i + W]) - Math.abs(curl[i - W]);
+        const len = Math.hypot(gx, gy) + 0.0001;
+        const nx = gx / len, ny = gy / len;
+        u[i] += eps * (ny * curl[i]) * dt;
+        v[i] -= eps * (nx * curl[i]) * dt;
+      }
+    }
+  }
+
+  advectScalars(dt) {
+    const { u, v, solid } = this;
+    const advect = (field) => {
+      const src = this.tmp;
+      src.set(field);
+      for (let y = 1; y < H - 1; y++) {
+        const row = y * W;
+        for (let x = 1; x < W - 1; x++) {
+          const i = row + x;
+          const sx = clamp(x - u[i] * dt, 0.5, W - 1.5);
+          const sy = clamp(y - v[i] * dt, 0.5, H - 1.5);
+          const x0 = sx | 0, y0 = sy | 0;
+          const fx = sx - x0, fy = sy - y0;
+          const j = y0 * W + x0;
+          field[i] =
+            src[j] * (1 - fx) * (1 - fy) +
+            src[j + 1] * fx * (1 - fy) +
+            src[j + W] * (1 - fx) * fy +
+            src[j + W + 1] * fx * fy;
+        }
+      }
+      // solids keep their own temperature, smoke never enters walls
+      for (let i = 0; i < N; i++) {
+        if (solid[i]) field[i] = src[i];
+        else if (field[i] < 0.001) field[i] = 0;
+      }
+    };
+    advect(this.temp);
+    advect(this.smoke);
+    advect(this.flame);
+    void solid;
+  }
+
+  diffuse(dt) {
+    const { temp, smoke, mat, solid } = this;
+    // temperature conduction
+    const src = this.tmp;
+    src.set(temp);
+    const k = Math.min(0.12, dt * 1.7);
+    for (let y = 1; y < H - 1; y++) {
+      for (let x = 1; x < W - 1; x++) {
+        const i = y * W + x;
+        const m = mat[i];
+        const cond = MAT[m].cond;
+        const pl = src[i - 1];
+        const pr = src[i + 1];
+        const pu = src[i - W];
+        const pd = src[i + W];
+        const avg = (pl + pr + pu + pd) * 0.25;
+        const cool = MAT[m].cool;
+        temp[i] += (avg - src[i]) * cond * k;
+        temp[i] -= (temp[i] - AMBIENT) * cool * dt * (temp[i] > AMBIENT ? 1 : 0.25);
+        if (temp[i] < AMBIENT) temp[i] = AMBIENT;
+      }
+    }
+    // smoke diffusion + decay
+    const ss = this.tmp2;
+    ss.set(smoke);
+    const ks = Math.min(0.2, dt * 9);
+    for (let y = 1; y < H - 1; y++) {
+      for (let x = 1; x < W - 1; x++) {
+        const i = y * W + x;
+        if (solid[i]) { smoke[i] = 0; continue; }
+        const avg = (ss[i - 1] + ss[i + 1] + ss[i - W] + ss[i + W]) * 0.25;
+        smoke[i] += (avg - ss[i]) * 0.45 * ks;
+        smoke[i] *= 1 - dt * 0.055;
+        if (smoke[i] < 0.002) smoke[i] = 0;
+      }
+    }
+    // flame is short lived
+    for (let i = 0; i < N; i++) {
+      if (this.flame[i] > 0) {
+        this.flame[i] *= 1 - dt * 1.25;
+        if (this.flame[i] < 0.004) this.flame[i] = 0;
+      }
+    }
+  }
+
+  combust(dt) {
+    const { mat, temp, smoke, flame, burn, fuel, wet, solid } = this;
+    let fire = 0;
+    for (let y = 1; y < H - 1; y++) {
+      const row = y * W;
+      for (let x = 1; x < W - 1; x++) {
+        const i = row + x;
+        const m = mat[i];
+        if (m === GLASS) {
+          if (temp[i] > 145) {
+            this.setMat(i, AIR);
+            this.smoke[i] = Math.min(1.6, this.smoke[i] + 0.28);
+            this.flame[i] = Math.max(this.flame[i], 0.22);
+          }
+          continue;
+        }
+        if (m === AIR || m === WATER || m === STONE || m === SOIL || m === ASH || m === CHAR ||
+            m === CONCRETE || m === METAL || m === LAMP) continue;
+        const pr = MAT[m];
+        if (wet[i] > 0) {
+          wet[i] -= dt * (0.04 + Math.max(0, temp[i] - 90) * 0.0016);
+          if (wet[i] < 0) wet[i] = 0;
+        }
+        if (fuel[i] <= 0) continue;
+        if (temp[i] > pr.ign && wet[i] < 0.24) {
+          burn[i] = Math.min(1, burn[i] + dt * 2.3);
+        } else {
+          burn[i] = Math.max(0, burn[i] - dt * 0.7);
+        }
+        if (burn[i] <= 0.015) continue;
+        if (!this.ignoredFire.has(i)) fire++;
+        const rate = pr.burn * burn[i] * this.firePower;
+        fuel[i] -= rate * dt;
+        if (fuel[i] < 0) fuel[i] = 0;
+        const target = 430 + 520 * burn[i];
+        if (temp[i] < target) temp[i] += (target - temp[i]) * Math.min(1, dt * 5);
+        temp[i] = Math.min(1400, temp[i] + pr.heat * rate * dt * 0.28);
+        smoke[i] = Math.min(1.6, smoke[i] + rate * dt * 1.35);
+
+        // flame plume above the fuel
+        const up = i - W;
+        const flick = 0.75 + 0.25 * Math.sin(this.time * 7.3 + x * 0.8);
+        if (mat[up] === AIR) {
+          flame[up] = Math.min(2.1, flame[up] + rate * dt * 11);
+          temp[up] = Math.min(1300, temp[up] + rate * dt * 3200);
+          smoke[up] = Math.min(1.8, smoke[up] + rate * dt * 4.2);
+          this.v[up] = Math.min(this.v[up], (-15 - 30 * burn[i]) * flick);
+          this.u[up] += Math.sin(this.time * 3.1 + y * 0.7) * 26 * dt;
+        }
+        // burn the exposed flanks too — gives the fire a wide, rolling body
+        for (let sdir = -1; sdir <= 1; sdir += 2) {
+          const side = i + sdir;
+          if (mat[side] === AIR) {
+            flame[side] = Math.min(1.1, flame[side] + rate * dt * 2.4);
+            temp[side] = Math.min(900, temp[side] + rate * dt * 700);
+            this.v[side] = Math.min(this.v[side], -8 - 14 * burn[i]);
+          }
+        }
+        const up2 = i - W * 2;
+        if (mat[up2] === AIR) {
+          flame[up2] = Math.min(1.8, flame[up2] + rate * dt * 5);
+          temp[up2] = Math.min(1250, temp[up2] + rate * dt * 1400);
+          smoke[up2] = Math.min(1.6, smoke[up2] + rate * dt * 0.9);
+        }
+        const up3 = i - W * 3;
+        if (mat[up3] === AIR) {
+          flame[up3] = Math.min(1.4, flame[up3] + rate * dt * 1.6);
+          smoke[up3] = Math.min(1.6, smoke[up3] + rate * dt * 0.4);
+        }
+
+        // preheat neighbours so fire creeps through fuel
+        if (burn[i] > 0.22) {
+          for (let k = 0; k < 4; k++) {
+            const n = k === 0 ? i - 1 : k === 1 ? i + 1 : k === 2 ? i - W : i + W;
+            if (n < 0 || n >= N) continue;
+            if (fuel[n] > 0 && wet[n] < 0.45) {
+              temp[n] += (MAT[mat[n]].ign + 220 - temp[n]) * Math.min(0.6, dt * 1.7 * burn[i]);
+              if (mat[n] === LEAF || mat[n] === GRASS) temp[n] += dt * 260 * burn[i];
+            }
+          }
+        }
+
+        if (m === OIL && burn[i] > 0.3 && !this.boom[i]) {
+          this.boom[i] = 1;
+          this.explode(x, y);
+        }
+        if (Math.random() < dt * 0.32 * burn[i] && this.embers.length < 380) {
+          this.embers.push({
+            x: x + (Math.random() - 0.5), y: y - 0.5,
+            vx: (Math.random() - 0.5) * 10 + this.wind.x * 8,
+            vy: -14 - Math.random() * 18,
+            life: 1.4 + Math.random() * 2.2, max: 4,
+          });
+        }
+        if (fuel[i] <= 0) {
+          if (m === WOOD) { this.setMat(i, CHAR); this.temp[i] = Math.min(temp[i], 900); }
+          else if (m === LEAF) { this.setMat(i, AIR); this.temp[i] = Math.min(temp[i], 400); }
+          else if (m === OIL) { this.setMat(i, AIR); this.temp[i] = Math.min(temp[i], 500); }
+          else if (m === GRASS) { this.setMat(i, ASH); this.temp[i] = Math.min(temp[i], 300); }
+          void solid;
+        }
+      }
+    }
+    this.fireCount = fire;
+    this.burningTotal = fire;
+  }
+
+  extinguishCell(i, x, y) {
+    this.burn[i] = 0;
+    this.flame[i] = 0;
+    this.smoke[i] = Math.min(1.6, this.smoke[i] + 0.35);
+    this.temp[i] = Math.max(20, this.temp[i] - 360);
+    this.wet[i] = Math.min(1, this.wet[i] + 1);
+    this.extinguished++;
+    if (this.onExtinguish) this.onExtinguish(x, y);
+  }
+
+  waterStep(dt) {
+    const { mat, temp, wet, burn, smoke, flame, solid } = this;
+    this.moved.fill(0);
+    for (let y = H - 2; y >= 1; y--) {
+      const leftToRight = Math.random() < 0.5;
+      for (let k = 1; k < W - 1; k++) {
+        const x = leftToRight ? k : W - 1 - k;
+        const i = y * W + x;
+        if (mat[i] !== WATER) continue;
+        // cool itself
+        if (temp[i] > 30) temp[i] = Math.max(26, temp[i] - 420 * dt);
+        // interact with nearby cells (water beats fire back)
+        let killed = 0;
+        for (let oy = -2; oy <= 2; oy++) {
+          for (let ox = -2; ox <= 2; ox++) {
+            if (!ox && !oy) continue;
+            const nx = x + ox, ny = y + oy;
+            if (nx < 0 || ny < 0 || nx >= W || ny >= H) continue;
+            const n = ny * W + nx;
+            if (burn[n] > 0.02) {
+              this.extinguishCell(n, nx, ny);
+              killed++;
+              if (killed >= 2) break;
+            } else if (solid[n] && MAT[mat[n]].fuel > 0 && wet[n] < 1) {
+              wet[n] = Math.min(1, wet[n] + dt * 1.2);
+            }
+          }
+          if (killed >= 2) break;
+        }
+        if (mat[i] !== WATER) continue;
+        if (killed > 0 && Math.random() < 0.45) {
+          this.setMat(i, AIR);
+          temp[i] = 150;
+          this.v[i] -= 18;
+          smoke[i] = Math.min(1.6, smoke[i] + 0.4);
+          continue;
+        }
+        if (temp[i] > 128) {
+          this.setMat(i, AIR);
+          temp[i] = 150;
+          this.smoke[i] = Math.min(1.6, this.smoke[i] + 0.4);
+          this.v[i] -= 30;
+          this.u[i] += (Math.random() - 0.5) * 8;
+          continue;
+        }
+        // fall / spread
+        const below = i + W;
+        if (y < H - 2 && mat[below] === AIR && !this.moved[below]) {
+          this.moveWater(i, below);
+          continue;
+        }
+        const dir = Math.random() < 0.5 ? 1 : -1;
+        const dl = below + dir;
+        if (y < H - 2 && mat[dl] === AIR && !this.moved[dl] && x + dir > 0 && x + dir < W - 1) {
+          this.moveWater(i, dl);
+          continue;
+        }
+        const dr = below - dir;
+        if (y < H - 2 && mat[dr] === AIR && !this.moved[dr] && x - dir > 0 && x - dir < W - 1) {
+          this.moveWater(i, dr);
+          continue;
+        }
+        const s1 = i + dir;
+        if (mat[s1] === AIR && !this.moved[s1] && x + dir > 0 && x + dir < W - 1 && Math.random() < 0.65) {
+          this.moveWater(i, s1);
+        }
+      }
+    }
+  }
+
+  moveWater(src, dst) {
+    this.mat[dst] = WATER;
+    this.mat[src] = AIR;
+    this.solid[src] = 0;
+    this.solid[dst] = 0;
+    const t = this.temp[src];
+    this.temp[src] = this.temp[dst];
+    this.temp[dst] = t;
+    this.moved[dst] = 1;
+    this.fuel[src] = 0;
+    this.fuel[dst] = 0;
+    this.burn[src] = 0;
+    this.burn[dst] = 0;
+    this.wet[src] = 0;
+    this.wet[dst] = 0;
+  }
+
+  rainStep(dt) {
+    // a downpour douses fires across the whole map, not just where drops land
+    const burning = [];
+    for (let i = 0; i < N; i++) if (this.burn[i] > 0.02) burning.push(i);
+    const douses = Math.min(burning.length, Math.round(dt * 110));
+    for (let k = 0; k < douses; k++) {
+      const i = burning[(Math.random() * burning.length) | 0];
+      this.extinguishCell(i, i % W, (i / W) | 0);
+      this.wet[i] = 1;
+    }
+    const drops = Math.round(dt * 300);
+    for (let k = 0; k < drops; k++) {
+      const x = 2 + ((Math.random() * (W - 4)) | 0);
+      const y = 2 + ((Math.random() * H * 0.35) | 0);
+      const i = y * W + x;
+      if (this.mat[i] === AIR) {
+        this.setMat(i, WATER);
+        this.temp[i] = 12;
+        this.v[i] -= 20;
+      } else if (this.solid[i] && this.burn[i] > 0) {
+        this.burn[i] = 0;
+        this.wet[i] = 1;
+        this.temp[i] = Math.max(20, this.temp[i] - 300);
+        this.smoke[i] += 0.2;
+        this.extinguished++;
+        if (this.onExtinguish) this.onExtinguish(x, y + 3);
+      } else if (this.solid[i]) {
+        this.wet[i] = Math.min(1, this.wet[i] + 0.4);
+      }
+    }
+  }
+
+  emberStep(dt) {
+    const list = this.embers;
+    for (let k = list.length - 1; k >= 0; k--) {
+      const e = list[k];
+      e.life -= dt;
+      if (e.life <= 0) { list.splice(k, 1); continue; }
+      const i = clamp((e.y | 0), 1, H - 2) * W + clamp((e.x | 0), 1, W - 2);
+      e.vx += (this.wind.x * 46 - e.vx * 0.6) * dt;
+      e.vy += 34 * dt;
+      e.x += e.vx * dt;
+      e.y += e.vy * dt;
+      if (e.x < 1 || e.x > W - 2 || e.y < 1 || e.y > H - 2) { list.splice(k, 1); continue; }
+      const ci = (e.y | 0) * W + (e.x | 0);
+      if (this.mat[ci] === WATER) { list.splice(k, 1); continue; }
+      if (this.solid[ci] && this.fuel[ci] > 0 && this.wet[ci] < 0.45) {
+        this.temp[ci] = Math.max(this.temp[ci], MAT[this.mat[ci]].ign + 90);
+        this.burn[ci] = Math.max(this.burn[ci], 0.22);
+        list.splice(k, 1);
+        continue;
+      }
+      void i;
+    }
+  }
+
+  step(dt) {
+    dt = Math.min(dt, 1 / 30);
+    this.time += dt;
+    this.stepWind(dt);
+    this.applyForces(dt);
+    this.advectVel(dt);
+    this.project(14);
+    this.vorticity(dt);
+    this.advectScalars(dt);
+    this.diffuse(dt);
+    for (const v of this.steamVents) {
+      for (let k = -1; k <= 1; k++) {
+        const x = v.x + k, y = v.y;
+        if (x < 1 || x > W - 2 || y < 1 || y > H - 2) continue;
+        const i = y * W + x;
+        if (this.mat[i] !== AIR) continue;
+        this.smoke[i] = Math.min(1.8, this.smoke[i] + dt * 3.4);
+        this.v[i] = Math.min(this.v[i], -18);
+        this.temp[i] += dt * 40;
+      }
+    }
+    for (const i of this.fireSources) {
+      if (this.mat[i] !== AIR) { this.fireSources.delete(i); continue; }
+      this.flame[i] = Math.min(2.2, this.flame[i] + dt * 12);
+      this.temp[i] = Math.min(1300, this.temp[i] + dt * 900);
+      this.smoke[i] = Math.min(1.8, this.smoke[i] + dt * 3);
+      this.v[i] = Math.min(this.v[i], -6);
+      if (Math.random() < dt * 5 && this.embers.length < 180) {
+        this.embers.push({
+          x: i % W, y: (i / W) | 0,
+          vx: (Math.random() - 0.5) * 12 + this.wind.x * 10,
+          vy: -10 - Math.random() * 16,
+          life: 1.2 + Math.random() * 1.6, max: 3,
+        });
+      }
+    }
+    this.combust(dt);
+    if (this.rainTimer > 0) {
+      this.rainStep(dt);
+      this.rainTimer -= dt;
+    }
+    this.waterStep(dt);
+    this.emberStep(dt);
+    this.shake *= 1 - dt * 3;
+    if (this.shake < 0.002) this.shake = 0;
+  }
+
+  buildingStats() {
+    const list = this.missionBuildings || this.buildings;
+    if (!list.length) return { frac: 1, list: [] };
+    let alive = 0, total = 0;
+    for (const b of list) {
+      total += b.total;
+      for (const i of b.cells) {
+        const m = this.mat[i];
+        if (m === GLASS || m === WOOD) alive++;
+      }
+    }
+    return { frac: total ? alive / total : 1, list };
+  }
+
+  treeStats() {
+    const list = this.missionTrees || this.trees;
+    if (!list.length) return { frac: 1, saved: 0, total: 0 };
+    let sum = 0, saved = 0;
+    for (const t of list) {
+      let alive = 0;
+      for (const i of t.leafCells) if (this.mat[i] === LEAF) alive++;
+      const f = alive / t.leafTotal;
+      sum += f;
+      if (f >= 0.4) saved++;
+    }
+    return { frac: sum / list.length, saved, total: list.length };
+  }
+
+  cabinStats() {
+    const list = this.missionCabins || this.cabins;
+    if (!list.length) return { frac: 1, list: [] };
+    let sum = 0;
+    const out = [];
+    for (const c of list) {
+      let alive = 0;
+      for (const i of c.cells) {
+        const m = this.mat[i];
+        if (m === WOOD || m === STONE) alive++;
+      }
+      const f = alive / c.total;
+      sum += f;
+      out.push(f);
+    }
+    return { frac: sum / list.length, list: out };
+  }
+
+  rain(seconds) { this.rainTimer = Math.max(this.rainTimer, seconds); }
+}
+
+</script>
+<script>
+/* ============================================================
+   EMBER · city landmarks
+   connected high-rises · oil refinery · reservoir & dam
+   ============================================================ */
+'use strict';
+
+function citySet(s, x, y, m, cells) {
+  if (x < 1 || y < 1 || x > W - 2 || y > H - 2) return;
+  const i = y * W + x;
+  s.setMat(i, m);
+  if (cells && (m === GLASS || m === WOOD)) cells.push(i);
+}
+
+/* ------------------------------------------------ reservoir & dam */
+function buildReservoir(s, cells) {
+  const base = 107;
+  // lake
+  for (let x = 2; x <= 55; x++) {
+    for (let y = 76; y <= 105; y++) {
+      const i = y * W + x;
+      if (s.mat[i] === AIR) s.setMat(i, WATER);
+    }
+  }
+  // dam wall, thicker at the base
+  for (let y = 70; y <= base; y++) {
+    const t = 3 + Math.floor((y - 70) / 9);
+    for (let x = 56; x < 56 + t; x++) citySet(s, x, y, CONCRETE, cells);
+  }
+  // crest walkway, gatehouse and rail
+  for (let x = 51; x <= 69; x++) {
+    citySet(s, x, 67, CONCRETE, cells);
+    citySet(s, x, 66, CONCRETE, cells);
+  }
+  for (let x = 52; x <= 68; x += 3) citySet(s, x, 64, METAL, cells);
+  for (let y = 61; y <= 66; y++) {
+    for (let x = 57; x <= 62; x++) {
+      const edge = y === 61 || y === 66 || x === 57 || x === 62;
+      citySet(s, x, y, edge ? CONCRETE : GLASS, cells);
+    }
+  }
+  // buttresses on the dry face
+  for (let y = 78; y <= 104; y += 12) {
+    for (let yy = y; yy <= y + 5; yy++) {
+      citySet(s, 62, yy, CONCRETE, cells);
+      citySet(s, 63, yy, CONCRETE, cells);
+    }
+  }
+  // spillway gate
+  for (let y = 67; y <= 72; y++) citySet(s, 65, y, METAL, cells);
+  citySet(s, 65, 66, METAL, cells);
+  citySet(s, 59, 60, LAMP, cells);
+  // hydro-electric station
+  buildOffice(s, 67, base, 13, 11, cells);
+  // penstock
+  for (let x = 60; x <= 67; x++) citySet(s, x, 98, METAL, cells);
+  // little pier and boat
+  for (let x = 16; x <= 28; x++) citySet(s, x, 75, WOOD, cells);
+  for (const px of [17, 22, 27]) {
+    for (let y = 76; y <= 79; y++) citySet(s, px, y, METAL, cells);
+  }
+  citySet(s, 24, 74, LAMP, cells);
+  for (let x = 33; x <= 38; x++) citySet(s, x, 75, WOOD, cells);
+  for (let x = 34; x <= 37; x++) citySet(s, x, 74, WOOD, cells);
+  for (let y = 70; y <= 73; y++) citySet(s, 36, y, METAL, cells);
+  citySet(s, 36, 69, LAMP, cells);
+  // small service tank
+  for (let x = 74; x <= 78; x++) for (let y = 100; y <= 105; y++)
+    citySet(s, x, y, CONCRETE, cells);
+}
+
+/* ------------------------------------------------------ buildings */
+function buildOffice(s, x0, base, w, h, cells) {
+  const top = base - h;
+  const x1 = x0 + w;
+  for (let y = top; y <= base; y++) {
+    const floor = (y - top) % 4 === 0;
+    for (let x = x0; x <= x1; x++) {
+      const edge = x === x0 || x === x1 || y === top || y === base;
+      let m = CONCRETE;
+      if (!edge && !floor) m = GLASS;
+      citySet(s, x, y, m, cells);
+    }
+    if (floor && y > top + 1) {
+      citySet(s, x0 + 3, y - 1, WOOD, cells);
+      citySet(s, x1 - 3, y - 1, WOOD, cells);
+    }
+  }
+  // service core / furniture spine
+  for (let y = top + 2; y < base; y++) citySet(s, x0 + 3, y, WOOD, cells);
+  // entrance
+  for (let y = base - 3; y <= base; y++) {
+    for (let x = x0 + Math.floor(w / 2) - 1; x <= x0 + Math.floor(w / 2) + 1; x++) {
+      citySet(s, x, y, AIR, cells);
+    }
+  }
+  // roof lip
+  for (let x = x0 - 1; x <= x1 + 1; x++) citySet(s, x, top - 1, CONCRETE, cells);
+}
+
+function buildTower(s, cx, base, w, h, cells, antenna, cladSide = 'left') {
+  const left = cx - Math.floor(w / 2);
+  const right = left + w - 1;
+  const top = base - h;
+  const cladX = cladSide === 'right' ? right : left;
+  for (let y = top; y <= base; y++) {
+    const dy = y - top;
+    const floor = dy === 0 || dy === 1 || dy % 6 === 0 || y === base;
+    for (let x = left; x <= right; x++) {
+      let m;
+      if (dy < 2) m = CONCRETE;
+      else if (floor) m = CONCRETE;
+      else if (x === left || x === right || (x - left) % 6 === 0) m = CONCRETE;
+      else m = GLASS;
+      citySet(s, x, y, m, cells);
+    }
+    if (floor && dy > 2) {
+      // timber floor band and balconies
+      for (let x = left + 1; x <= right - 1; x++) citySet(s, x, y - 1, WOOD, cells);
+    }
+  }
+  // flammable cladding strip runs up the facade
+  for (let y = top + 3; y < base; y++) citySet(s, cladX, y, WOOD, cells);
+
+  // crown / antenna
+  for (let x = left + 3; x <= right - 3; x++) {
+    citySet(s, x, top - 2, CONCRETE, cells);
+    citySet(s, x, top - 3, CONCRETE, cells);
+  }
+  if (antenna) {
+    for (let y = top - antenna; y < top - 3; y++) citySet(s, cx, y, METAL, cells);
+    citySet(s, cx, top - antenna - 1, LAMP, cells);
+  }
+}
+
+function buildSkybridge(s, x0, x1, y, cells) {
+  for (let x = x0; x <= x1; x++) {
+    citySet(s, x, y, CONCRETE, cells);
+    citySet(s, x, y + 1, WOOD, cells);
+    citySet(s, x, y + 2, GLASS, cells);
+    citySet(s, x, y + 3, CONCRETE, cells);
+  }
+}
+
+function buildSkyline(s, cells) {
+  // connected podium
+  const p0 = 86, p1 = 174, pBase = 107, pTop = 99;
+  for (let y = pTop; y <= pBase; y++) {
+    const floor = (y - pTop) % 4 === 0;
+    for (let x = p0; x <= p1; x++) {
+      const edge = x === p0 || x === p1 || y === pTop || y === pBase;
+      let m = CONCRETE;
+      if (!edge && !floor) m = GLASS;
+      citySet(s, x, y, m, cells);
+    }
+    if (floor && y > pTop + 1) {
+      for (let x = p0 + 4; x < p1; x += 11) citySet(s, x, y - 1, WOOD, cells);
+    }
+  }
+  // three towers, connected
+  buildTower(s, 101, 107, 24, 88, cells, 9, 'left');
+  buildTower(s, 133, 107, 26, 102, cells, 4, 'right');
+  buildTower(s, 162, 107, 20, 74, cells, 11, 'left');
+  buildSkybridge(s, 112, 120, 62, cells);
+  buildSkybridge(s, 145, 152, 80, cells);
+  // rooftop plant boxes
+  for (let x = 96; x <= 106; x += 3) citySet(s, x, 17, METAL, cells);
+  // street lamps
+  for (const lx of [82, 177]) {
+    for (let y = 100; y <= 106; y++) citySet(s, lx, y, METAL, cells);
+    citySet(s, lx, 99, LAMP, cells);
+    citySet(s, lx - 1, 99, METAL, cells);
+  }
+}
+
+/* ------------------------------------------------------- refinery */
+function buildTank(s, cx, base, r, h, cells) {
+  const top = base - h;
+  for (let y = top; y <= base; y++) {
+    const p = (y - top) / h;
+    let half = r;
+    if (p < 0.22) {
+      const q = 1 - (0.22 - p) / 0.22;
+      half = Math.max(2, Math.round(r * Math.sqrt(Math.max(0, 1 - q * q))));
+    }
+    for (let x = cx - half; x <= cx + half; x++) {
+      const border = Math.abs(x - cx) >= half - 1 || y === top || y === base || y === base - 1;
+      citySet(s, x, y, border ? METAL : OIL, cells);
+    }
+  }
+  // vent + rim
+  for (let x = cx - 2; x <= cx + 2; x++) citySet(s, x, top + 1, AIR, cells);
+  for (let x = cx - 3; x <= cx + 3; x++) {
+    citySet(s, x, top, METAL, cells);
+    if (Math.abs(x - cx) === 3) citySet(s, x, top + 1, METAL, cells);
+  }
+  // ladder stripe
+  for (let y = top + 3; y < base; y += 2) citySet(s, cx + r - 1, y, METAL, cells);
+}
+
+function buildRefinery(s, cells) {
+  const base = 107;
+  // concrete yard
+  for (let x = 175; x <= 238; x++) {
+    citySet(s, x, base - 1, CONCRETE, cells);
+    citySet(s, x, base, CONCRETE, cells);
+  }
+  // control building
+  buildOffice(s, 176, base, 14, 10, cells);
+  // storage tanks
+  buildTank(s, 203, base, 9, 17, cells);
+  buildTank(s, 221, base, 7, 14, cells);
+  // distillation columns
+  for (let y = 60; y < base; y++) {
+    for (let x = 231; x <= 235; x++) citySet(s, x, y, METAL, cells);
+  }
+  for (let y = 58; y <= 60; y++) for (let x = 232; x <= 234; x++) citySet(s, x, y, METAL, cells);
+  for (const py of [68, 78, 88, 98]) {
+    for (let x = 229; x <= 237; x++) citySet(s, x, py, METAL, cells);
+  }
+  // pipes
+  for (let x = 213; x <= 231; x++) citySet(s, x, 94, METAL, cells);
+  for (let x = 229; x <= 232; x++) citySet(s, x, 90, METAL, cells);
+  for (let y = 94; y <= 106; y++) citySet(s, 226, y, METAL, cells);
+  // flare stack with a three-cell burner boom
+  for (let y = 44; y < base; y++) citySet(s, 238, y, METAL, cells);
+  for (let x = 236; x <= 238; x++) citySet(s, x, 44, METAL, cells);
+  for (let x = 236; x <= 238; x++) {
+    citySet(s, x, 43, OIL, cells);
+    const fi = 43 * W + x;
+    s.fuel[fi] = 999;
+    s.burn[fi] = 1;
+    s.temp[fi] = 840;
+    s.boom[fi] = 1;
+    s.ignoredFire.add(fi);
+    s.flame[fi - W] = 0.5;
+  }
+  // oil spill by the tanks
+  for (let x = 191; x <= 195; x++) {
+    for (let y = 104; y <= 105; y++) {
+      if (s.mat[y * W + x] === AIR || s.mat[y * W + x] === CONCRETE) citySet(s, x, y, OIL, cells);
+    }
+  }
+  // safety valves
+  for (const vx of [197, 214, 228]) citySet(s, vx, 103, METAL, cells);
+  // yard floodlights
+  for (const lx of [192, 214]) {
+    for (let y = 90; y <= 103; y++) citySet(s, lx, y, METAL, cells);
+    citySet(s, lx, 89, LAMP, cells);
+  }
+  // tank gauge lights
+  for (const [lx, ly] of [[196, 100], [211, 100], [216, 102], [226, 102]]) citySet(s, lx, ly, LAMP, cells);
+  // column beacon
+  citySet(s, 233, 57, LAMP, cells);
+  // office roof lamp
+  citySet(s, 183, 96, LAMP, cells);
+}
+
+/* -------------------------------------------------------- scene */
+function buildCityScene(s, opts = {}) {
+  s.clear();
+  s.addGround();
+  const collector = [];
+  buildReservoir(s, collector);
+  buildSkyline(s, collector);
+  buildRefinery(s, collector);
+  // a park tree between the dam and the city
+  s.addPine(80, 107, 18);
+  // pavement seams
+  for (let x = 79; x <= 175; x += 16) citySet(s, x, 106, CONCRETE);
+
+  // only count glass/wood that actually survived construction
+  const seen = new Set();
+  const cells = [];
+  for (const i of collector) {
+    if (seen.has(i)) continue;
+    const m = s.mat[i];
+    if (m === GLASS || m === WOOD) { seen.add(i); cells.push(i); }
+  }
+  s.buildings.push({ name: 'City', cells, total: Math.max(1, cells.length) });
+  s.wind.x = 0.22;
+  s.windTarget = 0.22;
+  s.windTimeline = null;
+
+  if (opts.mission) {
+    s.igniteArea(90, 72, 3);      // high-rise balcony
+    s.igniteArea(179, 100, 2);    // refinery control room
+  }
+}
+
+/* ============================================================
+   Standalone sandbox presets
+   ============================================================ */
+
+function citySceneFinish(s, cells, wind = 0.2) {
+  const seen = new Set();
+  const out = [];
+  for (const i of cells) {
+    if (seen.has(i)) continue;
+    const m = s.mat[i];
+    if (m === GLASS || m === WOOD) { seen.add(i); out.push(i); }
+  }
+  s.buildings.push({ name: 'City', cells: out, total: Math.max(1, out.length) });
+  s.wind.x = wind;
+  s.windTarget = wind;
+  s.windTimeline = null;
+  s.firePower = 1;
+  s.rainTimer = 0;
+}
+
+function buildCityOnly(s) {
+  s.clear();
+  s.addGround();
+  const cells = [];
+  buildSkyline(s, cells);
+  // a fourth, shorter tower linked by a bridge
+  buildTower(s, 198, 107, 18, 48, cells, 5, 'right');
+  buildSkybridge(s, 171, 189, 70, cells);
+  // low-rise blocks and a pocket park
+  buildOffice(s, 18, 107, 26, 18, cells);
+  buildOffice(s, 214, 107, 22, 12, cells);
+  s.addPine(54, 107, 30);
+  s.addPine(72, 107, 20);
+  for (let x = 10; x <= 230; x += 8) citySet(s, x, 106, CONCRETE);
+  citySceneFinish(s, cells, 0.2);
+}
+
+function buildCoolingTower(s, cx, base, top, cells) {
+  const h = base - top;
+  for (let y = top; y <= base; y++) {
+    const t = (y - top) / h;
+    const half = Math.max(4, Math.round(10 + 1.5 * t - 5 * Math.sin(Math.PI * t * 0.86)));
+    for (let x = cx - half; x <= cx + half; x++) {
+      const edge = Math.abs(x - cx) >= half - 2 || y === base || y === top;
+      const inner = y < top + 3 ? AIR : CHAR;
+      citySet(s, x, y, edge ? CONCRETE : inner, cells);
+    }
+  }
+  citySet(s, cx - 3, top, LAMP, cells);
+  citySet(s, cx + 3, top, LAMP, cells);
+  citySet(s, cx - 4, top + 1, LAMP, cells);
+  citySet(s, cx + 4, top + 1, LAMP, cells);
+  for (let x = cx - 5; x <= cx + 5; x += 5) citySet(s, x, base - 1, CONCRETE, cells);
+  // seed the steam plume
+  for (let k = -2; k <= 2; k++) {
+    const i = (53) * W + cx + k;
+    if (s.mat[i] === AIR) s.smoke[i] = 0.5;
+  }
+}
+
+function buildColumn(s, cx, base, h, cells) {
+  const top = base - h;
+  for (let y = top; y <= base; y++) {
+    for (let x = cx - 2; x <= cx + 2; x++) citySet(s, x, y, METAL, cells);
+  }
+  for (let y = top + 8; y < base; y += 12) {
+    for (let x = cx - 4; x <= cx + 4; x++) citySet(s, x, y, METAL, cells);
+    citySet(s, cx - 4, y - 1, METAL, cells);
+    citySet(s, cx + 4, y - 1, METAL, cells);
+  }
+  for (let x = cx - 1; x <= cx + 1; x++) citySet(s, x, top, METAL, cells);
+  citySet(s, cx, top - 1, LAMP, cells);
+}
+
+function buildRefineryScene(s) {
+  s.clear();
+  s.addGround();
+  const cells = [];
+  const base = 107;
+  buildOffice(s, 10, base, 24, 12, cells);
+  // tank farm
+  buildTank(s, 60, base, 11, 22, cells);
+  buildTank(s, 92, base, 11, 22, cells);
+  buildTank(s, 124, base, 12, 24, cells);
+  // cooling tower and steam
+  buildCoolingTower(s, 154, base, 54, cells);
+  s.steamVents.push({ x: 154, y: 53 });
+  // tall process towers
+  buildColumn(s, 180, base, 90, cells);
+  buildColumn(s, 196, base, 66, cells);
+  // chimney
+  for (let y = 8; y < base; y++) {
+    for (let x = 208; x <= 212; x++) citySet(s, x, y, CONCRETE, cells);
+  }
+  for (let x = 207; x <= 213; x++) citySet(s, x, 7, CONCRETE, cells);
+  citySet(s, 210, 6, LAMP, cells);
+  // flare stack
+  for (let y = 20; y < base; y++) citySet(s, 232, y, METAL, cells);
+  for (let x = 230; x <= 232; x++) citySet(s, x, 20, METAL, cells);
+  for (let x = 230; x <= 232; x++) {
+    citySet(s, x, 19, OIL, cells);
+    const fi = 19 * W + x;
+    s.fuel[fi] = 999;
+    s.burn[fi] = 1;
+    s.temp[fi] = 840;
+    s.boom[fi] = 1;
+    s.ignoredFire.add(fi);
+    s.flame[fi - W] = 0.5;
+  }
+  // pipework
+  for (let x = 138; x <= 174; x++) citySet(s, x, 94, METAL, cells);
+  for (let x = 182; x <= 194; x++) citySet(s, x, 94, METAL, cells);
+  for (let x = 200; x <= 208; x++) citySet(s, x, 94, METAL, cells);
+  for (let x = 168; x <= 230; x++) citySet(s, x, 70, METAL, cells);
+  for (const px of [140, 172, 186, 202, 220]) {
+    for (let y = 70; y <= 104; y++) citySet(s, px, y, METAL, cells);
+  }
+  // spill puddles
+  for (const [a, b] of [[72, 76], [104, 108], [138, 142]]) {
+    for (let x = a; x <= b; x++) {
+      for (let y = 104; y <= 105; y++) citySet(s, x, y, OIL, cells);
+    }
+  }
+  // floodlights
+  for (const lx of [44, 76, 108, 140, 172, 200, 226]) {
+    for (let y = 92; y <= 104; y++) citySet(s, lx, y, METAL, cells);
+    citySet(s, lx, 91, LAMP, cells);
+  }
+  s.addPine(4, 107, 18);
+  citySceneFinish(s, cells, 0.22);
+}
+
+function buildReservoirScene(s) {
+  s.clear();
+  s.addGround();
+  const cells = [];
+  const base = 107;
+  // lake
+  for (let x = 2; x <= 113; x++) {
+    for (let y = 72; y <= 105; y++) {
+      const i = y * W + x;
+      if (s.mat[i] === AIR) s.setMat(i, WATER);
+    }
+  }
+  // dam wall, thick gravity profile
+  for (let y = 56; y <= base; y++) {
+    const t = 8 + Math.floor((y - 56) / 5);
+    for (let x = 114; x < 114 + t; x++) citySet(s, x, y, CONCRETE, cells);
+  }
+  // crest road + rail
+  for (let x = 104; x <= 140; x++) {
+    citySet(s, x, 55, CONCRETE, cells);
+    citySet(s, x, 54, CONCRETE, cells);
+  }
+  for (let x = 105; x <= 139; x += 4) citySet(s, x, 52, METAL, cells);
+  // gatehouse on the crest
+  for (let y = 44; y <= 53; y++) {
+    for (let x = 116; x <= 122; x++) {
+      const edge = y === 44 || y === 53 || x === 116 || x === 122;
+      citySet(s, x, y, edge ? CONCRETE : GLASS, cells);
+    }
+  }
+  citySet(s, 116, 49, WOOD, cells);
+  citySet(s, 122, 49, WOOD, cells);
+  citySet(s, 119, 43, LAMP, cells);
+  // buttresses on the dry face
+  for (const by of [78, 90, 100]) {
+    for (let y = by; y <= by + 5; y++) {
+      citySet(s, 128, y, CONCRETE, cells);
+      citySet(s, 129, y, CONCRETE, cells);
+    }
+  }
+  // spillway channel
+  for (let y = 56; y <= base; y++) {
+    citySet(s, 132, y, CONCRETE, cells);
+    citySet(s, 139, y, CONCRETE, cells);
+    if (y % 9 === 0) {
+      for (let x = 132; x <= 139; x++) citySet(s, x, y, CONCRETE, cells);
+    }
+  }
+  for (let y = 54; y <= 59; y++) citySet(s, 135, y, METAL, cells);
+  // hydro station
+  buildOffice(s, 144, base, 20, 16, cells);
+  for (let x = 143; x <= 165; x++) citySet(s, x, 90, METAL, cells);
+  for (let x = 126; x <= 144; x++) citySet(s, x, 96, METAL, cells);
+  for (let x = 146; x <= 152; x++) {
+    for (let y = 98; y <= 104; y++) citySet(s, x, y, METAL, cells);
+  }
+  // tailrace river
+  for (let x = 165; x <= 208; x++) {
+    for (let y = 104; y <= 105; y++) {
+      if (s.mat[y * W + x] === AIR) citySet(s, x, y, WATER, cells);
+    }
+  }
+  // pier, boat
+  for (let x = 40; x <= 54; x++) citySet(s, x, 71, WOOD, cells);
+  for (const px of [41, 47, 53]) {
+    for (let y = 72; y <= 75; y++) citySet(s, px, y, METAL, cells);
+  }
+  citySet(s, 49, 70, LAMP, cells);
+  for (let x = 58; x <= 63; x++) citySet(s, x, 71, WOOD, cells);
+  for (let x = 59; x <= 62; x++) citySet(s, x, 70, WOOD, cells);
+  for (let y = 66; y <= 69; y++) citySet(s, 61, y, METAL, cells);
+  citySet(s, 61, 65, LAMP, cells);
+  // forest on the far bank
+  const xs = [174, 190, 206, 220, 232, 240];
+  const hs = [30, 52, 38, 64, 44, 28];
+  xs.forEach((x, i) => s.addPine(x, 107, hs[i]));
+  // shoreline rocks
+  for (const [x, y] of [[20, 105], [64, 105], [92, 105], [108, 104], [120, 104]]) {
+    citySet(s, x, y, STONE, cells);
+    citySet(s, x + 1, y, STONE, cells);
+  }
+  // station lamp
+  citySet(s, 162, 89, LAMP, cells);
+  citySceneFinish(s, cells, 0.18);
+}
+
+function buildDeepForestScene(s) {
+  s.clear();
+  s.addGround();
+  const xs = [8, 24, 40, 56, 72, 88, 104, 120, 136, 152, 168, 184, 200, 216, 232];
+  const hs = [60, 44, 80, 34, 96, 52, 70, 40, 88, 30, 64, 48, 76, 38, 56];
+  xs.forEach((x, i) => {
+    if (x > 98 && x < 128) return; // central clearing
+    s.addPine(x, 107, hs[i]);
+  });
+  // clearing details
+  for (const [x, y] of [[108, 104], [112, 105], [120, 104]]) {
+    citySet(s, x, y, STONE, null);
+  }
+  s.addPine(100, 107, 20);
+  s.addPine(128, 107, 16);
+  s.wind.x = 0.15;
+  s.windTarget = 0.15;
+  s.windTimeline = null;
+  s.firePower = 1;
+  s.rainTimer = 0;
+}
+
+function buildBlankScene(s) {
+  s.clear();
+  s.addGround();
+  s.wind.x = 0.15;
+  s.windTarget = 0.15;
+  s.windTimeline = null;
+  s.firePower = 1;
+  s.rainTimer = 0;
+}
+
+</script>
+<script>
+/* ============================================================
+   EMBER · renderer (3× supersampled material pass)
+   ============================================================ */
+'use strict';
+
+const FIRE_LUT = (() => {
+  const stops = [
+    [0.0, 46, 8, 0],
+    [0.12, 150, 28, 2],
+    [0.28, 244, 82, 8],
+    [0.45, 255, 128, 18],
+    [0.62, 255, 170, 44],
+    [0.78, 255, 199, 92],
+    [0.9, 255, 231, 158],
+    [1.0, 255, 250, 224],
+  ];
+  const out = new Uint8Array(128 * 3);
+  for (let i = 0; i < 128; i++) {
+    const t = i / 127;
+    let a = stops[0], b = stops[stops.length - 1];
+    for (let k = 0; k < stops.length - 1; k++) {
+      if (t >= stops[k][0] && t <= stops[k + 1][0]) { a = stops[k]; b = stops[k + 1]; break; }
+    }
+    const f = (t - a[0]) / Math.max(0.0001, b[0] - a[0]);
+    out[i * 3] = Math.round(lerp(a[1], b[1], f));
+    out[i * 3 + 1] = Math.round(lerp(a[2], b[2], f));
+    out[i * 3 + 2] = Math.round(lerp(a[3], b[3], f));
+  }
+  return out;
+})();
+
+const Renderer = {
+  init(scale) {
+    this.S = scale || 2;
+    this.main = document.getElementById('mainCanvas');
+    this.glow = document.getElementById('glowCanvas');
+    this.mctx = this.main.getContext('2d', { alpha: false });
+    this.gctx = this.glow.getContext('2d');
+    this.glow.width = W;
+    this.glow.height = H;
+    this.gimg = this.gctx.createImageData(W, H);
+    this.time = 0;
+    this.alloc();
+  },
+  alloc() {
+    this.rw = W * this.S;
+    this.rh = H * this.S;
+    this.main.width = this.rw;
+    this.main.height = this.rh;
+    this.img = this.mctx.createImageData(this.rw, this.rh);
+    this.bg = new Uint8ClampedArray(this.rw * this.rh * 4);
+    this.fine = new Float32Array(this.rw * this.rh);
+    for (let i = 0; i < this.fine.length; i++) this.fine[i] = Math.random();
+    this.buildBackground();
+  },
+  setScale(scale) {
+    if (scale === this.S) return;
+    this.S = scale;
+    this.alloc();
+  },
+
+  buildBackground() {
+    const S = this.S, rw = this.rw, rh = this.rh;
+    const d = this.bg;
+    const moonX = W * 0.76, moonY = H * 0.1;
+    for (let py = 0; py < rh; py++) {
+      const cy = py / S;
+      for (let px = 0; px < rw; px++) {
+        const cx = px / S;
+        const p = (py * rw + px) * 4;
+        const t = cy / H;
+        let r = 5 + 4.5 * t;
+        let g = 7 + 4.5 * t;
+        let b = 12 + 7 * t;
+        const dx = (cx - moonX) / 90, dy = (cy - moonY) / 55;
+        const md = Math.sqrt(dx * dx + dy * dy);
+        const moon = Math.max(0, 1 - md) ** 3;
+        r += 22 * moon; g += 34 * moon; b += 58 * moon;
+        const horizon = Math.max(0, 1 - Math.abs(cy - H * 0.9) / (H * 0.4));
+        r += 12 * horizon * horizon;
+        g += 7 * horizon * horizon;
+        b += 5 * horizon * horizon;
+        const n = hash2(px, py);
+        if (cy < H * 0.72 && n > 0.9975) {
+          const star = (n - 0.9975) / 0.0025;
+          const s = 35 + star * 120;
+          r += s; g += s * 0.95; b += s * 0.85;
+        }
+        // moon disc
+        const mdx = cx - 196, mdy = cy - 18;
+        const mr = Math.sqrt(mdx * mdx + mdy * mdy);
+        if (mr < 7) {
+          const k = mr < 5 ? 1 : (7 - mr) / 2;
+          r = lerp(r, 214, k * 0.85);
+          g = lerp(g, 222, k * 0.85);
+          b = lerp(b, 236, k * 0.85);
+        }
+        // distant ridges
+        const r1 = 95 + Math.sin(cx * 0.047) * 4.5 + Math.sin(cx * 0.014 + 2.1) * 6.5;
+        const r2 = 101 + Math.sin(cx * 0.031 + 1.2) * 2.5;
+        if (cy >= r1) { r = 8; g = 10; b = 14; }
+        if (cy >= r2) { r = 11; g = 13; b = 17; }
+        if (Math.abs(cy - r1) < 0.35) { r += 12; g += 16; b += 22; }
+        // distant pine silhouettes
+        const pxc = (cx % 15) - 7.5;
+        const dh = 6 + 9 * hash2(Math.floor(cx / 15), 4);
+        const ptop = 104 - dh;
+        if (cy >= ptop && cy < 106 && Math.abs(pxc) < (cy - ptop) * 0.5) {
+          r = 15; g = 20; b = 27;
+        }
+        d[p] = r; d[p + 1] = g; d[p + 2] = b; d[p + 3] = 255;
+      }
+    }
+  },
+
+  draw(sim, dt) {
+    this.time += dt;
+    const time = this.time;
+    const S = this.S, rw = this.rw;
+    const data = this.img.data;
+    data.set(this.bg);
+    const gd = this.gimg.data;
+    gd.fill(0);
+    const { mat, temp, smoke, flame, burn, fuel, wet, noise } = sim;
+    const lut = FIRE_LUT;
+    const embers = sim.embers;
+    const fine = this.fine;
+
+    for (let y = 1; y < H - 1; y++) {
+      const row = y * W;
+      for (let x = 1; x < W - 1; x++) {
+        const i = row + x;
+        const m = mat[i];
+        const nz = noise[i];
+        let r = 0, g = 0, b = 0;
+        if (m !== AIR) {
+          switch (m) {
+            case WOOD: {
+              r = 111 + nz * 30;
+              g = 77 + nz * 23;
+              b = 51 + nz * 17;
+              if (wet[i] > 0.2) { r *= 0.8; g *= 0.86; b *= 0.95; }
+              const gone = 1 - Math.min(1, fuel[i]);
+              r *= 1 - gone * 0.62;
+              g *= 1 - gone * 0.68;
+              b *= 1 - gone * 0.66;
+              break;
+            }
+            case LEAF: {
+              r = 52 + nz * 26;
+              g = 101 + nz * 44;
+              b = 58 + nz * 26;
+              if (nz < 0.18) { r *= 0.72; g *= 0.78; b *= 0.72; }
+              if (wet[i] > 0.2) { r *= 0.8; g *= 0.9; b *= 1.0; }
+              break;
+            }
+            case GRASS: {
+              r = 101 + nz * 38;
+              g = 113 + nz * 40;
+              b = 56 + nz * 22;
+              break;
+            }
+            case STONE: {
+              r = 86 + nz * 24;
+              g = 93 + nz * 24;
+              b = 103 + nz * 26;
+              if (wet[i] > 0.2) { r *= 0.78; g *= 0.82; b *= 0.86; }
+              break;
+            }
+            case SOIL: {
+              r = 54 + nz * 18;
+              g = 44 + nz * 14;
+              b = 35 + nz * 11;
+              break;
+            }
+            case WATER: {
+              r = 26 + nz * 16;
+              g = 78 + nz * 44;
+              b = 126 + nz * 52;
+              break;
+            }
+            case OIL: {
+              r = 30 + nz * 10;
+              g = 27 + nz * 8;
+              b = 22 + nz * 6;
+              if (nz > 0.8) { r += 26; g += 20; b += 6; }
+              break;
+            }
+            case ASH: {
+              r = 54 + nz * 16;
+              g = 52 + nz * 14;
+              b = 50 + nz * 13;
+              break;
+            }
+            case CHAR: {
+              r = 26 + nz * 8;
+              g = 21 + nz * 6;
+              b = 19 + nz * 5;
+              if (temp[i] > 320) {
+                const e = Math.min(1, (temp[i] - 320) / 600);
+                r += e * 150; g += e * 44; b += e * 6;
+              }
+              break;
+            }
+            case CONCRETE: {
+              r = 82 + nz * 18;
+              g = 88 + nz * 18;
+              b = 97 + nz * 20;
+              if (wet[i] > 0.2) { r *= 0.8; g *= 0.84; b *= 0.9; }
+              break;
+            }
+            case GLASS: {
+              const lit = hash2(x * 7 + 3, y * 11 + 5) > 0.58;
+              const hot = smoothstep(120, 320, temp[i]);
+              if (lit) {
+                const warm = 0.75 + nz * 0.25;
+                r = 210 * warm + 20;
+                g = 158 * warm + 14;
+                b = 92 * warm + 18;
+              } else {
+                r = 28 + nz * 16;
+                g = 48 + nz * 20;
+                b = 64 + nz * 24;
+              }
+              if (hot > 0.02) {
+                r = lerp(r, 255, hot * 0.45);
+                g = lerp(g, 190, hot * 0.3);
+                b = lerp(b, 90, hot * 0.15);
+              }
+              break;
+            }
+            case METAL: {
+              r = 105 + nz * 18;
+              g = 112 + nz * 18;
+              b = 120 + nz * 18;
+              if (wet[i] > 0.2) { r *= 0.8; g *= 0.84; b *= 0.9; }
+              break;
+            }
+            case LAMP: {
+              r = 255; g = 205; b = 132;
+              break;
+            }
+            default: break;
+          }
+        }
+
+        const sm = smoke[i];
+        const warm = smoothstep(450, 950, temp[i]);
+        let heat = (temp[i] - 150) / 900;
+        const fl = flame[i] * 1.25;
+        if (fl > heat) heat = fl;
+        if (burn[i] > 0.02) {
+          const bh = burn[i] * 0.62;
+          if (bh > heat) heat = bh;
+        }
+        const hasHeat = heat > 0.018;
+        if (hasHeat) heat = clamp(heat, 0, 1);
+
+        /* glow buffer (cell resolution) */
+        const gp = i * 4;
+        if (m === GLASS && hash2(x * 7 + 3, y * 11 + 5) > 0.58) {
+          gd[gp] = 255; gd[gp + 1] = 188; gd[gp + 2] = 110; gd[gp + 3] = 26;
+        } else if (m === LAMP) {
+          gd[gp] = 255; gd[gp + 1] = 194; gd[gp + 2] = 120; gd[gp + 3] = 190;
+        }
+        if (hasHeat) {
+          const li = (heat * 127) | 0;
+          gd[gp] = lut[li * 3];
+          gd[gp + 1] = lut[li * 3 + 1];
+          gd[gp + 2] = lut[li * 3 + 2];
+          gd[gp + 3] = Math.min(255, heat * heat * 2.0 * 255);
+        }
+
+        /* material block with fine texture */
+        const bx = x * S, by = y * S;
+        const smA = sm > 0.012 ? Math.min(0.82, sm * 0.62) : 0;
+        const sr = lerp(104, 168, warm), sg = lerp(111, 136, warm), sb = lerp(122, 112, warm);
+        let fr = 0, fg = 0, fb = 0, add = 0;
+        if (hasHeat) {
+          const li = (heat * 127) | 0;
+          fr = lut[li * 3]; fg = lut[li * 3 + 1]; fb = lut[li * 3 + 2];
+          add = Math.min(1, Math.pow(heat, 1.2) * 2.1);
+        }
+        for (let dy = 0; dy < S; dy++) {
+          const py = by + dy;
+          const frow = py * rw;
+          for (let dx = 0; dx < S; dx++) {
+            const px = bx + dx;
+            const p = (frow + px) * 4;
+            const fn = fine[frow + px];
+            let rr, gg, bb;
+            if (m === AIR) {
+              rr = data[p]; gg = data[p + 1]; bb = data[p + 2];
+            } else {
+              rr = r; gg = g; bb = b;
+              const grain = (fn - 0.5) * 12;
+              rr += grain; gg += grain; bb += grain;
+              if (m === WOOD) {
+                const g2 = Math.sin(px * 1.15 + py * 0.38 + nz * 8);
+                rr *= 0.86 + g2 * 0.14;
+                gg *= 0.86 + g2 * 0.14;
+                bb *= 0.86 + g2 * 0.14;
+                if ((px + py * 2) % 23 === 0) { rr *= 0.78; gg *= 0.78; bb *= 0.8; }
+              } else if (m === LEAF) {
+                const g2 = (fn - 0.5) * 34;
+                rr += g2; gg += g2 * 0.9; bb += g2 * 0.7;
+                if (fn > 0.9) { rr += 16; gg += 22; bb += 8; }
+              } else if (m === SOIL) {
+                rr += (fn - 0.5) * 22; gg += (fn - 0.5) * 16; bb += (fn - 0.5) * 12;
+                if (fn > 0.985) { rr = 92; gg = 92; bb = 96; }
+                if (y > 1 && mat[i - W] !== SOIL) {
+                  if (hash2(px, 9) > 0.55) { rr = 52 + nz * 22; gg = 70 + nz * 30; bb = 38 + nz * 12; }
+                  else { rr += 18; gg += 14; bb += 8; }
+                }
+              } else if (m === WATER) {
+                const rip = Math.sin(px * 0.6 + py * 0.85 + time * 5.2 + nz * 5);
+                const crest = Math.max(0, rip);
+                rr += crest * 10; gg += crest * 26; bb += crest * 24;
+                const above = y > 1 ? mat[i - W] : AIR;
+                if (above !== WATER) { rr += 38; gg += 44; bb += 30; }
+                if (fn > 0.986) { rr = 176; gg = 228; bb = 248; }
+              } else if (m === CONCRETE) {
+                if ((px + py * 3) % 31 === 0) { rr *= 0.8; gg *= 0.82; bb *= 0.84; }
+                if (fn > 0.94) { rr += 18; gg += 18; bb += 18; }
+              } else if (m === METAL) {
+                if ((px * 5 + py * 3) % 47 < 2) { rr += 30; gg += 30; bb += 30; }
+              } else if (m === GLASS) {
+                const refl = Math.sin(px * 0.4 + py * 0.13 + 1.3);
+                if (refl > 0.9) { rr += 26; gg += 32; bb += 34; }
+              } else if (m === LAMP) {
+                rr = 255; gg = 210; bb = 140;
+              }
+            }
+            if (smA > 0) {
+              rr = rr * (1 - smA) + sr * smA;
+              gg = gg * (1 - smA) + sg * smA;
+              bb = bb * (1 - smA) + sb * smA;
+            }
+            if (add > 0) {
+              const flick = 0.8 + 0.2 * Math.sin(time * 4.6 + px * 0.4 + py * 0.55 + nz * 7);
+              rr = Math.min(255, rr + fr * add * flick * 0.92);
+              gg = Math.min(255, gg + fg * add * flick * 0.8);
+              bb = Math.min(255, bb + fb * add * flick * 0.7);
+            }
+            data[p] = rr; data[p + 1] = gg; data[p + 2] = bb; data[p + 3] = 255;
+          }
+        }
+      }
+    }
+
+    this.mctx.putImageData(this.img, 0, 0);
+    this.gctx.putImageData(this.gimg, 0, 0);
+
+    /* persistent rings around fire sources */
+    if (sim.fireSources && sim.fireSources.size) {
+      this.mctx.save();
+      this.mctx.globalCompositeOperation = 'lighter';
+      const pulse = 0.55 + 0.35 * Math.sin(time * 5.5);
+      this.mctx.strokeStyle = `rgba(255, 148, 74, ${pulse.toFixed(2)})`;
+      this.mctx.lineWidth = Math.max(1, S * 1.1);
+      for (const si of sim.fireSources) {
+        const sx = si % W, sy = (si / W) | 0;
+        this.mctx.beginPath();
+        this.mctx.arc((sx + 0.5) * S, (sy + 0.5) * S, 5.5 * S, 0, Math.PI * 2);
+        this.mctx.stroke();
+      }
+      this.mctx.restore();
+    }
+
+    /* embers */
+    if (embers.length) {
+      this.mctx.globalCompositeOperation = 'lighter';
+      this.mctx.fillStyle = 'rgba(255, 205, 130, 0.95)';
+      for (let k = 0; k < embers.length; k++) {
+        const e = embers[k];
+        this.mctx.globalAlpha = Math.min(1, e.life * 1.4);
+        this.mctx.fillRect((e.x * S) | 0, (e.y * S) | 0, 2, 2);
+      }
+      this.mctx.globalAlpha = 1;
+      this.mctx.globalCompositeOperation = 'source-over';
+
+      this.gctx.globalCompositeOperation = 'lighter';
+      this.gctx.fillStyle = 'rgba(255, 172, 92, 0.9)';
+      for (let k = 0; k < embers.length; k++) {
+        const e = embers[k];
+        this.gctx.globalAlpha = Math.min(1, e.life);
+        this.gctx.fillRect(e.x | 0, e.y | 0, 1, 1);
+      }
+      this.gctx.globalAlpha = 1;
+      this.gctx.globalCompositeOperation = 'source-over';
+    }
+  },
+};
+
+</script>
+<script>
+/* ============================================================
+   EMBER · interface, audio, missions, game loop
+   ============================================================ */
+'use strict';
+
+const $ = (id) => document.getElementById(id);
+const stage = $('stage');
+const sim = new Simulation();
+const savedQuality = (() => {
+  try { const q = Number(localStorage.getItem('ember-quality')); return q === 1 || q === 3 ? q : 2; }
+  catch (e) { return 2; }
+})();
+Renderer.init(savedQuality);
+
+const TOOLS = [
+  {
+    id: 'wood', name: 'Wood', key: '1', accent: '#d29a63',
+    hint: 'Wood · fuel; it burns down to char',
+    icon: '<rect x="2.5" y="8" width="14.5" height="8" rx="4"/><ellipse cx="18" cy="12" rx="2.7" ry="4"/><path d="M6 10.2h7.5"/>',
+  },
+  {
+    id: 'pine', name: 'Pine', key: '2', accent: '#8cc46f',
+    hint: 'Plant a pine · the canopy catches fast',
+    icon: '<path d="M12 3 7.2 10.8h3L5.8 17h12.4l-4.4-6.2h3z"/><path d="M12 17v3.5"/>',
+  },
+  {
+    id: 'stone', name: 'Stone', key: '3', accent: '#9da9b6',
+    hint: 'Stone wall · blocks fire completely; build a firebreak',
+    icon: '<path d="m3.6 15.2 1.9-5.9 4.9-3 5.8 1.9 3 5-2.2 4.1H5.6z"/><path d="m9 6.3 1.1 4.8 5-2.5"/>',
+  },
+  {
+    id: 'water', name: 'Water', key: '4', accent: '#4cc3ff',
+    hint: 'Water · cools and puts out fire; refills slowly in missions',
+    icon: '<path d="M12 2.8s6 6.5 6 10.1a6 6 0 0 1-12 0C6 9.3 12 2.8 12 2.8z"/><path d="M9.6 13.4a2.4 2.4 0 0 0 2.4 2.4"/>',
+  },
+  {
+    id: 'oil', name: 'Oil', key: '5', accent: '#d8b25f',
+    hint: 'Oil · ignites fast and explodes',
+    icon: '<path d="M7.5 4.2h9v3l2.2 3.2v8.6H5.3V10.4L7.5 7.2z"/><path d="M5.3 12.6h13.4"/><path d="M9 4.2V2h6v2.2"/>',
+  },
+  {
+    id: 'fire', name: 'Ignite', key: '6', accent: '#ff8a4a',
+    hint: 'Ignite · set nearby fuel alight; wind helps',
+    icon: '<path d="M12 2.6c2.6 3.9 5 5.4 5 9a5 5 0 0 1-10 0c0-2 1-3.6 2.8-5.2.4 1.7 1 2.8 2 3.5.4-2.2.1-4.6.2-7.3z"/>',
+  },
+  {
+    id: 'wind', name: 'Wind', key: '7', accent: '#8ad3ff',
+    hint: 'Drag to blow · push the fire where you want',
+    icon: '<path d="M2.8 8.2h8.6a2.8 2.8 0 1 0-2.8-2.8"/><path d="M2.8 12.2h12.4a2.6 2.6 0 1 1-2.6 2.6"/><path d="M2.8 16.2h5.6"/>',
+  },
+  {
+    id: 'erase', name: 'Erase', key: '8', accent: '#b3bcc7',
+    hint: 'Erase · clear the materials here',
+    icon: '<path d="m5 15.6 6.2-6.2 6.2 6.2-3.2 3.2H8.2z"/><path d="m9.3 9.3 6.2 6.2"/><path d="M3 21h18"/>',
+  },
+];
+
+const MISSIONS = [
+  {
+    id: 'cabin', name: 'Cabin Watch', tag: 'Intro',
+    brief: 'A campfire caught the pines and the wind is pushing it toward the cabin. Put out the flames and save the cabin and 60% of the trees.',
+    goal: 'Extinguish all fires · Trees ≥ 60% · Save the cabin',
+    hint: 'Tip: soak the trunks first, then the canopy — fire will not jump as easily.',
+    time: 110, water: 170, refill: 4.5, type: 'clear',
+    minTrees: 0.6, star2: 0.78, star3: 0.94, rain: 0, cabins: true,
+    windFn: (t) => 0.34 + Math.sin(t * 0.25) * 0.12,
+    setup(s) {
+      s.addGround();
+      s.addPine(38, 107, 76);
+      s.addPine(66, 107, 56);
+      s.addPine(96, 107, 34);
+      s.addCabin(152, 107, 46, 28);
+      s.addPine(206, 107, 70);
+      s.addPine(232, 107, 44);
+      s.igniteArea(66, 76, 6);
+    },
+  },
+  {
+    id: 'line', name: 'Firebreak', tag: 'Contain',
+    brief: 'Dry grass connects the whole pine grove and a strong wind is driving the flames right. Cut a firebreak before the forest burns down.',
+    goal: 'Extinguish all fires · Trees ≥ 55%',
+    hint: 'Tip: cut across the grass with stone; the fire cannot cross. Wet the seams.',
+    time: 120, water: 200, refill: 5, type: 'clear',
+    minTrees: 0.55, star2: 0.7, star3: 0.88, rain: 0,
+    windFn: (t) => 0.72 + Math.sin(t * 0.33) * 0.14,
+    setup(s) {
+      s.addGround();
+      s.addGrassLine(GROUND_Y, 4, W - 4);
+      const xs = [96, 120, 142, 164, 186, 208, 230];
+      xs.forEach((x, i) => s.addPine(x, 107, 34 + ((i * 9) % 24)));
+      s.addOilDrum(22, 106);
+      s.igniteArea(22, 102, 4);
+    },
+  },
+  {
+    id: 'spot', name: 'Spot Fires', tag: 'Chaos',
+    brief: 'Two ignitions, two oil drums, two cabins. The wind keeps shifting — embers can land behind you.',
+    goal: 'Extinguish all fires · Trees ≥ 65% · Both cabins',
+    hint: 'Tip: oil drums explode. Soak them first, or ring them with stone.',
+    time: 120, water: 230, refill: 5.5, type: 'clear',
+    minTrees: 0.65, star2: 0.8, star3: 0.94, rain: 1, cabins: true,
+    windFn: (t) => 0.72 * Math.tanh(Math.sin(t * 0.19 + 1.2) * 3),
+    setup(s) {
+      s.addGround();
+      s.addCabin(76, 107, 34, 24);
+      s.addCabin(196, 107, 34, 24);
+      s.addPine(30, 107, 56);
+      s.addPine(108, 107, 42);
+      s.addPine(140, 107, 60);
+      s.addPine(170, 107, 34);
+      s.addPine(222, 107, 50);
+      s.addPine(238, 107, 36);
+      s.addOilDrum(122, 107);
+      s.addOilDrum(158, 107);
+      s.igniteArea(30, 77, 5);
+      s.igniteArea(140, 76, 5);
+    },
+  },
+  {
+    id: 'night', name: 'Long Night', tag: 'Finale',
+    brief: 'Three fires are out of control and the storm will not let up. You have three rains and one firebreak.',
+    goal: 'Save 40% of the forest · Survive 150s',
+    hint: 'Tip: rain douses a wide area; save it for the worst moment.',
+    time: 150, water: 280, refill: 5.5, type: 'hold',
+    minTrees: 0.4, star2: 0.55, star3: 0.75, rain: 3,
+    windFn: (t) => 0.35 * Math.sin(t * 0.21 + 2) + 0.18 * Math.sin(t * 1.1) + 0.12,
+    setup(s) {
+      s.addGround();
+      const hs = [40, 58, 40, 58, 40, 58, 40, 58];
+      [22, 50, 80, 112, 140, 178, 206, 232].forEach((x, i) => s.addPine(x, 107, hs[i]));
+      s.addCabin(160, 107, 36, 24);
+      s.addOilDrum(96, 107);
+      s.igniteArea(50, 76, 5);
+      s.igniteArea(140, 84, 5);
+      s.igniteArea(206, 84, 5);
+    },
+  },
+  {
+    id: 'city', name: 'City on Fire', tag: 'City',
+    brief: 'A high-rise is burning and the refinery control room is smoking. Put out every fire before the tanks chain-explode and take the city with them.',
+    goal: 'Extinguish all fires · City integrity ≥ 55%',
+    hint: 'Tip: cut the oil spill with stone, soak the tanks, and if things go bad, erase the dam to flood the refinery.',
+    time: 150, water: 320, refill: 6, type: 'clear',
+    metric: 'buildings', minMetric: 0.55, star2: 0.7, star3: 0.88, rain: 2,
+    windFn: (t) => 0.22 + Math.sin(t * 0.2) * 0.18,
+    setup(s) { buildCityScene(s, { mission: true }); },
+  },
+];
+
+const SMOTHER_DIFFS = [
+  { id: 'easy', name: 'Easy', total: 8, interval: 7, maxActive: 2, maxFire: 500, time: 120, power: 0.8, blurb: '8 ignitions, a slow burn' },
+  { id: 'medium', name: 'Medium', total: 14, interval: 5, maxActive: 4, maxFire: 700, time: 150, power: 1.0, blurb: '14 ignitions, the fire starts chasing you' },
+  { id: 'hard', name: 'Hard', total: 22, interval: 3.5, maxActive: 6, maxFire: 950, time: 180, power: 1.2, blurb: '22 ignitions, the fire runs' },
+  { id: 'hell', name: 'Hell', total: 32, interval: 2.4, maxActive: 9, maxFire: 1300, time: 210, power: 1.45, blurb: '32 ignitions, no breathing room' },
+];
+
+const G = {
+  mode: 'sandbox',
+  scene: 'city',
+  mission: null,
+  missionIndex: -1,
+  smother: null,
+  ended: false,
+  paused: false,
+  modalOpen: false,
+  speed: 1,
+  tool: 'wood',
+  brush: 6,
+  timeLeft: 0,
+  water: Infinity,
+  refill: 0,
+  score: 0,
+  combo: 0,
+  comboT: 0,
+  calm: 0,
+  rainCharges: 0,
+  rainCD: 0,
+  fps: 60,
+  uiAcc: 0,
+  painting: false,
+  lastCell: null,
+  lastTree: null,
+  lastExt: 0,
+  lastPopup: 0,
+  lastEmptyWarn: 0,
+  lastWindSign: 1,
+  missionToken: 0,
+  missionStart: 0,
+  countdown: 0,
+  tipShown: false,
+};
+
+/* ------------------------------------------------------------- audio */
+const Sfx = {
+  on: true,
+  ctx: null,
+  master: null,
+  noise: null,
+  fireGain: null,
+  windGain: null,
+  waterGain: null,
+  fire: 0,
+  wind: 0,
+  water: false,
+  ensure() {
+    if (this.ctx) {
+      if (this.ctx.state === 'suspended') this.ctx.resume();
+      return;
+    }
+    try {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) { this.on = false; return; }
+      this.ctx = new AC();
+      const ctx = this.ctx;
+      this.master = ctx.createGain();
+      this.master.gain.value = this.on ? 0.55 : 0;
+      this.master.connect(ctx.destination);
+
+      const len = Math.floor(ctx.sampleRate * 2);
+      const buf = ctx.createBuffer(1, len, ctx.sampleRate);
+      const d = buf.getChannelData(0);
+      for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+      this.noise = buf;
+
+      const layer = (type, freq, q) => {
+        const src = ctx.createBufferSource();
+        src.buffer = buf;
+        src.loop = true;
+        const f = ctx.createBiquadFilter();
+        f.type = type;
+        f.frequency.value = freq;
+        f.Q.value = q;
+        const g = ctx.createGain();
+        g.gain.value = 0;
+        src.connect(f);
+        f.connect(g);
+        g.connect(this.master);
+        src.start();
+        return g;
+      };
+      this.fireGain = layer('bandpass', 480, 0.7);
+      this.windGain = layer('lowpass', 300, 0.4);
+      this.waterGain = layer('bandpass', 1500, 1.1);
+      this.crackleTimer = setInterval(() => this.crackle(), 170);
+    } catch (err) {
+      this.on = false;
+    }
+  },
+  update(fire, wind, water) {
+    this.fire = fire;
+    this.wind = wind;
+    this.water = water;
+    if (!this.ctx || !this.fireGain) return;
+    const t = this.ctx.currentTime;
+    this.fireGain.gain.setTargetAtTime(this.on ? fire * 0.13 : 0, t, 0.25);
+    this.windGain.gain.setTargetAtTime(this.on ? wind * 0.09 : 0, t, 0.5);
+    this.waterGain.gain.setTargetAtTime(this.on && water ? 0.085 : 0, t, 0.08);
+  },
+  crackle() {
+    if (!this.on || !this.ctx || this.fire < 0.04) return;
+    if (Math.random() > 0.55 + this.fire * 0.4) return;
+    const ctx = this.ctx;
+    const t = ctx.currentTime;
+    const src = ctx.createBufferSource();
+    src.buffer = this.noise;
+    const f = ctx.createBiquadFilter();
+    f.type = 'bandpass';
+    f.frequency.value = 260 + Math.random() * 1100;
+    f.Q.value = 1.5 + Math.random() * 3;
+    const g = ctx.createGain();
+    const peak = (0.02 + this.fire * 0.06) * (0.35 + Math.random() * 0.9);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(peak, t + 0.012);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + 0.05 + Math.random() * 0.12);
+    src.connect(f);
+    f.connect(g);
+    g.connect(this.master);
+    src.start(t, Math.random() * 1.6, 0.25);
+  },
+  boom() {
+    if (!this.on || !this.ctx) return;
+    const ctx = this.ctx;
+    const t = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(92, t);
+    osc.frequency.exponentialRampToValueAtTime(30, t + 0.6);
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0.55, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 1.0);
+    osc.connect(g);
+    g.connect(this.master);
+    osc.start(t);
+    osc.stop(t + 1.05);
+
+    const src = ctx.createBufferSource();
+    src.buffer = this.noise;
+    const f = ctx.createBiquadFilter();
+    f.type = 'lowpass';
+    f.frequency.value = 700;
+    const ng = ctx.createGain();
+    ng.gain.setValueAtTime(0.4, t);
+    ng.gain.exponentialRampToValueAtTime(0.001, t + 0.55);
+    src.connect(f);
+    f.connect(ng);
+    ng.connect(this.master);
+    src.start(t, 0.2, 0.7);
+  },
+  chime(win) {
+    if (!this.on || !this.ctx) return;
+    const ctx = this.ctx;
+    const notes = win ? [523.25, 659.25, 783.99] : [392, 311, 233];
+    notes.forEach((n, i) => {
+      const t = ctx.currentTime + i * 0.13;
+      const o = ctx.createOscillator();
+      o.type = 'triangle';
+      o.frequency.value = n;
+      const g = ctx.createGain();
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(0.12, t + 0.03);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 0.7);
+      o.connect(g);
+      g.connect(this.master);
+      o.start(t);
+      o.stop(t + 0.75);
+    });
+  },
+  click() {
+    if (!this.on || !this.ctx) return;
+    const ctx = this.ctx;
+    const t = ctx.currentTime;
+    const o = ctx.createOscillator();
+    o.type = 'triangle';
+    o.frequency.value = 760;
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0.04, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.05);
+    o.connect(g);
+    g.connect(this.master);
+    o.start(t);
+    o.stop(t + 0.06);
+  },
+  toggle() {
+    this.on = !this.on;
+    if (this.ctx) this.master.gain.setTargetAtTime(this.on ? 0.55 : 0, this.ctx.currentTime, 0.05);
+    $('soundBtn').classList.toggle('off', !this.on);
+    if (this.on) { this.ensure(); this.click(); }
+  },
+};
+
+/* --------------------------------------------------------------- utils */
+function formatTime(sec) {
+  sec = Math.max(0, Math.ceil(sec));
+  const m = Math.floor(sec / 60);
+  const s = sec % 60;
+  return String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+}
+
+function toast(msg, warm = false) {
+  const wrap = $('toasts');
+  const el = document.createElement('div');
+  el.className = 'toast' + (warm ? ' warm' : '');
+  el.textContent = msg;
+  wrap.appendChild(el);
+  while (wrap.children.length > 3) wrap.firstChild.remove();
+  setTimeout(() => {
+    el.classList.add('out');
+    setTimeout(() => el.remove(), 400);
+  }, 2600);
+}
+
+function popup(text, cellX, cellY, big) {
+  const r = stage.getBoundingClientRect();
+  if (!r.width) return;
+  const el = document.createElement('span');
+  el.className = 'popup' + (big ? ' big' : '');
+  el.textContent = text;
+  el.style.left = (cellX / W) * r.width + 'px';
+  el.style.top = (cellY / H) * r.height + 'px';
+  $('popups').appendChild(el);
+  setTimeout(() => el.remove(), 1100);
+}
+
+function buildToolGrid() {
+  const grid = $('toolGrid');
+  grid.innerHTML = TOOLS.map((t) => `
+    <button class="tool-btn" data-tool="${t.id}" style="--accent:${t.accent}" title="${t.hint}" type="button">
+      <span class="key">${t.key}</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.55" stroke-linecap="round" stroke-linejoin="round">${t.icon}</svg>
+      <span>${t.name}</span>
+    </button>`).join('');
+  grid.addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-tool]');
+    if (!btn) return;
+    setTool(btn.dataset.tool);
+    Sfx.ensure();
+    Sfx.click();
+  });
+}
+
+function setTool(id) {
+  if (G.mode === 'smother' && id !== 'wood') return;
+  G.tool = id;
+  const tool = TOOLS.find((t) => t.id === id);
+  document.querySelectorAll('.tool-btn').forEach((b) => b.classList.toggle('active', b.dataset.tool === id));
+  $('footHint').innerHTML = tool ? tool.hint : '';
+  const ring = $('brushRing');
+  if (tool) {
+    ring.style.borderColor = tool.accent + 'cc';
+    ring.style.boxShadow = `0 0 18px ${tool.accent}22, 0 0 0 1px rgba(0,0,0,.3)`;
+  }
+  updateBrushRing();
+}
+
+function updateBrushRing() {
+  const r = stage.getBoundingClientRect();
+  if (!r.width) return;
+  const px = (G.brush * 2 / W) * r.width;
+  const ring = $('brushRing');
+  ring.style.width = px + 'px';
+  ring.style.height = px + 'px';
+}
+
+/* -------------------------------------------------------------- layout */
+function layoutStage() {
+  if (window.innerWidth <= 980) {
+    stage.style.width = '';
+    stage.style.height = '';
+    updateBrushRing();
+    return;
+  }
+  const area = document.querySelector('.stage-area');
+  const rect = area.getBoundingClientRect();
+  const availW = Math.max(320, rect.width);
+  const availH = Math.max(240, rect.height - 38);
+  const size = Math.min(availW, (availH * 16) / 9);
+  stage.style.width = Math.floor(size) + 'px';
+  stage.style.height = Math.floor((size * 9) / 16) + 'px';
+  updateBrushRing();
+}
+
+/* ------------------------------------------------------------- scene */
+function buildSandbox() {
+  switch (G.scene) {
+    case 'blank': buildBlankScene(sim); break;
+    case 'forest': buildForest(); break;
+    case 'deep': buildDeepForestScene(sim); break;
+    case 'refinery': buildRefineryScene(sim); break;
+    case 'reservoir': buildReservoirScene(sim); break;
+    case 'city':
+    default: buildCityOnly(sim); break;
+  }
+}
+
+function buildForest() {
+  sim.clear();
+  sim.addGround();
+  sim.addPine(28, 107, 96);
+  sim.addPine(60, 107, 64);
+  sim.addPine(92, 107, 36);
+  sim.addCabin(136, 107, 46, 30);
+  sim.addPine(216, 107, 84);
+  sim.addPine(236, 107, 50);
+  sim.addCampfire(176, 107);
+  sim.wind.x = 0.15;
+  sim.windTarget = 0.15;
+  sim.windTimeline = null;
+  sim.firePower = 1;
+  sim.rainTimer = 0;
+  sim.missionTrees = null;
+  sim.missionCabins = null;
+}
+
+function startSandbox(silent) {
+  closeModal();
+  G.mode = 'sandbox';
+  G.mission = null;
+  G.missionIndex = -1;
+  G.smother = null;
+  $('fireAlert').hidden = true;
+  G.ended = false;
+  G.paused = false;
+  G.timeLeft = 0;
+  G.water = Infinity;
+  G.refill = 0;
+  G.score = 0;
+  G.combo = 0;
+  G.comboT = 0;
+  G.calm = 0;
+  G.rainCharges = 0;
+  G.rainCD = 0;
+  G.speed = 1;
+  G.countdown = 0;
+  G.missionToken++;
+  $('countdown').hidden = true;
+  $('windRange').disabled = false;
+  $('powerRange').value = 100;
+  sim.firePower = 1;
+  buildSandbox();
+  $('windRange').value = Math.round(sim.wind.x * 100);
+  if (!G.tipShown) {
+    const tips = {
+      blank: 'Blank canvas: create freely with the 8 tools.<small>Draw wood, build, ignite — then deal with it.</small>',
+      forest: 'Draw <strong>wood</strong>, ignite it with <strong>Fire</strong>, then put it out with <strong>Water</strong>.<small>Stone blocks fire · Wind bends it · Try a mission</small>',
+      deep: 'Deep forest: nothing but trees.<small>Try wind and firebreaks — or start a forest fire.</small>',
+      city: 'City skyline: glass shatters when hot, timber bands carry fire up floor by floor.<small>Try igniting a balcony, or cut it off with stone.</small>',
+      refinery: 'Large refinery: tanks chain-explode.<small>Soak the tanks and cut the oil off with stone.</small>',
+      reservoir: 'Reservoir: erase the dam to release the water.<small>Or keep it intact and play with wind over the lake.</small>',
+    };
+    $('stageTip').innerHTML = tips[G.scene] || tips.city;
+  }
+  setModeUI('sandbox');
+  updateMissionChrome();
+  updateToolsForMode();
+  updateLiveUI(true);
+  if (!silent) toast('Back to the sandbox · play with fire');
+}
+
+/* ------------------------------------------------------------ painting */
+function toCell(e) {
+  const r = stage.getBoundingClientRect();
+  return {
+    x: clamp(((e.clientX - r.left) / r.width) * W, 1, W - 2),
+    y: clamp(((e.clientY - r.top) / r.height) * H, 1, H - 2),
+  };
+}
+
+function warnEmptyWater() {
+  const now = performance.now();
+  if (now - G.lastEmptyWarn < 1600) return;
+  G.lastEmptyWarn = now;
+  toast('Tank empty · it refills over time', true);
+}
+
+function paintAt(x, y) {
+  if (G.tool === 'pine') {
+    sim.addPine(Math.round(x), Math.round(y) + 2, 22 + G.brush * 2);
+    return;
+  }
+  if (G.tool === 'water' && G.mode === 'mission') {
+    if (G.water <= 0.4) { warnEmptyWater(); return; }
+    const budget = Math.floor(G.water / 0.22);
+    const used = sim.paint(x, y, G.brush, 'water', { budget });
+    G.water = Math.max(0, G.water - used * 0.22);
+    return;
+  }
+  if (G.tool === 'wind') return;
+  sim.paint(x, y, G.brush, G.tool, { smother: G.mode === 'smother' });
+}
+
+function strokeTo(cell) {
+  const prev = G.lastCell;
+  if (!prev) {
+    paintAt(cell.x, cell.y);
+    G.lastCell = cell;
+    return;
+  }
+  const dist = Math.hypot(cell.x - prev.x, cell.y - prev.y);
+  if (G.tool === 'wind') {
+    let dx = cell.x - prev.x;
+    let dy = cell.y - prev.y;
+    const len = Math.hypot(dx, dy) || 1;
+    dx /= len; dy /= len;
+    sim.paint(cell.x, cell.y, Math.max(4, G.brush), 'wind', { dx: dx * 0.95, dy: dy * 0.95 });
+    G.lastCell = cell;
+    return;
+  }
+  if (G.tool === 'pine') {
+    if (!G.lastTree || Math.hypot(cell.x - G.lastTree.x, cell.y - G.lastTree.y) > 11) {
+      paintAt(cell.x, cell.y);
+      G.lastTree = cell;
+    }
+    G.lastCell = cell;
+    return;
+  }
+  const steps = Math.max(1, Math.ceil(dist / Math.max(1.2, G.brush * 0.45)));
+  for (let k = 1; k <= steps; k++) {
+    paintAt(lerp(prev.x, cell.x, k / steps), lerp(prev.y, cell.y, k / steps));
+    if (G.mode === 'mission' && G.water <= 0.4 && G.tool === 'water') break;
+  }
+  G.lastCell = cell;
+}
+
+stage.addEventListener('pointerdown', (e) => {
+  if (e.button !== undefined && e.button !== 0) return;
+  if (e.target.closest('button')) return;
+  Sfx.ensure();
+  hideTip();
+  G.painting = true;
+  G.lastTree = null;
+  const cell = toCell(e);
+  G.lastCell = null;
+  strokeTo(cell);
+  try { stage.setPointerCapture(e.pointerId); } catch (err) { /* noop */ }
+});
+
+stage.addEventListener('pointermove', (e) => {
+  const cell = toCell(e);
+  const r = stage.getBoundingClientRect();
+  const ring = $('brushRing');
+  ring.hidden = false;
+  ring.style.left = e.clientX - r.left + 'px';
+  ring.style.top = e.clientY - r.top + 'px';
+  if (G.painting) strokeTo(cell);
+});
+
+stage.addEventListener('pointerup', () => {
+  G.painting = false;
+  G.lastCell = null;
+  G.lastTree = null;
+});
+
+stage.addEventListener('pointercancel', () => {
+  G.painting = false;
+  G.lastCell = null;
+});
+
+stage.addEventListener('pointerleave', () => {
+  if (!G.painting) $('brushRing').hidden = true;
+});
+
+stage.addEventListener('pointerenter', () => { $('brushRing').hidden = false; });
+
+/* --------------------------------------------------------------- modal */
+function openModal(html, sticky) {
+  const root = $('modalRoot');
+  root.innerHTML = '<div class="modal">' + html + '</div>';
+  root.hidden = false;
+  G.modalOpen = true;
+  root.onclick = (e) => {
+    if (e.target === root && !sticky) closeModal();
+  };
+  root.querySelectorAll('[data-close]').forEach((b) => (b.onclick = closeModal));
+}
+
+function closeModal() {
+  const root = $('modalRoot');
+  root.hidden = true;
+  root.innerHTML = '';
+  G.modalOpen = false;
+  if (G.mode === 'mission') setModeUI('mission');
+  else if (G.mode === 'smother') setModeUI('smother');
+  else setModeUI('sandbox');
+}
+
+function loadProgress() {
+  try { return JSON.parse(localStorage.getItem('ember-progress-v1') || '{}'); }
+  catch (e) { return {}; }
+}
+function saveProgress(p) {
+  try { localStorage.setItem('ember-progress-v1', JSON.stringify(p)); } catch (e) { /* noop */ }
+}
+
+function starsMarkup(n) {
+  let s = '';
+  for (let i = 0; i < 3; i++) s += `<span class="${i < n ? '' : 'dim'}">★</span>`;
+  return s;
+}
+
+function openMissions() {
+  const progress = loadProgress();
+  const items = MISSIONS.map((m, i) => {
+    const p = progress[m.id];
+    const locked = i > 0 && !(progress[MISSIONS[i - 1].id] && progress[MISSIONS[i - 1].id].stars > 0);
+    const best = p ? `Best ${p.score.toLocaleString()}` : locked ? 'Locked' : 'Unplayed';
+    return `
+      <button class="mission-item" data-mission="${i}" type="button" ${locked ? 'disabled' : ''}>
+        <span class="mission-num">${locked ? '🔒' : String(i + 1).padStart(2, '0')}</span>
+        <span class="mission-info">
+          <h3>${m.name} <span style="color:var(--muted-2);font-size:9px;letter-spacing:.16em;">${m.tag}</span></h3>
+          <p>${m.brief}</p>
+        </span>
+        <span class="mission-meta">
+          <span class="stars">${starsMarkup(p ? p.stars : 0)}</span>
+          <span class="mission-best">${best}</span>
+        </span>
+      </button>`;
+  }).join('');
+  openModal(`
+    <div class="modal-head">
+      <div>
+        <div class="modal-kicker">MISSIONS</div>
+        <h2>Firefighting Missions</h2>
+        <p class="modal-sub">Fire spreads, wind shifts, drums explode. Finish a mission to unlock the next.</p>
+      </div>
+      <button class="modal-close" data-close type="button" aria-label="Close">×</button>
+    </div>
+    <div class="mission-list">${items}</div>
+    <div class="help-note">Mission wind is scripted. Stars are based on how much forest or city survives. Progress is saved on this device.</div>
+  `);
+  $('modalRoot').querySelectorAll('[data-mission]').forEach((b) => {
+    b.onclick = () => startMission(Number(b.dataset.mission));
+  });
+}
+
+function openHelp() {
+  openModal(`
+    <div class="modal-head">
+      <div>
+        <div class="modal-kicker">HOW TO PLAY</div>
+        <h2>Play with fire. Put it out.</h2>
+        <p class="modal-sub">A spreading fluid-fire sandbox. Paint materials, ignite them, then find a way to control it.</p>
+      </div>
+      <button class="modal-close" data-close type="button" aria-label="Close">×</button>
+    </div>
+    <div class="help-grid">
+      <div class="help-item"><h4><span>🪵</span> Wood &amp; Pines</h4><p>Wood is fuel and burns down to char. Pine canopies are dry and thin — one spark and the fire leaps with the wind.</p></div>
+      <div class="help-item"><h4><span>💧</span> Water</h4><p>Water cools, soaks fuel and puts flames out; it turns to steam when hot. Missions have a limited tank that refills over time.</p></div>
+      <div class="help-item"><h4><span>🪨</span> Stone</h4><p>Stone is fireproof — a reliable firebreak. Cut across grass or forest and the flames stop. Embers can still fly over.</p></div>
+      <div class="help-item"><h4><span>💨</span> Wind</h4><p>Wind pushes flames, smoke and embers downwind. Drag with the Wind tool to steer a fire.</p></div>
+      <div class="help-item"><h4><span>🛢️</span> Oil</h4><p>Oil burns hot and fast and explodes when ignited, throwing fire in every direction. Keep flames away from drums.</p></div>
+      <div class="help-item"><h4><span>🔥</span> Ignite</h4><p>Ignite fuel or create spot fires. Want to test a firebreak? Light it up.</p></div>
+    </div>
+    <div class="help-note">
+      City: glass shatters when hot and timber floors carry fire up; refinery tanks chain-explode; erase the dam to flood the refinery.<br>
+      <strong>Smother mode</strong>: the computer keeps igniting; paint wood onto fire to smother it. Wood anywhere else becomes fuel.<br>
+      Shortcuts: <kbd>1</kbd>–<kbd>8</kbd> tools · <kbd>[</kbd> <kbd>]</kbd> brush size · <kbd>Space</kbd> pause · <kbd>M</kbd> mute · <kbd>R</kbd> reset<br>
+      Inspired by <em>Fluid Fire 3</em> by Escape Motions (Peter Blaskovic). This version turns the canvas into a firefighting sandbox you can actually win or lose.
+    </div>
+  `);
+}
+
+/* -------------------------------------------------------------- mission */
+function startMission(index) {
+  const def = MISSIONS[index];
+  if (!def) return;
+  closeModal();
+  G.mode = 'mission';
+  G.smother = null;
+  $('fireAlert').hidden = true;
+  G.mission = def;
+  G.missionIndex = index;
+  G.ended = false;
+  G.paused = false;
+  G.timeLeft = def.time;
+  G.water = def.water;
+  G.refill = def.refill;
+  G.score = 0;
+  G.combo = 0;
+  G.comboT = 0;
+  G.calm = 0;
+  G.rainCharges = def.rain || 0;
+  G.rainCD = 0;
+  G.speed = 1;
+  G.countdown = 3.6;
+  G.lastWindSign = 1;
+  G.missionStart = performance.now();
+  G.missionToken++;
+  G.painting = false;
+  G.lastCell = null;
+  $('brushRing').hidden = true;
+  $('brushRing').style.left = '-120px';
+  $('brushRing').style.top = '-120px';
+  const token = G.missionToken;
+
+  sim.clear();
+  sim.firePower = 1;
+  def.setup(sim);
+  sim.shake = 0;
+  sim.missionTrees = sim.trees.slice();
+  sim.missionCabins = sim.cabins.slice();
+  sim.missionBuildings = sim.buildings.slice();
+  sim.windTimeline = def.windFn || null;
+  sim.windTime = 0;
+  sim.wind.x = def.windFn ? def.windFn(0) : 0.2;
+  sim.windTarget = sim.wind.x;
+  sim.rainTimer = 0;
+  sim.extinguished = 0;
+
+  setModeUI('mission');
+  updateMissionChrome();
+  updateToolsForMode();
+  $('powerRange').value = 100;
+  updateLiveUI(true);
+  hideTip();
+  toast(`Mission ${index + 1} · ${def.name}`, true);
+  setTimeout(() => {
+    if (G.missionToken === token && !G.ended) toast(def.hint);
+  }, 3600);
+  setTimeout(() => Sfx.ensure(), 30);
+}
+
+function checkMission(dt) {
+  if (G.ended || G.mode !== 'mission') return;
+  const tree = sim.treeStats();
+  const cs = sim.cabinStats();
+  const def = G.mission;
+  const metric = def.metric === 'buildings' ? sim.buildingStats() : tree;
+  const min = def.minMetric != null ? def.minMetric : def.minTrees;
+  const isCity = def.metric === 'buildings';
+
+  if (sim.fireCount === 0) {
+    G.calm += dt;
+  } else {
+    G.calm = 0;
+  }
+
+  if (def.cabins && cs.list.some((f) => f < 0.4)) {
+    loseMission('The cabin burned down.');
+    return;
+  }
+  if (metric.frac < min - 0.12) {
+    loseMission(isCity ? 'Too much of the city was destroyed; the skyline is lost.' : 'Too much forest burned; the line broke.');
+    return;
+  }
+
+  if (G.calm > 2.2) {
+    if (metric.frac >= min) winMission(tree, cs, metric);
+    else loseMission(isCity ? 'The fire is out, but the city cannot be saved.' : 'The fire is out, but the forest is lost.');
+    return;
+  }
+
+  if (G.timeLeft <= 0) {
+    if (def.type === 'hold' && metric.frac >= min) winMission(tree, cs, metric);
+    else loseMission('Time is up — the fire is still out of control.');
+  }
+}
+
+function winMission(st, cs, metric) {
+  if (G.ended) return;
+  G.ended = true;
+  G.calm = 0;
+  const def = G.mission;
+  const used = Math.max(1, def.time - G.timeLeft);
+  const treesPct = Math.round(metric.frac * 100);
+  const metricLabel = def.metric === 'buildings' ? 'city intact' : 'forest saved';
+  const bonus = Math.round(metric.frac * 1000 + G.timeLeft * 6 + cs.frac * 260);
+  G.score += bonus;
+  let stars = 1;
+  if (metric.frac >= def.star2) stars = 2;
+  if (metric.frac >= def.star3) stars = 3;
+
+  const progress = loadProgress();
+  const prev = progress[def.id];
+  if (!prev || prev.stars < stars || prev.score < G.score) {
+    progress[def.id] = { stars: Math.max(stars, prev ? prev.stars : 0), score: Math.max(G.score, prev ? prev.score : 0) };
+    saveProgress(progress);
+  }
+
+  Sfx.ensure();
+  Sfx.chime(true);
+  const next = G.missionIndex + 1;
+  const nextExists = next < MISSIONS.length;
+  openModal(`
+    <div class="result">
+      <div class="result-badge">✦</div>
+      <div class="modal-kicker">MISSION CLEAR</div>
+      <h2>Fire Under Control</h2>
+      <div class="stars-big">${starsMarkup(stars)}</div>
+      <p class="result-sub">${def.name} · ${treesPct}% ${metricLabel}</p>
+      <div class="result-stats">
+        <div class="result-stat"><b>${formatTime(used)}</b><span>Time</span></div>
+        <div class="result-stat"><b>${treesPct}%</b><span>${metricLabel}</span></div>
+        <div class="result-stat"><b>${Math.round(G.score).toLocaleString()}</b><span>Score</span></div>
+      </div>
+      <div class="result-actions">
+        <button class="btn ghost" data-act="list" type="button">Mission List</button>
+        <button class="btn primary" data-act="next" type="button">${nextExists ? 'Next Mission' : 'Finish'}</button>
+      </div>
+    </div>
+  `, true);
+  const root = $('modalRoot');
+  root.querySelector('[data-act="list"]').onclick = () => { closeModal(); startSandbox(true); openMissions(); };
+  root.querySelector('[data-act="next"]').onclick = () => {
+    if (nextExists) startMission(next);
+    else { closeModal(); startSandbox(true); openMissions(); toast('All missions complete — you are a true firekeeper.'); }
+  };
+  updateMissionChrome();
+}
+
+function loseMission(reason) {
+  if (G.ended) return;
+  G.ended = true;
+  Sfx.ensure();
+  Sfx.chime(false);
+  const def = G.mission;
+  const st = def.metric === 'buildings' ? sim.buildingStats() : sim.treeStats();
+  const metricLabel = def.metric === 'buildings' ? 'city intact' : 'forest saved';
+  openModal(`
+    <div class="result">
+      <div class="result-badge lose">✕</div>
+      <div class="modal-kicker">MISSION FAILED</div>
+      <h2>The Fire Won This Round</h2>
+      <p class="result-sub">${reason}</p>
+      <div class="result-stats">
+        <div class="result-stat"><b>${Math.round(st.frac * 100)}%</b><span>${metricLabel}</span></div>
+        <div class="result-stat"><b>${sim.fireCount}</b><span>Burning</span></div>
+        <div class="result-stat"><b>${Math.round(G.score).toLocaleString()}</b><span>Score</span></div>
+      </div>
+      <div class="result-actions">
+        <button class="btn ghost" data-act="list" type="button">Mission List</button>
+        <button class="btn primary" data-act="retry" type="button">Try Again</button>
+      </div>
+    </div>
+  `, true);
+  const root = $('modalRoot');
+  root.querySelector('[data-act="list"]').onclick = () => { closeModal(); startSandbox(true); openMissions(); };
+  root.querySelector('[data-act="retry"]').onclick = () => startMission(G.missionIndex);
+  void def;
+}
+
+/* --------------------------------------------------------------- chrome */
+function setModeUI(mode) {
+  const sw = $('modeSwitch');
+  sw.dataset.active = mode;
+  sw.querySelectorAll('button').forEach((b) => b.classList.toggle('active', b.dataset.mode === mode));
+}
+
+function updateToolsForMode() {
+  const isMission = G.mode === 'mission';
+  const isSmother = G.mode === 'smother';
+  const isSandbox = G.mode === 'sandbox';
+  $('windRange').disabled = !isSandbox;
+  $('windRange').style.opacity = isSandbox ? '' : '0.4';
+  $('windLabel').textContent = isSmother
+    ? 'Challenge breeze'
+    : isMission
+      ? 'Mission wind'
+      : Math.abs(sim.wind.x).toFixed(1) + (sim.wind.x >= 0 ? ' →' : ' ←');
+  $('powerRange').disabled = isSmother;
+  $('powerRange').style.opacity = isSmother ? '0.4' : '';
+  document.querySelectorAll('.slider-row').forEach((el) => { el.style.display = isSmother ? 'none' : ''; });
+  $('speedSeg').style.display = isSmother ? 'none' : '';
+  document.querySelectorAll('.tool-btn').forEach((b) => {
+    b.disabled = isSmother && b.dataset.tool !== 'wood';
+  });
+  $('speedSeg').querySelectorAll('button').forEach((b) => {
+    b.disabled = isSmother;
+    if (isSmother) b.classList.toggle('active', b.dataset.speed === '1');
+  });
+  $('resetBtn').innerHTML = isSmother ? '<span>↺</span> Restart' : '<span>↺</span> Reset Scene';
+  updateSceneUI();
+  if (isSmother) {
+    setTool('wood');
+    $('footHint').innerHTML = 'Wood: paint onto fire to <strong>smother</strong> · wood elsewhere becomes fuel';
+  }
+}
+
+function updateSceneUI() {
+  const seg = $('sceneSeg');
+  if (!seg) return;
+  seg.querySelectorAll('button').forEach((b) => {
+    b.classList.toggle('active', b.dataset.scene === G.scene);
+    b.disabled = G.mode !== 'sandbox';
+  });
+  seg.style.opacity = G.mode !== 'sandbox' ? '0.4' : '';
+  $('sceneSection').hidden = G.mode !== 'sandbox';
+}
+
+function setScene(scene) {
+  if (G.mode === 'mission') { toast('Mission in progress — cannot change the scene.'); return; }
+  if (G.scene === scene) return;
+  G.scene = scene;
+  startSandbox(true);
+  Sfx.click();
+  const labels = {
+    blank: 'Blank canvas · create freely',
+    forest: 'Forest · pines and cabin',
+    deep: 'Deep forest · all trees',
+    city: 'City skyline · connected towers',
+    refinery: 'Large refinery · tanks and flare',
+    reservoir: 'Reservoir · dam and forest',
+  };
+  toast(labels[scene] || 'Sandbox scene');
+}
+
+function updateMissionChrome() {
+  const isMission = G.mode === 'mission' && G.mission;
+  const isSmother = G.mode === 'smother' && G.smother;
+  $('missionHud').hidden = !isMission && !isSmother;
+  $('missionCard').hidden = !isMission && !isSmother;
+  $('waterWrap').hidden = !isMission;
+  $('scorePill').hidden = !isMission && !isSmother;
+  if (isSmother) {
+    const S = G.smother;
+    $('mhTag').textContent = `SMOTHER · ${S.diff.name}`;
+    $('mhName').textContent = 'Wood Smother';
+    $('mhGoal').textContent = 'Smother every fire with wood';
+    $('mcTag').textContent = `CHALLENGE · ${S.diff.name}`;
+    $('mcName').textContent = 'Wood Smother';
+    $('mcGoal').textContent = 'Smother every fire · the computer keeps igniting';
+    $('mcQuit').textContent = 'Quit Challenge';
+    return;
+  }
+  $('mcQuit').textContent = 'Quit Mission';
+  if (!isMission) return;
+  const def = G.mission;
+  $('mhTag').textContent = `MISSION ${G.missionIndex + 1} · ${def.tag}`;
+  $('mhName').textContent = def.name;
+  $('mhGoal').textContent = def.goal;
+  $('mcTag').textContent = `MISSION ${G.missionIndex + 1}`;
+  $('mcName').textContent = def.name;
+  $('mcGoal').textContent = def.goal;
+}
+
+/* --------------------------------------------------------------- UI tick */
+function updateLiveUI(force) {
+  const st = sim.treeStats();
+  const cs = sim.cabinStats();
+  const wx = sim.wind.x;
+  const power = Math.abs(wx);
+
+  $('windArrow').textContent = wx >= 0 ? '→' : '←';
+  $('windVal').textContent = power.toFixed(1);
+  const bars = $('windBars').children;
+  const lit = Math.min(4, Math.round(power * 3.4));
+  for (let i = 0; i < bars.length; i++) bars[i].classList.toggle('on', i < lit);
+
+  if (G.mode === 'sandbox') {
+    $('windRange').value = Math.round(wx * 100);
+    $('windRange').style.setProperty('--p', ((wx + 1) / 2) * 100 + '%');
+    $('windLabel').textContent = power.toFixed(1) + (wx >= 0 ? ' →' : ' ←');
+  }
+
+  $('statFire').textContent = `Fire ${sim.fireCount}`;
+  $('statTrees').textContent = G.mode === 'smother'
+    ? `Sources ${sim.fireSources.size}`
+    : sim.trees.length ? `Trees ${Math.round(st.frac * 100)}%` : 'Trees —';
+  $('statFps').textContent = `${Math.round(G.fps)} FPS`;
+  $('footStats').textContent = G.mode === 'smother' && G.smother
+    ? `FPS ${Math.round(G.fps)} · Fire ${sim.fireCount}/${G.smother.diff.maxFire} · Sources ${sim.fireSources.size}`
+    : `FPS ${Math.round(G.fps)} · Fire ${sim.fireCount} · Embers ${sim.embers.length}`;
+
+  if (G.mode === 'smother' && G.smother) {
+    const S = G.smother;
+    $('mhTime').textContent = formatTime(S.timeLeft);
+    $('mhTime').classList.toggle('warn', S.timeLeft < 15);
+    $('mcTime').textContent = formatTime(S.timeLeft);
+    $('mcTime').classList.toggle('warn', S.timeLeft < 15);
+    const danger = Math.min(1, sim.fireCount / S.diff.maxFire);
+    $('mhGoal').textContent = `Fire ${sim.fireCount}/${S.diff.maxFire} · Ignitions left ${S.aiLeft}`;
+    $('mcTrees').textContent = `Sources ${sim.fireSources.size} · Fire ${sim.fireCount}/${S.diff.maxFire}`;
+    $('mcProgress').style.width = Math.max(2, danger * 100) + '%';
+    $('mcProgress').style.background = danger > 0.66
+      ? 'linear-gradient(90deg,#ff4d3d,#ff9a52)'
+      : danger > 0.3
+        ? 'linear-gradient(90deg,#ffb15c,#ffd27a)'
+        : 'linear-gradient(90deg,#6ec49a,#b7e38a)';
+    $('scoreNum').textContent = Math.round(S.score).toLocaleString();
+    $('comboTag').classList.remove('show');
+    $('rainBtn').disabled = true;
+    $('rainCount').textContent = '';
+  } else if (G.mode === 'mission' && G.mission) {
+    const def = G.mission;
+    const m = def.metric === 'buildings' ? sim.buildingStats() : st;
+    const min = def.minMetric != null ? def.minMetric : def.minTrees;
+    const label = def.metric === 'buildings' ? 'City' : 'Trees';
+    $('mhTime').textContent = formatTime(G.timeLeft);
+    $('mhTime').classList.toggle('warn', G.timeLeft < 15);
+    $('mcTime').textContent = formatTime(G.timeLeft);
+    $('mcTime').classList.toggle('warn', G.timeLeft < 15);
+    $('mcTrees').textContent = `${label} ${Math.round(m.frac * 100)}%`;
+    $('mcProgress').style.width = Math.max(2, m.frac * 100) + '%';
+    $('mcProgress').style.background = m.frac < min
+      ? 'linear-gradient(90deg,#ff6b4a,#ffb15c)'
+      : 'linear-gradient(90deg,#6ec49a,#b7e38a)';
+
+    const pct = Math.max(0, Math.min(1, G.water / def.water));
+    $('waterFill').style.width = pct * 100 + '%';
+    $('waterNum').textContent = Math.ceil(G.water);
+    $('waterWrap').classList.toggle('low', pct < 0.2);
+    $('scoreNum').textContent = Math.round(G.score).toLocaleString();
+    $('comboTag').classList.toggle('show', G.comboT > 0 && G.combo > 1);
+    $('comboTag').textContent = '×' + G.combo;
+
+    $('rainBtn').disabled = G.rainCharges <= 0;
+    $('rainCount').textContent = '×' + Math.max(0, G.rainCharges);
+  } else {
+    $('rainBtn').disabled = G.rainCD > 0;
+    $('rainCount').textContent = G.rainCD > 0 ? Math.ceil(G.rainCD) + 's' : '';
+  }
+
+  if (force) {
+    $('brushVal').textContent = G.brush;
+    const p = ((G.brush - 2) / 12) * 100;
+    $('brushRange').style.setProperty('--p', p + '%');
+    $('powerLabel').textContent = sim.firePower.toFixed(1) + '×';
+    $('powerRange').style.setProperty('--p', ((sim.firePower - 0.4) / 1.5) * 100 + '%');
+  }
+
+  const active = !G.paused && !G.ended && !G.modalOpen;
+  let fx = 0, fy = 0, mass = 0;
+  for (let i = 0; i < sim.n; i += 1) {
+    if (sim.burn[i] > 0.08) { fx += i % W; fy += (i / W) | 0; mass++; }
+  }
+  const fl = $('firelight');
+  if (mass > 2) {
+    fl.style.left = (fx / mass / W) * 100 + '%';
+    fl.style.top = (fy / mass / H) * 100 + '%';
+    const size = Math.min(760, 220 + mass * 2.2);
+    fl.style.width = size + 'px';
+    fl.style.height = size + 'px';
+    fl.style.opacity = String(Math.min(0.85, mass / 90));
+  } else {
+    fl.style.opacity = '0';
+  }
+
+  const fireNorm = active ? Math.min(1, sim.fireCount / 140) : 0;
+  Sfx.update(fireNorm, active ? Math.min(1, power) : 0, active && G.painting && G.tool === 'water');
+}
+
+/* -------------------------------------------------------- smother mode */
+let smotherAlertTimer = null;
+
+function loadSmotherProgress() {
+  try { return JSON.parse(localStorage.getItem('ember-smother-v1') || '{}'); }
+  catch (e) { return {}; }
+}
+function saveSmotherProgress(id, score) {
+  try {
+    const p = loadSmotherProgress();
+    p[id] = p[id] || { best: 0, wins: 0 };
+    p[id].best = Math.max(p[id].best, score);
+    p[id].wins += 1;
+    localStorage.setItem('ember-smother-v1', JSON.stringify(p));
+  } catch (e) { /* noop */ }
+}
+
+function showFireAlert(x, y) {
+  const el = $('fireAlert');
+  const r = stage.getBoundingClientRect();
+  if (!r.width) return;
+  el.style.left = (x / W) * r.width + 'px';
+  el.style.top = (y / H) * r.height + 'px';
+  el.hidden = false;
+  if (smotherAlertTimer) clearTimeout(smotherAlertTimer);
+  smotherAlertTimer = setTimeout(() => { el.hidden = true; }, 1800);
+}
+
+function openSmotherMenu() {
+  const progress = loadSmotherProgress();
+  const items = SMOTHER_DIFFS.map((d, i) => `
+    <button class="mission-item" data-diff="${d.id}" type="button">
+      <span class="mission-num">0${i + 1}</span>
+      <span class="mission-info">
+        <h3>${d.name} <span style="color:var(--muted-2);font-size:9px;letter-spacing:.16em;">${d.total} IGNITIONS</span></h3>
+        <p>${d.blurb} · ${Math.round(d.time / 60)} MIN</p>
+      </span>
+      <span class="mission-meta">
+        <span class="mission-best">${progress[d.id] ? 'Best ' + progress[d.id].best.toLocaleString() : 'Not played'}</span>
+      </span>
+    </button>`).join('');
+  setModeUI('smother');
+  openModal(`
+    <div class="modal-head">
+      <div>
+        <div class="modal-kicker">SMOTHER CHALLENGE</div>
+        <h2>Wood Smother</h2>
+        <p class="modal-sub">The computer keeps igniting. Paint wood onto the flames to cover them; wood anywhere else becomes fuel. Smother every fire to win.</p>
+      </div>
+      <button class="modal-close" data-close type="button" aria-label="Close">×</button>
+    </div>
+    <div class="mission-list">${items}</div>
+    <div class="help-note">Wood only. Painting onto a burning cell smothers it instantly; smothered wood stays wet and resists fire for a while. Clear every fire before the timer runs out; if the fire grows past the limit, you lose.</div>
+  `);
+  $('modalRoot').querySelectorAll('[data-diff]').forEach((b) => {
+    b.onclick = () => startSmother(b.dataset.diff);
+  });
+}
+
+function startSmother(id) {
+  const diff = SMOTHER_DIFFS.find((d) => d.id === id);
+  if (!diff) return;
+  closeModal();
+  G.mode = 'smother';
+  G.smother = {
+    diff, timeLeft: diff.time, aiTotal: diff.total, aiLeft: diff.total,
+    nextSpawn: 2.0, score: 0, covered: 0, calm: 0, ended: false,
+  };
+  G.mission = null;
+  G.missionIndex = -1;
+  G.ended = false;
+  G.paused = false;
+  G.speed = 1;
+  G.countdown = 3.4;
+  G.water = Infinity;
+  G.refill = 0;
+  G.score = 0;
+  G.combo = 0;
+  G.comboT = 0;
+  G.rainCharges = 0;
+  G.rainCD = 0;
+  sim.clear();
+  sim.firePower = diff.power;
+  buildBlankScene(sim);
+  sim.firePower = diff.power;
+  sim.wind.x = 0.1;
+  sim.windTarget = 0.1;
+  sim.windTimeline = null;
+  sim.onSmother = (x, y, wasSource) => {
+    if (G.mode !== 'smother' || !G.smother || G.smother.ended) return;
+    const S = G.smother;
+    S.covered += 1;
+    const p = wasSource ? 150 : 12;
+    S.score += p;
+    if (wasSource || Math.random() < 0.22) popup('+' + p, x, y, wasSource);
+  };
+  G.tool = 'wood';
+  G.brush = 8;
+  $('brushRange').value = 8;
+  $('brushVal').textContent = '8';
+  $('brushRange').style.setProperty('--p', '50%');
+  updateBrushRing();
+  setTool('wood');
+  $('footHint').innerHTML = 'Wood: paint onto fire to <strong>smother</strong> · wood elsewhere becomes fuel';
+  $('fireAlert').hidden = true;
+  $('countdown').hidden = true;
+  setModeUI('smother');
+  updateMissionChrome();
+  updateToolsForMode();
+  updateLiveUI(true);
+  hideTip();
+  toast(`Smother Challenge · ${diff.name}`, true);
+  setTimeout(() => { if (G.mode === 'smother' && G.smother) toast('The computer keeps igniting — cover the flames with wood!'); }, 3800);
+  Sfx.ensure();
+}
+
+function spawnComputerFire() {
+  const S = G.smother;
+  if (!S || S.aiLeft <= 0 || S.ended) return;
+  const woods = [];
+  for (let i = 0; i < sim.n; i++) {
+    if (sim.mat[i] === WOOD && sim.burn[i] < 0.01 && sim.wet[i] < 0.65) {
+      woods.push(i);
+      if (woods.length > 500) break;
+    }
+  }
+  let x = 0, y = 0, source = false, ok = false;
+  if (woods.length && Math.random() < 0.64) {
+    const i = woods[(Math.random() * woods.length) | 0];
+    x = i % W;
+    y = (i / W) | 0;
+    sim.igniteArea(x, y, 2);
+    ok = true;
+  } else if (sim.fireSources.size < S.diff.maxActive) {
+    for (let k = 0; k < 110; k++) {
+      const tx = 10 + ((Math.random() * (W - 20)) | 0);
+      const ty = 32 + ((Math.random() * 66) | 0);
+      const i = ty * W + tx;
+      if (sim.mat[i] === AIR && !sim.fireSources.has(i)) {
+        sim.fireSources.add(i);
+        sim.temp[i] = 800;
+        sim.flame[i] = 1;
+        sim.smoke[i] = 0.4;
+        x = tx; y = ty; source = true; ok = true;
+        break;
+      }
+    }
+  }
+  if (!ok) { S.nextSpawn = 0.9; return; }
+  S.aiLeft -= 1;
+  S.nextSpawn = S.diff.interval * (0.8 + Math.random() * 0.45);
+  showFireAlert(x, y);
+  toast(source ? 'The computer ignites a fire! A fire source appeared.' : 'The computer lights your wood on fire!', true);
+  Sfx.ensure();
+}
+
+function updateSmother(dt) {
+  const S = G.smother;
+  if (!S || S.ended || G.ended) return;
+  S.timeLeft -= dt;
+  if (S.timeLeft <= 0) {
+    S.timeLeft = 0;
+    loseSmother('Time is up — fires remain.');
+    return;
+  }
+  S.nextSpawn -= dt;
+  if (S.aiLeft > 0 && S.nextSpawn <= 0) spawnComputerFire();
+  if (S.aiLeft === 0 && sim.fireCount === 0 && sim.fireSources.size === 0) S.calm += dt;
+  else S.calm = 0;
+  if (S.calm > 1.4) { winSmother(); return; }
+  if (sim.fireCount > S.diff.maxFire) loseSmother('The fire is out of control — it grew too large.');
+}
+
+function bindSmotherResult(diff) {
+  const root = $('modalRoot');
+  const retry = root.querySelector('[data-act="retry"]');
+  if (retry) retry.onclick = () => startSmother(diff.id);
+  const other = root.querySelector('[data-act="diff"]');
+  if (other) other.onclick = () => { closeModal(); startSandbox(true); openSmotherMenu(); };
+  const back = root.querySelector('[data-act="back"]');
+  if (back) back.onclick = () => startSandbox();
+}
+
+function winSmother() {
+  const S = G.smother;
+  if (!S || S.ended) return;
+  S.ended = true;
+  G.ended = true;
+  S.score += Math.round(S.timeLeft * 10) + 300;
+  saveSmotherProgress(S.diff.id, S.score);
+  Sfx.ensure();
+  Sfx.chime(true);
+  openModal(`
+    <div class="result">
+      <div class="result-badge">✦</div>
+      <div class="modal-kicker">FIRE OUT</div>
+      <h2>All Fires Out</h2>
+      <p class="result-sub">${S.diff.name} · You smothered ${S.covered} fire cells</p>
+      <div class="result-stats">
+        <div class="result-stat"><b>${formatTime(S.timeLeft)}</b><span>Time left</span></div>
+        <div class="result-stat"><b>${S.covered}</b><span>Cells smothered</span></div>
+        <div class="result-stat"><b>${Math.round(S.score).toLocaleString()}</b><span>Score</span></div>
+      </div>
+      <div class="result-actions">
+        <button class="btn ghost" data-act="back" type="button">Back to Sandbox</button>
+        <button class="btn ghost" data-act="diff" type="button">Other Difficulty</button>
+        <button class="btn primary" data-act="retry" type="button">Play Again</button>
+      </div>
+    </div>
+  `, true);
+  bindSmotherResult(S.diff);
+}
+
+function loseSmother(reason) {
+  const S = G.smother;
+  if (!S || S.ended) return;
+  S.ended = true;
+  G.ended = true;
+  Sfx.ensure();
+  Sfx.chime(false);
+  openModal(`
+    <div class="result">
+      <div class="result-badge lose">✕</div>
+      <div class="modal-kicker">CHALLENGE FAILED</div>
+      <h2>The Fire Got Away</h2>
+      <p class="result-sub">${S.diff.name} · ${reason}</p>
+      <div class="result-stats">
+        <div class="result-stat"><b>${S.aiTotal - S.aiLeft}/${S.aiTotal}</b><span>Ignitions</span></div>
+        <div class="result-stat"><b>${S.covered}</b><span>Cells smothered</span></div>
+        <div class="result-stat"><b>${Math.round(S.score).toLocaleString()}</b><span>Score</span></div>
+      </div>
+      <div class="result-actions">
+        <button class="btn ghost" data-act="back" type="button">Back to Sandbox</button>
+        <button class="btn ghost" data-act="diff" type="button">Other Difficulty</button>
+        <button class="btn primary" data-act="retry" type="button">Try Again</button>
+      </div>
+    </div>
+  `, true);
+  bindSmotherResult(S.diff);
+}
+
+function setQuality(q) {
+  Renderer.setScale(q);
+  try { localStorage.setItem('ember-quality', String(q)); } catch (e) { /* noop */ }
+  document.querySelectorAll('#qualitySeg button').forEach((b) => {
+    b.classList.toggle('active', Number(b.dataset.q) === q);
+  });
+  toast(q === 1 ? 'Quality: Fast 1×' : q === 3 ? 'Quality: Ultra 3×' : 'Quality: Clear 2×');
+}
+
+/* ---------------------------------------------------------------- loop */
+let lastFrame = performance.now();
+function loop(now) {
+  const raw = Math.min(0.05, (now - lastFrame) / 1000);
+  lastFrame = now;
+  if (raw > 0) G.fps = G.fps * 0.92 + (1 / raw) * 0.08;
+
+  if (G.countdown > 0) {
+    G.countdown -= raw;
+    const cd = $('countdown');
+    cd.hidden = false;
+    const n = Math.ceil(G.countdown - 0.5);
+    cd.textContent = n > 0 ? String(n) : 'GO';
+    if (G.countdown <= 0) {
+      cd.hidden = true;
+      $('countdown').hidden = true;
+    }
+  } else if (!G.paused && !G.ended && !G.modalOpen) {
+    const dt = raw * G.speed;
+    if (G.mode === 'mission') {
+      G.timeLeft -= dt;
+      G.water = Math.min(G.mission.water, G.water + G.refill * dt);
+      G.comboT -= raw;
+      if (G.comboT <= 0) G.combo = 0;
+      if (G.rainCD > 0) G.rainCD -= raw;
+    } else if (G.rainCD > 0) {
+      G.rainCD -= raw;
+    }
+    sim.step(dt);
+    if (G.mode === 'mission') checkMission(raw * G.speed);
+    else if (G.mode === 'smother') updateSmother(raw * G.speed);
+  }
+
+  Renderer.draw(sim, raw);
+
+  if (sim.shake > 0.01) {
+    const s = sim.shake * 5;
+    stage.style.transform = `translate(${(Math.random() - 0.5) * s}px, ${(Math.random() - 0.5) * s}px)`;
+  } else if (stage.style.transform) {
+    stage.style.transform = '';
+  }
+
+  G.uiAcc += raw;
+  if (G.uiAcc > 0.1) {
+    G.uiAcc = 0;
+    updateLiveUI();
+  }
+  requestAnimationFrame(loop);
+}
+
+/* ------------------------------------------------------------- controls */
+$('brushRange').addEventListener('input', (e) => {
+  G.brush = Number(e.target.value);
+  $('brushVal').textContent = G.brush;
+  $('brushRange').style.setProperty('--p', ((G.brush - 2) / 12) * 100 + '%');
+  updateBrushRing();
+});
+
+$('windRange').addEventListener('input', (e) => {
+  const v = Number(e.target.value) / 100;
+  sim.windTarget = Math.abs(v) < 0.04 ? 0 : v;
+  sim.windTimeline = null;
+  sim.wind.x += (v - sim.wind.x) * 0.5;
+  e.target.style.setProperty('--p', ((v + 1) / 2) * 100 + '%');
+  Sfx.ensure();
+});
+
+$('powerRange').addEventListener('input', (e) => {
+  sim.firePower = Number(e.target.value) / 100;
+  $('powerLabel').textContent = sim.firePower.toFixed(1) + '×';
+  e.target.style.setProperty('--p', ((sim.firePower - 0.4) / 1.5) * 100 + '%');
+});
+
+$('speedSeg').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-speed]');
+  if (!b) return;
+  G.speed = Number(b.dataset.speed);
+  $('speedSeg').querySelectorAll('button').forEach((x) => x.classList.toggle('active', x === b));
+  Sfx.click();
+});
+
+$('rainBtn').addEventListener('click', () => {
+  if (G.mode === 'smother') return;
+  Sfx.ensure();
+  if (G.mode === 'mission') {
+    if (G.rainCharges <= 0) return;
+    G.rainCharges--;
+    sim.rain(5);
+    toast('A timely rain ☂', true);
+  } else {
+    if (G.rainCD > 0) return;
+    sim.rain(5.5);
+    G.rainCD = 14;
+    toast('It is raining ☂');
+  }
+  Sfx.click();
+});
+
+$('resetBtn').addEventListener('click', () => {
+  Sfx.click();
+  if (G.mode === 'smother' && G.smother) startSmother(G.smother.diff.id);
+  else if (G.mode === 'mission' && G.mission) startMission(G.missionIndex);
+  else startSandbox(true);
+});
+
+$('mcQuit').addEventListener('click', () => startSandbox());
+
+$('playBtn').addEventListener('click', () => togglePause());
+
+function togglePause() {
+  if (G.ended) return;
+  G.paused = !G.paused;
+  stage.classList.toggle('paused', G.paused);
+  updatePlayIcon();
+  toast(G.paused ? 'Paused · press Space to resume' : 'Resumed');
+  Sfx.click();
+}
+
+function updatePlayIcon() {
+  $('playBtn').innerHTML = G.paused
+    ? '<svg viewBox="0 0 12 12"><path d="M3 1.6v8.8L10 6z" fill="currentColor"/></svg>'
+    : '<svg viewBox="0 0 12 12"><rect x="2.4" y="1.6" width="2.7" height="8.8" rx="1" fill="currentColor"/><rect x="6.9" y="1.6" width="2.7" height="8.8" rx="1" fill="currentColor"/></svg>';
+}
+
+$('soundBtn').addEventListener('click', () => Sfx.toggle());
+$('helpBtn').addEventListener('click', () => { Sfx.ensure(); openHelp(); });
+
+$('modeSwitch').addEventListener('click', (e) => {
+  const b = e.target.closest('button[data-mode]');
+  if (!b) return;
+  Sfx.ensure();
+  if (b.dataset.mode === 'missions') {
+    setModeUI('missions');
+    openMissions();
+  } else if (b.dataset.mode === 'smother') {
+    openSmotherMenu();
+  } else if (G.mode !== 'sandbox' || G.mission || G.smother) {
+    startSandbox();
+  } else {
+    closeModal();
+    setModeUI('sandbox');
+  }
+});
+
+$('qualitySeg').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-q]');
+  if (!b) return;
+  setQuality(Number(b.dataset.q));
+  Sfx.click();
+});
+document.querySelectorAll('#qualitySeg button').forEach((b) => {
+  b.classList.toggle('active', Number(b.dataset.q) === savedQuality);
+});
+
+document.addEventListener('keydown', (e) => {
+  if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
+  if (e.metaKey || e.ctrlKey || e.altKey) return;
+  const k = e.key;
+  if (k === 'Escape') {
+    if (G.modalOpen && !G.ended) closeModal();
+    return;
+  }
+  if (G.modalOpen) return;
+  if (k === ' ') {
+    e.preventDefault();
+    togglePause();
+    return;
+  }
+  if (k === 'm' || k === 'M') { Sfx.toggle(); return; }
+  if (k === 'r' || k === 'R') {
+    if (G.mode === 'smother' && G.smother) startSmother(G.smother.diff.id);
+    else if (G.mode === 'mission' && G.mission) startMission(G.missionIndex);
+    else startSandbox(true);
+    return;
+  }
+  if (k === '[' || k === ']') {
+    G.brush = clamp(G.brush + (k === ']' ? 1 : -1), 2, 14);
+    $('brushRange').value = G.brush;
+    $('brushVal').textContent = G.brush;
+    $('brushRange').style.setProperty('--p', ((G.brush - 2) / 12) * 100 + '%');
+    updateBrushRing();
+    return;
+  }
+  const tool = TOOLS.find((t) => t.key === k);
+  if (tool) { setTool(tool.id); Sfx.click(); }
+});
+
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden && (G.mode === 'mission' || G.mode === 'smother') && !G.ended) {
+    G.paused = true;
+    stage.classList.add('paused');
+    updatePlayIcon();
+  }
+});
+
+/* ------------------------------------------------------------- boot */
+sim.onExtinguish = (x, y) => {
+  if (G.mode !== 'mission' || G.ended) return;
+  const now = performance.now();
+  if (now - G.lastExt < 1500) G.combo = Math.min(6, G.combo + 1);
+  else G.combo = 1;
+  G.lastExt = now;
+  G.comboT = 1.6;
+  G.score += 12 * G.combo;
+  if (now - G.lastPopup > 80) {
+    G.lastPopup = now;
+    popup('+' + 12 * G.combo, x, y, G.combo >= 3);
+  }
+};
+
+sim.onExplode = () => {
+  Sfx.boom();
+  if (navigator.vibrate) navigator.vibrate(40);
+};
+
+$('sceneSeg').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-scene]');
+  if (!b) return;
+  Sfx.ensure();
+  setScene(b.dataset.scene);
+});
+
+buildToolGrid();
+setTool('wood');
+updatePlayIcon();
+startSandbox(true);
+updateMissionChrome();
+updateLiveUI(true);
+layoutStage();
+setTimeout(layoutStage, 60);
+setTimeout(layoutStage, 300);
+new ResizeObserver(() => requestAnimationFrame(layoutStage)).observe(document.querySelector('.stage-area'));
+window.addEventListener('resize', () => requestAnimationFrame(layoutStage));
+
+// hide the intro tip on first interaction / after a while
+function hideTip() {
+  G.tipShown = true;
+  $('stageTip').classList.remove('show');
+}
+setTimeout(() => { if (!G.tipShown) $('stageTip').classList.add('show'); }, 700);
+setTimeout(hideTip, 10000);
+window.addEventListener('pointerdown', hideTip, { once: true });
+
+window.__EMBER__ = { sim, G, MISSIONS, startMission, startSandbox };
+
+requestAnimationFrame(loop);
+
+</script>
+</body>
+</html>

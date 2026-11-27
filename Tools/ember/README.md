@@ -1,178 +1,248 @@
 # EMBER · Wildfire Lab
 
-An interactive fluid-fire sandbox that runs entirely in the browser. Paint materials, light them up, and then try to put the fire out — with wind, water, stone firebreaks, a dam, or your bare hands and a lot of wood.
+Two ways to play with fire — and put it out.
 
-Inspired by [Fluid Fire 3](https://escapermotions.com/) by Escape Motions (Peter Blaskovic). This is a from-scratch, vanilla-JavaScript reinterpretation that turns the toy into a small game you can actually win or lose.
+- **[EMBER 2D](ember-wildfire.html)** — a side-view fluid-fire sandbox: draw wood, stone and water, light it up, fight five missions, or play the four-difficulty Smother challenge.
+- **[EMBER 3D](ember-3d.html)** — a first-person firefighter: walk in with a hose, ride the aerial ladder or fly the firefighting drone, cool tanks before they BLEVE, breach the reservoir dam, and fight the six 3D locations.
 
-![Six sandbox presets](ember/shots/en-presets-montage.png)
+Both pages are fully English, both link to each other, and both run from the same folder. There is no build step or server needed to play.
+
+**2D → 3D:** the **3D VERSION** button in the 2D header (desktop) or **Play 3D Version** in the right-hand panel; the help dialog also links across.
+**3D → 2D:** the **2D version** button in the 3D menu.
+
+## What's new
+
+- **Aerial ladder truck** in every 3D scene — press **F** to ride the bucket, scroll to raise/lower it, and spray from up to 28 m while the truck keeps your tank filled.
+- **Firefighting drone** — press **G** to deploy, fly with **WASD** + **Space/C**, spray from the air, and press **G** to recall.
+- **Clearer fire and water** — larger additive flames, a pulsing fire glow, stronger fire light, a thick visible water jet, bigger droplets and splashes.
+- **Persistent fire sources** — the main fire in each 3D scenario keeps burning until you wet it, so a scene cannot auto-complete when the first flame dies.
+- **City fix** — the city has a street-level pallet fire plus a high balcony fire, and a minimum scenario time before a win.
+- **One project, two versions** — 2D and 3D are merged, both link to each other, and this is the single README for both.
 
 ## Quick start
 
-No install, no build step, no network requests:
-
 ```bash
-open ember-wildfire.html          # macOS
-# or just double-click the file, or drag it into Chrome
+open ember-wildfire.html     # 2D
+open ember-3d.html           # 3D
 ```
 
-If your browser is picky about `file://` (it usually is not here), serve the folder:
+Chrome or Edge is recommended. The 2D version also works on tablets and phones. The 3D version is desktop-first: it uses pointer lock for mouse look.
 
-```bash
-python3 -m http.server 8000
-# open http://localhost:8000/ember-wildfire.html
-```
+## At a glance
 
-Chrome or Edge is recommended. The game also works on phones and tablets with touch.
+| | EMBER 2D | EMBER 3D |
+| --- | --- | --- |
+| View | Side-on sandbox | First person, eye level |
+| You control | 8 drawing tools, wind, rain | A hose, a breach tool, movement, a water tank, an aerial ladder and a drone |
+| Fire | 240 × 135 fluid/cellular fire | 96 × 40 × 96 voxel fire and heat |
+| Scenes | 6 presets | 6 rebuilt 3D scenes |
+| Modes | Sandbox · 5 Missions · Smother | 6 Scenarios · Firestorm |
+| Difficulty | 4 Smother levels | 4 Firestorm levels |
+| Best for | Drawing, experimenting, free play | Immersion, firefighting, danger |
+| Renderer | Canvas 2D, 1×/2×/3× | Three.js WebGL, voxels + particles |
 
-## What is in the box
+---
 
-- **Fluid fire** — a 240×135 stable-fluids velocity field drives flames, smoke, heat and embers. Fire climbs, bends with the wind and throws spot fires.
-- **Materials that react** — wood, pine, stone, water, oil, ash, char, grass, soil, concrete, glass, metal and lamps all have their own fire/heat behaviour. Glass shatters, oil drums explode, timber floors carry fire up a high-rise, wet fuel resists ignition.
-- **6 sandbox presets** — blank canvas, forest cabin, deep forest, connected city towers, a large oil refinery and a dammed reservoir.
-- **5 missions** with objectives, stars and saved progress.
-- **Smother challenge** — an AI opponent that keeps igniting fires while you cover them with wood, across four difficulties.
-- **Three render qualities**, procedural sound, and a responsive desktop/mobile layout.
+# EMBER 2D
 
-## Controls
+A fluid-fire sandbox with six presets, five missions and a wood-smothering challenge.
+
+## 2D scenes
+
+| Preset | What is there |
+| --- | --- |
+| Blank | A bare valley with a little grass. Build anything. |
+| Forest | Pines, grass, a log cabin and a campfire. |
+| Deep Forest | A dense pine forest with no buildings. |
+| City | Four connected high-rises, glass facades, timber balconies and a small refinery. |
+| Refinery | Three oil tanks, a cooling tower, two distillation columns, a chimney and a flare stack. |
+| Reservoir | A dam, spillway, hydro plant and forest. Erase the dam to flood the valley. |
+
+## 2D controls
 
 | Input | Action |
 | --- | --- |
 | Left mouse / touch drag | Paint with the selected tool |
 | `1` … `8` | Wood, Pine, Stone, Water, Oil, Ignite, Wind, Erase |
-| `[` / `]` | Smaller / larger brush |
+| `[` / `]` | Brush size |
 | `Space` | Pause / resume |
-| `M` | Mute / unmute |
-| `R` | Restart the current scene, mission or challenge |
+| `M` | Mute |
+| `R` | Restart |
 | `Esc` | Close a dialog |
 
-**Wind** is different from the other tools: drag across the canvas to blow the fire in a direction. **Erase** clears materials and is the only way to break the reservoir dam.
+**Wind** is a drag tool: pull across the canvas to push fire. **Erase** removes materials and is the only way to break the reservoir dam.
 
-## Modes
+## 2D missions
 
-### Sandbox
-
-Six presets, all fully destructible:
-
-| Preset | What is there |
-| --- | --- |
-| Blank | A bare valley with a little grass. Build anything. |
-| Forest | Pines, grass, a cabin and a campfire. |
-| Deep Forest | A dense pine forest with no buildings. |
-| City | Four connected high-rise towers, glass facades, timber balconies, a small refinery. |
-| Refinery | Three oil tanks, a cooling tower, two distillation columns, a chimney and a flare stack. |
-| Reservoir | A dam, spillway, hydro plant and forest. Erase the dam to flood the valley. |
-
-### Missions
-
-Five hand-built missions unlock in order. Stars are based on how much forest or city survives; progress is stored in `localStorage` on the device.
+Five hand-built missions unlock in order; stars are based on how much forest or city survives, and progress is saved in `localStorage`.
 
 1. **Cabin Watch** — save the cabin and 60% of the trees.
-2. **Firebreak** — cut the grass with stone before the whole grove burns.
+2. **Firebreak** — cut the grass with stone before the grove burns.
 3. **Spot Fires** — two cabins, two oil drums, shifting wind.
 4. **Long Night** — three fires, three rains, 150 seconds.
-5. **City on Fire** — a high-rise and a refinery, with the reservoir dam available as a last resort.
+5. **City on Fire** — a high-rise and a refinery, with the reservoir dam as a last resort.
 
-![Mission select](ember/shots/301-en-missions.png)
+## 2D Smother challenge
 
-### Smother challenge
+The computer keeps igniting fires; you only have wood. Paint wood onto a burning cell or a fire source to smother it instantly; the wet wood resists fire for a while. Wood anywhere else becomes fuel. Clear every fire after the last ignition to win. The four levels tune ignitions, spawn interval, fire limit and time.
 
-The third tab is a different game. The computer ignites fires continuously; you only have wood.
+## 2D quality
 
-- **Paint wood onto a burning cell or a fire source** to smother it instantly. The wood left behind is wet and resists fire for a while.
-- **Wood painted anywhere else becomes fuel.** You can build structures, but the AI will happily set them alight.
-- Fire sources in the air are marked with a pulsing orange ring. Ignitions are announced on screen.
-- The **fire meter** shows how close the fire is to the failure limit. If it overflows, or the timer runs out, you lose.
-- The AI has a limited number of ignitions. **Smother every fire after the last ignition to win.**
-- Your best score for each difficulty is saved.
+The physics grid is always 240 × 135. The canvas is supersampled and every cell is painted with per-pixel material textures:
 
-| Difficulty | Ignitions | Ignite every | Max live sources | Fire limit | Time |
-| --- | ---: | ---: | ---: | ---: | ---: |
-| Easy | 8 | ~7 s | 2 | 500 | 2:00 |
-| Medium | 14 | ~5 s | 4 | 700 | 2:30 |
-| Hard | 22 | ~3.5 s | 6 | 950 | 3:00 |
-| Hell | 32 | ~2.4 s | 9 | 1300 | 3:30 |
+| Setting | Render resolution |
+| --- | --- |
+| Fast | 240 × 135 (1×) |
+| Clear | 480 × 270 (2×) — default |
+| Ultra | 720 × 405 (3×) |
 
-![Wood Smother](ember/shots/303-en-smother.png)
+![2D presets](2d/shots/en-presets-montage.png)
 
-## Render quality and performance
+![2D Smother](2d/shots/303-en-smother.png)
 
-The physics grid is always **240×135**. The canvas is supersampled and every cell is painted with a per-pixel material texture:
+---
 
-| Setting | Render resolution | Notes |
-| --- | --- | --- |
-| Fast | 240×135 (1×) | Cheapest; most pixelated |
-| Clear | 480×270 (2×) | **Default**; good balance |
-| Ultra | 720×405 (3×) | Sharpest; heaviest |
+# EMBER 3D
 
-The choice is in **Environment → Quality** and is remembered in `localStorage`.
+A first-person firefighter built on the same firefighting idea. You are on the ground, in the aerial bucket, or at the drone's camera — no god camera.
 
-On a 2021 MacBook Pro in Chrome, the heavy city mission runs at roughly **6–7 ms/frame at 2×** (well above 60 fps) and about 8 ms at 3×. The simulation uses 14 pressure-solver iterations, semi-Lagrangian advection, vorticity confinement and a cellular water/combustion layer.
+## 3D scenes
 
-If you see a locked ~30 fps:
+| Scene | What is in the 3D build |
+| --- | --- |
+| Training Yard | Fire station, training tower, four burning drums, aerial ladder truck, hydrants |
+| Forest Cabin | Pine forest, log cabin with porch and chimney, campfire, path, well |
+| Deep Forest | Dense pines only, no buildings, stream-side refill point |
+| City Skyline | Four connected high-rises, glass skybridges, shared podium mall, low-rises, park with fountain |
+| Refinery | 3 oil tanks, cooling tower with steam, 2 distillation columns, chimney, live flare, pipe racks, control room; tanks overheat and chain-BLEVE |
+| Reservoir | Large dam, gatehouse, spillway, hydro station, dock and boat, forest on the right; the dam can be breached and the lake drains into the valley |
 
-1. Switch the quality to **Fast** and check the FPS counter.
-2. Open `ember-wildfire.html` directly in Chrome rather than inside a preview pane or iframe — some embedded previews cap `requestAnimationFrame` at 30 Hz.
-3. Close other heavy tabs, or use a smaller browser window.
+Every 3D scene also includes an **aerial ladder truck** and a **firefighting drone**: the ladder is the tall, stable platform, and the drone is the fast flying option.
 
-## How it works
+## 3D controls
 
-The source lives in [`ember/`](ember/):
+| Input | Action |
+| --- | --- |
+| Mouse | Look |
+| `W A S D` | Move · `Shift` sprint · `Space` jump |
+| Left mouse | Spray water (hold) |
+| `E` | Hold near a hydrant, water point or the reservoir to refill |
+| `1` / `2` | Hose / breach tool |
+| `F` | Ride / leave the aerial ladder truck |
+| Mouse wheel (on ladder) | Raise / lower the aerial platform |
+| `G` | Deploy / recall the firefighting drone |
+| `Space` / `C` (drone) | Climb / descend |
+| `Esc` | Release mouse / pause |
+| `R` | Restart the current scenario |
+| `M` | Mute |
 
-```
+On foot, **Space** jumps. While flying the drone, **Space** climbs and **C** descends.
+
+## Aerial ladder and drone
+
+Both versions of the high-access kit are in the 3D game:
+
+- **Aerial ladder truck** — parked near the action in every scene. Walk up and press **F**. You ride the bucket up to 18 m (scroll to adjust between 5 m and 28 m), keep the hose, and the truck keeps your tank topped up while you are on the platform. The city spawn is within reach of the truck, so you can press F straight away.
+- **Firefighting drone** — press **G** to deploy. Fly with **WASD**, climb/descend with **Space / C**, look with the mouse, and hold the left mouse button to spray from the drone. Press **G** again to recall. The drone uses your water tank; fly it to a hydrant, water point or the reservoir and hold **E** to refill without landing. The drone camera sits just above the frame, with its arms and rotors visible below.
+
+The ladder is the stable high platform for sustained streams; the drone is the fast, flexible option for tower tops and canopy fires.
+
+The **breach tool** is the first-person erase tool. It breaks concrete, stone, wood and metal — including the reservoir dam. Open the dam and the shallow-water simulation floods the valley, dousing ground fires and lowering the lake.
+
+## 3D scenarios
+
+Each scene has an objective, a timer and a failure condition:
+
+- **Training** — put out every training fire.
+- **Forest Cabin** — save the cabin and 60% of the pines.
+- **Deep Forest** — save 40% of the forest.
+- **City Skyline** — save 55% of the city blocks.
+- **Refinery** — stop the tank fire before a BLEVE.
+- **Reservoir** — save the forest, or flood it.
+
+Fires are persistent **fire sources** until you wet them, so a scenario cannot finish just because the first flame burned out. The city has a street-level pallet fire plus a high balcony fire; look up and use the hose's long reach.
+
+## 3D Firestorm
+
+The city keeps reigniting. An orange beam marks each new ignition; you have one hose and a fire cap.
+
+| Difficulty | Ignitions | Interval | Fire cap | Time |
+| --- | ---: | ---: | ---: | ---: |
+| Easy | 8 | ~7 s | 500 | 2:30 |
+| Medium | 14 | ~5 s | 700 | 3:00 |
+| Hard | 22 | ~3.5 s | 900 | 3:30 |
+| Hell | 32 | ~2.4 s | 1200 | 4:00 |
+
+## 3D performance
+
+The 3D renderer is heavier than the 2D one. On a normal desktop GPU it runs smoothly; in a headless/software WebGL environment (automated screenshots) it can drop to a few frames per second. If it is slow:
+
+1. Use Chrome directly rather than an embedded preview.
+2. Use a smaller window; the renderer caps its pixel ratio at 1.5.
+3. The 2D version is much lighter and remains available.
+
+![3D menu](3d/shots/3d-hero-menu.png)
+
+![3D city fire](3d/shots/3d-hero-city.png)
+
+![3D water jet](3d/shots/3d-hero-water.png)
+
+![3D aerial ladder](3d/shots/3d-ladder.png)
+
+![3D drone water](3d/shots/3d-drone-water.png)
+
+---
+
+# Shared technology
+
+- **Vanilla JavaScript + Canvas 2D** for the 2D version.
+- **Three.js r150 + WebGL** for the 3D version.
+- Both are single-file builds with no external requests: CSS, JS, Three.js and screenshots are inlined or local.
+- The 2D simulation uses a 240 × 135 stable-fluids velocity field, 14 pressure iterations, semi-Lagrangian advection, vorticity confinement, and a cellular material layer for fire, water, glass, oil and steam.
+- The 3D simulation uses a 96 × 40 × 96 voxel grid at 2.4 m cells, typed arrays, a 12 Hz fire/heat tick with persistent fire sources, and a 20 Hz shallow-water field for the reservoir. Fire, smoke, water, steam and sparks are GPU point systems.
+- The 3D world is a single instanced box mesh with per-instance colours; glass windows are a separate emissive mesh so the city lights up at night.
+- The aerial ladder is a scene prop with an adjustable platform; the drone is a free-flying camera and water nozzle that uses the same raycast, water and extinguish code as the hose.
+
+## Project structure
+
+```text
 ember/
-├── index.html      # markup and canvas layers
-├── style.css       # dark UI, responsive layout
-├── sim.js          # fluid + fire + materials simulation
-├── city.js         # scene builders (city, refinery, reservoir, forest, blank)
-├── renderer.js     # Canvas2D supersampled renderer, textures, glow, embers
-├── ui.js           # state, tools, missions, smother AI, audio, game loop
-├── build.py        # inlines CSS + JS into the single-file deliverable
-└── shots/          # screenshots
+├── README.md
+├── .gitignore
+├── ember-wildfire.html      # built 2D single file
+├── ember-3d.html            # built 3D single file
+├── 2d/                      # 2D source
+│   ├── index.html
+│   ├── style.css
+│   ├── sim.js
+│   ├── city.js
+│   ├── renderer.js
+│   ├── ui.js
+│   ├── build.py
+│   └── shots/
+└── 3d/                      # 3D source
+    ├── index.html
+    ├── style.css
+    ├── world.js
+    ├── game.js
+    ├── three.min.js
+    ├── build.py
+    └── shots/
 ```
 
-### Simulation
-
-`sim.js` keeps all state in typed arrays over a 240×135 grid:
-
-- **Velocity** — semi-Lagrangian advection, buoyancy, vorticity confinement and a 14-iteration pressure projection. Solid cells are excluded from the velocity solve so plumes can rise out of a fire.
-- **Scalars** — temperature, smoke and flame are advected and diffused, then coupled back into the velocity field.
-- **Materials** — a cellular layer for wood, pine, stone, water, oil, ash, char, grass, soil, concrete, glass, metal and lamps. Each has fuel, heat resistance, conductivity and flammability.
-- **Combustion** — preheating, ignition, burn-down to char, embers, smoke and explosions.
-- **Water** — a cellular automaton with flow, soaking and evaporation; hot water becomes steam.
-- **Glass** — heated glass shatters into shards and can cut through the building.
-- **Fire sources** — used by Smother mode; an air cell that keeps burning until covered.
-- **Smother painting** — when the wood tool is used in Smother mode, painting a burning cell extinguishes it and creates wet wood.
-
-### Rendering
-
-`renderer.js` writes into an offscreen `ImageData` at 1×/2×/3×, then composites a low-resolution bloom, embers and fire-source rings. Materials get high-resolution procedural textures (wood grain, pine needles, glass reflections, stone speckle), which is what keeps the upscaled cells from looking like a plain pixel grid.
-
-`build.py` reads `index.html`, inlines `style.css` and all four JS files, and writes `../ember-wildfire.html`. Run it from `ember/`:
+## Build
 
 ```bash
-python3 build.py
+cd 2d && python3 build.py      # writes ../ember-wildfire.html
+cd 3d && python3 build.py      # writes ../ember-3d.html
 ```
 
-The output is a single self-contained HTML file with no external fonts, images or scripts.
-
-## Browser support
-
-Modern Chrome, Edge, Safari and Firefox. Requires Canvas 2D and (for sound) Web Audio. Touch painting works on mobile; the layout collapses to a single column. No server is required.
+Both build scripts use paths relative to their own folder, so the project can be cloned anywhere and rebuilt.
 
 ## Credits
 
-- Original concept and inspiration: **Fluid Fire 3** by [Escape Motions](https://escapermotions.com/) / Peter Blaskovic.
-- This implementation, code and scene art: built from scratch with vanilla JavaScript and Canvas 2D. No code or assets from the original are included.
-- Sound effects are synthesized at runtime with the Web Audio API.
-- Interface icons are inline SVG or emoji.
-
-## Notes and limitations
-
-- The physics grid is 240×135. The render is supersampled (up to 3×), but it is not a higher-resolution simulation; very fine channels and filaments are below the grid scale.
-- Mission wind is scripted; sandbox wind can be dragged freely.
-- The game is tuned for a desktop mouse. Touch works, but the Smother mode is harder on a phone.
-- This is a personal fan project, provided as-is for learning and personal use.
+Inspired by **Fluid Fire 3** by [Escape Motions](https://escapermotions.com/) / Peter Blaskovic. This is an independent, from-scratch implementation; no original code or assets are included. Sound effects are synthesized with the Web Audio API. Interface icons are inline SVG or emoji.
 
 ## License
 
-The MIT Licence. **Fluid Fire 3** and the Escape Motions name are the property of Escape Motions; this project is not affiliated with or endorsed by them.
+The source is provided for personal, non-commercial use. **Fluid Fire 3** and the Escape Motions name are the property of Escape Motions; this project is not affiliated with or endorsed by them.

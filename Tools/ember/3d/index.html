@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#06080b" />
+  <title>EMBER 3D · First-Person Firefighter</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <canvas id="scene"></canvas>
+  <div id="vignette"></div>
+  <div id="heat"></div>
+
+  <div id="hud" class="hidden">
+    <div class="hud-top-left">
+      <div class="hud-kicker" id="hudScene">CITY ON FIRE</div>
+      <div class="hud-objective" id="hudObjective">Extinguish every fire</div>
+      <div class="hud-progress" id="hudProgress"></div>
+    </div>
+    <div class="hud-top-right">
+      <div class="hud-stat"><span class="hud-stat-label">FIRES</span><b id="hudFires">0</b></div>
+      <div class="hud-stat"><span class="hud-stat-label">TIME</span><b id="hudTime">04:00</b></div>
+      <div class="hud-stat hidden" id="hudIgnitionsWrap"><span class="hud-stat-label">IGNITIONS</span><b id="hudIgnitions">0</b></div>
+    </div>
+    <div class="crosshair" id="crosshair"><span></span></div>
+    <div class="hud-prompt" id="hudPrompt"></div>
+    <div class="hud-bottom-left">
+      <div class="bar-row">
+        <span class="bar-icon">H₂O</span>
+        <div class="bar water"><i id="waterBar"></i></div>
+        <b id="waterText">140 L</b>
+      </div>
+      <div class="bar-row">
+        <span class="bar-icon">HP</span>
+        <div class="bar health"><i id="healthBar"></i></div>
+        <b id="healthText">100</b>
+      </div>
+    </div>
+    <div class="hud-bottom-right">
+      <div class="tool-pill"><span id="toolKey">1</span><b id="toolName">HOSE</b></div>
+      <div class="hud-hint">LMB spray · E refill · F ladder · G drone · Esc pause</div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <div id="lockOverlay" class="overlay hidden">
+    <div class="lock-card">
+      <div class="lock-badge">FIRST PERSON</div>
+      <h2 id="lockTitle">Take the hose</h2>
+      <p id="lockText">Click to lock the mouse and deploy. Mouse look · WASD move · Hold LMB to spray.</p>
+      <button class="btn primary" id="lockBtn" type="button">Click to deploy</button>
+      <div class="lock-keys">WASD move · Shift sprint · Space jump · E refill · F aerial ladder · G drone · Esc pause</div>
+    </div>
+  </div>
+
+  <div id="pause" class="overlay hidden">
+    <div class="panel">
+      <div class="panel-kicker">INCIDENT PAUSED</div>
+      <h2>Hold the line.</h2>
+      <p class="panel-sub">The fire is waiting.</p>
+      <div class="panel-actions">
+        <button class="btn ghost" id="pauseMenuBtn" type="button">Return to menu</button>
+        <button class="btn ghost" id="pauseRestartBtn" type="button">Restart scene</button>
+        <button class="btn primary" id="pauseResumeBtn" type="button">Resume</button>
+      </div>
+      <div class="panel-hint">Press Esc to release the mouse at any time.</div>
+    </div>
+  </div>
+
+  <div id="result" class="overlay hidden">
+    <div class="panel result-panel">
+      <div class="panel-kicker" id="resultKicker">INCIDENT CLOSED</div>
+      <h2 id="resultTitle">Fire out.</h2>
+      <p class="panel-sub" id="resultSub"></p>
+      <div class="result-stats" id="resultStats"></div>
+      <div class="panel-actions">
+        <button class="btn ghost" id="resultMenuBtn" type="button">Return to menu</button>
+        <button class="btn primary" id="resultRetryBtn" type="button">Deploy again</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="menu" class="overlay show">
+    <div class="menu-inner">
+      <header class="menu-head">
+        <div class="brand">
+          <div class="brand-mark">▲</div>
+          <div>
+            <h1>EMBER <span>3D</span></h1>
+            <p>FIRST-PERSON FIREFIGHTER</p>
+          </div>
+        </div>
+        <div class="menu-head-right">
+          <span class="desktop-note">Desktop · mouse + keyboard</span>
+          <a class="btn ghost small" href="ember-wildfire.html">2D version</a>
+        </div>
+      </header>
+      <div class="menu-hero">
+        <div class="menu-hero-copy">
+          <div class="hero-kicker">NO GOD VIEW · ONE HOSE · FIVE SCENES</div>
+          <p>Grab the nozzle. Walk into the heat. Cut a firebreak with water, cool a tank before it goes, or breach the dam and let the reservoir do the work.</p>
+        </div>
+        <div class="menu-hero-meta">
+          <div><b>WASD</b><span>MOVE</span></div>
+          <div><b>LMB</b><span>SPRAY</span></div>
+          <div><b>E</b><span>REFILL</span></div>
+          <div><b>F</b><span>LADDER</span></div>
+          <div><b>G</b><span>DRONE</span></div>
+        </div>
+      </div>
+      <nav class="menu-nav" id="menuNav">
+        <button class="active" data-tab="deploy" type="button">Deploy</button>
+        <button data-tab="firestorm" type="button">Firestorm</button>
+        <button data-tab="help" type="button">How to play</button>
+      </nav>
+      <div class="menu-list" id="menuList"></div>
+      <footer class="menu-foot">
+        <span>Inspired by Fluid Fire 3 · built from scratch with Three.js + Canvas textures</span>
+        <span>All fires are simulated. No pre-baked animation.</span>
+      </footer>
+    </div>
+  </div>
+
+  <noscript><p style="color:#fff;padding:20px">This game needs JavaScript and WebGL.</p></noscript>
+  <script src="three.min.js"></script>
+  <script src="world.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>

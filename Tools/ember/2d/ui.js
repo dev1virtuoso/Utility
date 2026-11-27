@@ -716,6 +716,7 @@ function openHelp() {
       <strong>Smother mode</strong>: the computer keeps igniting; paint wood onto fire to smother it. Wood anywhere else becomes fuel.<br>
       Shortcuts: <kbd>1</kbd>–<kbd>8</kbd> tools · <kbd>[</kbd> <kbd>]</kbd> brush size · <kbd>Space</kbd> pause · <kbd>M</kbd> mute · <kbd>R</kbd> reset<br>
       Inspired by <em>Fluid Fire 3</em> by Escape Motions (Peter Blaskovic). This version turns the canvas into a firefighting sandbox you can actually win or lose.
+      <br><a class="help-3d-link" href="ember-3d.html">Play the first-person 3D version →</a>
     </div>
   `);
 }

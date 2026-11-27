@@ -516,7 +516,8 @@ button { cursor: pointer; }
   0%, 100% { opacity: 0.35; transform: translate(-50%, -50%) scale(0.92); }
   30% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
 }
-@media (max-width: 640px) { .countdown { font-size: 56px; } }
+@media (max-width: 640px) {
+  .top-link { display: none; } .countdown { font-size: 56px; } }
 
 /* toasts & popups */
 .toasts {
@@ -719,6 +720,15 @@ button { cursor: pointer; }
 }
 
 .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 11px; }
+.top-link { display: inline-flex; align-items: center; gap: 4px; height: 30px; padding: 0 9px; border-radius: 7px; border: 1px solid rgba(255, 140, 80, 0.28); background: rgba(255, 110, 50, 0.07); color: var(--text); font-size: 9px; font-weight: 700; letter-spacing: 0.13em; text-decoration: none; white-space: nowrap; transition: 0.16s; }
+.top-link:hover { background: rgba(255, 110, 50, 0.15); border-color: rgba(255, 150, 90, 0.5); }
+.top-link-3d { color: var(--orange); }
+.top-link-arrow { color: var(--muted); font-size: 10px; }
+.action-3d { grid-column: 1 / -1; justify-content: center; border-color: rgba(255, 140, 80, 0.24); background: linear-gradient(180deg, rgba(255, 110, 50, 0.11), rgba(255, 110, 50, 0.035)); color: var(--text); text-decoration: none; }
+.action-3d:hover { border-color: rgba(255, 150, 90, 0.5); background: rgba(255, 110, 50, 0.14); }
+.action-3d em { color: var(--orange); }
+.help-3d-link { display: inline-block; margin-top: 11px; color: var(--orange); text-decoration: none; border-bottom: 1px solid rgba(255, 120, 60, 0.4); }
+.help-3d-link:hover { color: #ffb08a; border-color: #ffb08a; }
 .action-btn {
   height: 40px;
   display: flex;
@@ -1022,6 +1032,7 @@ kbd {
   .panel .panel-foot { grid-column: 1 / -1; }
 }
 @media (max-width: 640px) {
+  .top-link { display: none; }
   .topbar { padding: 0 12px; height: 56px; gap: 8px; }
   .brand-mark { width: 32px; height: 32px; border-radius: 10px; }
   .brand-copy h1 { font-size: 14px; }
@@ -1097,6 +1108,7 @@ kbd {
     </nav>
 
     <div class="top-actions">
+      <a class="top-link" href="ember-3d.html" title="Play the first-person 3D version"><span class="top-link-3d">3D</span> VERSION<span class="top-link-arrow">↗</span></a>
       <span class="hint-key">SPACE PAUSE · M MUTE</span>
       <button class="icon-btn" id="soundBtn" type="button" aria-label="Toggle sound" title="Sound (M)">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6.5 9H3v6h3.5L11 19V5z"/><path class="wave1" d="M15.5 8.5a5 5 0 0 1 0 7"/><path class="wave2" d="M18.5 6a9 9 0 0 1 0 12"/></svg>
@@ -1225,6 +1237,7 @@ kbd {
       <div class="panel-section actions">
         <button class="action-btn sky" id="rainBtn" type="button"><span>☂</span> Rain <em id="rainCount"></em></button>
         <button class="action-btn" id="resetBtn" type="button"><span>↺</span> Reset Scene</button>
+        <a class="action-btn action-3d" href="ember-3d.html"><span>▲</span> Play 3D Version <em>FIRST PERSON</em></a>
       </div>
 
       <div class="panel-foot">
@@ -3912,6 +3925,7 @@ function openHelp() {
       <strong>Smother mode</strong>: the computer keeps igniting; paint wood onto fire to smother it. Wood anywhere else becomes fuel.<br>
       Shortcuts: <kbd>1</kbd>–<kbd>8</kbd> tools · <kbd>[</kbd> <kbd>]</kbd> brush size · <kbd>Space</kbd> pause · <kbd>M</kbd> mute · <kbd>R</kbd> reset<br>
       Inspired by <em>Fluid Fire 3</em> by Escape Motions (Peter Blaskovic). This version turns the canvas into a firefighting sandbox you can actually win or lose.
+      <br><a class="help-3d-link" href="ember-3d.html">Play the first-person 3D version →</a>
     </div>
   `);
 }
